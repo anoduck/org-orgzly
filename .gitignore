@@ -1,7 +1,7 @@
 ### https://raw.github.com/github/gitignore/e5323759e387ba347a9d50f8b0ddd16502eb71d4/Global/Emacs.gitignore
 
 # undo tree
-*\.~undo-tree~
+*\.\~undo-tree\~
 
 # -*- mode: gitignore; -*-
 *~
