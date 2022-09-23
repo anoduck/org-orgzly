@@ -41,14 +41,43 @@
     today)
   "Define today.")
 
+(defvar orgzly-file-name
+  (setq orgzly-file-name (defun orgzly-file-name ()
+			   (expand-file-name
+			    (re-search-forward
+			     (concat "[0-9]\{4\}" "\-" "[0-9]\{2\}" "\-" "[0-9]\{2\}" "\.org")
+			     )
+			    )
+			   )
+	)
+  )
+
+;; If current buffer is visiting an org file with proper syntax,
+;; acquire date from file name. If not, get date from user.
+(defvar orgzly-date
+  (if (eq (buffer-name) orgzly-file-name)
+      (let ((orgzly-date (format-time-string (substring orgzly-file-name 0 10))))
+	orgzly-date)
+      (let ((orgzly-date(org-read-date(org-calendar-select))))
+    orgzly-date)
+    )
+  )
+
+    ;; "LET ORGZLY-DATE equal date from calendar.")
+
+;; Define orgzly today
+(defun orgzly-today ()
+  "Visit the orgzly file for today."
+  (find-file (expand-file-name (concat orgzly-path (format-time-string "%Y-%m-%d" orgzly-date) ".org"))))
+
 (defun orgzly-gen-week ()
   "Create 'org-agenda' for today and write."
   (org-batch-agenda "a"
-		    org-agenda-span (quote week)
+		    org-agenda-span-to-ndays (quote 7)
 		    org-agenda-include-diary nil
-		    org-agenda-files
+		    org-agenda-files (quote(org-agenda-files))
 		    )
-  (org-agenda-write (concat orgzly-path orgzly-today ".org"))
+  (org-agenda-write (concat orgzly-path orgzly-date ".org"))
     )
 
 
