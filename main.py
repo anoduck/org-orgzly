@@ -30,13 +30,16 @@
 # https://github.com/karlicoss/orgparse
 # https://orgparse.readthedocs.io/en/latest/
 # ---------------------------------------------------------------------------------
+# https://codeburst.io/building-beautiful-command-line-interfaces-with-python-26c7e1bb54df?gi=fc1f4289663e
+# https://click.palletsprojects.com/en/8.1.x/
 
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
 import orgparse
-from orgparse import *
+import datetime
 from datetime import date
+import click
 import re
 import pathlib
 import sys
@@ -45,25 +48,20 @@ import sys
 # Variables
 # --------------------------------------------------------
 sys.path.append(pathlib.posixpath.expanduser("~/.local/lib/python3.9"))
-org_file = pathlib.posixpath.expanduser("~/org/TODO.org")
-orgzly_dir = pathlib.posixpath.expanduser("~/orgzly")
-orgzly_file = orgzly_dir + "/" + "today.org"
-dones = ['done', 'canceled']
-
+# org_file = pathlib.posixpath.expanduser("~/org/TODO.org")
+dones = ['DONE', 'CANCELED']
 
 # ---------------------------------------------------------
 # The Beans
 # ---------------------------------------------------------
 
-def write_file(node):
-    orgparse.load(org_file).env.nodes
-    env = orgparse.OrgEnv()
-    dk = env.done_keys
-    if not bool(dk):
-        w = open(orgzly_file, "a", encoding="utf-8", newline="\n")  # noqa: E501
-        w.writelines(str(node))
-        w.write("\n")
-        w.close()
+def date_test(entry):
+    ndate = ""
+    if bool(entry.deadline):
+        ndate = str(entry.deadline)
+    elif bool(entry.scheduled) and not bool(entry.deadline):
+        ndate = str(entry.scheduled)
+    return ndate
 
 def extract_date(ndate):
     t = re.findall(r'\d+', ndate)
@@ -71,34 +69,77 @@ def extract_date(ndate):
     bdate = str(rd[0]) + '-' + str(rd[1]) + '-' + str(rd[2])
     return str(bdate)
 
-def date_test(node):
-    ndate = ""
-    if bool(node.deadline):
-        ndate = str(node.deadline)
-    elif bool(node.scheduled) and not bool(node.deadline):
-        ndate = str(node.scheduled)
-    return ndate
+    # An year is a leap year if it is a multiple of 4,
+    # multiple of 400 and not a multiple of 100.
+    # return int(years / 4) - int(years / 100) + int(years / 400)
 
-def gen_file(org_file):
-    dr = range(2, 200)
+def get_future(tdate, days):
+    y, m, d = [int(x) for x in str(tdate).split('-')]
+    d = d + days
+    monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if y%4==0 or y%400==0 and not y%100==0:
+        monthDays[1]=29
+    if d > monthDays[m] and m < 12:
+        m = m + 1
+        d = d - monthDays[m]
+    elif d > monthDays[m] and m >= 12:
+        m = m - 12
+        y = y + 1
+        d = d - monthDays[m]
+    print(d)
+    future_date = datetime.date(y, m, d)
+    return future_date
+
+
+@click.command()
+@click.option("--org_file", default=pathlib.posixpath.expanduser("~/org/TODO.org"), help="File to process")
+@click.option("--orgzly_file", default=pathlib.posixpath.expanduser("~/orgzly/tasks.org"), help="Full path to orgzly file to write to")
+@click.option("--days", default=int(7), help="integer for number of days you want to process for your file.")
+def gen_file(org_file, orgzly_file, days):
+    file = orgparse.load(org_file)
+    entries = list(file.children)
+    ent_num = len(entries)
+    print("Number of entries is: " + str(ent_num))
+    dr = list(range(1, ent_num))
     for y in dr:
-        if y > 2:
-            try:
-                file = orgparse.load(org_file)
-                node = file.children[int(y)]
-                if bool(node.has_date):
-                    ndate = date_test(node)
-                    newdate = extract_date(ndate)
-                    print(newdate)
-                    tdate = date.today()
-                    y1, m1, d1 = [int(x) for x in newdate.split('-')]
-                    date_org = date(y1, m1, d1)
-                    y2, m2, d2 = [int(x) for x in str(tdate).split('-')]
-                    date_today = date(y2, m2, d2)
-                    if date_today >= date_org:
-                        write_file(node)
-            except IndexError:
-                print("Index Error encountered")
+        print("Selected: " + str(y))
+        try:
+            entry = file.children[y]
+            if bool(entry.todo):
+                print("It has a todo")
+                ndate = date_test(entry)
+                print("Meets Date Requirements!")
+                newdate = extract_date(ndate) # < ---- Change this to orgdate and use context to extract what is needed.
+                print("Deadline date is" + str(newdate))
+                tdate = date.today()
+                y1, m1, d1 = [int(x) for x in newdate.split('-')]
+                date_org = datetime.date(y1, m1, d1)
+                y2, m2, d2 = [int(x) for x in str(tdate).split('-')]
+                date_today = datetime.date(y2, m2, d2)
+                print("Generating future_date")
+                future_date = get_future(tdate, days)
+                print("Future date is now Generated!")
+                if date_today >= date_org and future_date >= date_org:
+                    print("Entry meets all requirements")
+                    to_write = []
+                    if entry not in to_write:
+                        to_write.append(entry)
+                        print("Entry added to list")
+                    for x in to_write:
+                        w = open(orgzly_file, "a", encoding="utf-8", newline="\n")
+                        w.writelines(str(entry))
+                        w.write("\n")
+                        w.close()
+                        print("Entry added to file")
+                else:
+                    if future_date <= date_org:
+                        print("Dates do not fall within acceptable parameters. Due to: " + str(future_date) + " is less than " + str(date_org))
+                    elif future_date >= date_org:
+                        print("Dates do not meet parameters for some unknown reason or due to: " + str(date_today))
+                    else:
+                        print("There appears to be something wrong with: " + date_org)
+        except IndexError:
+            print("none found")
 
 if __name__ == '__main__':
-    gen_file(org_file)
+    gen_file()
