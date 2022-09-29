@@ -1,13 +1,10 @@
 <pre>
-  ___  ___  ___
- / _ \| _ \/ __|  ___
-| (_) |   / (_ | |___|
- \___/|_|_\\___|
+                                  _
+ ___ _ _ __ _ ___ ___ _ _ __ _ __| |_  _
+/ _ \ '_/ _` |___/ _ \ '_/ _` |_ / | || |
+\___/_| \__, |   \___/_| \__, /__|_|\_, |
+        |___/            |___/      |__/
 
-  ___  ___  ___ _____ __   __
- / _ \| _ \/ __|_  / |\ \ / /
-| (_) |   / (_ |/ /| |_\ V /
- \___/|_|_\\___/___|____|_|
 </pre>
 
 ## Org-Orgzly
@@ -71,7 +68,12 @@ The default options are:
 | orgzly_file | "~/orgzly/todo.org" |
 | days        | 7                   |
 
-There was one last significant bit of advice to offer... If only I could remember what exactly it was...
+
+#### Troubleshooting
+
+If you receive an error while running the script stating `file not found`, then create an empty file for your desired orgzly file. 
+This can simply be done with `touch /path/to/orgzly/todo.org`.
+
 
 ### TODO List
 
