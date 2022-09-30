@@ -11,22 +11,25 @@
 
 _A python application to parse and generate org files for syncing with orgzly._
 
+### What the hell is this?
 
-### Who needs ELisp anyway?
+A python script to make time management using orgzly more practical.
 
-*I probably do*
+#### What it does
 
-So, programming in elisp is not as fun as it should be. Then came the entire
-question of "What exactly are we attempting to accomplish here?". This put aside elisp
-for a spell, because it was easier to write something in a familiar language 
- while hashing out the details of this project, than both hashing out details and 
- learning elisp all at the same time.  
+This script takes a specified file or files, extracts org entries, parses the dates and TODO keyword, tests
+if they fall within the designated time range and if they possess an open status, and then writes those entries
+to a designated file within a designated directory.
 
-### Current Status
+#### Methodological Assumptions
 
-The script is taking shape, and works. It parses an orgfile extracts entries, tests if those 
-entries meet the specified parameters. If they do, then it writes those entries to a file the
-user designates in preparation to be synced with orgzly.  
+There are several assumptions made concerning time management and an individuals use of orgzly:
+
+* He/She does not desire to sync all of there org-agenda-files with orgzly.
+* They have found mobile management of org entries to be not as convenient as when using their local setup.
+* The individual does not desire to have tasks that are purely for syncing with orgzly.
+* Also the individual does not desire to have duplicate tasks in their org files on their local computer.
+* It would be more convenient to only have a few org entries on orgzly, rather than their entire set. 
 
 ### What is required:
 
