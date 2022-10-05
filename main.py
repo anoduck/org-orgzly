@@ -31,16 +31,15 @@
 # https://orgparse.readthedocs.io/en/latest/
 # ---------------------------------------------------------------------------------
 
-
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
 import orgparse
 import datetime
 from datetime import date
-import configobj
+# import configobj
 from configobj import ConfigObj
-import validate
+# import validate
 from validate import Validator
 # from configobj.validate import Validator
 import argparse
@@ -65,14 +64,13 @@ ORGZLY_HOME = os.path.join(HOME, 'orgzly')
 # Config File Spec
 # -----------------------------------------------------------------------
 cfg = """
-org_files = list(min=1, max=15, default=list('~/org/todo.org', '~/org/inbox.org'))
+org_files = list(min=1, max=15, default=['~/org/todo.org', '~/org/inbox.org'])
 orgzly_files = list(min=1, max=10, default=list('~/orgzly/todo.org',))
 org_inbox = string(default='~/org/inbox.org')
 orgzly_inbox = string(default='~/orgzly/inbox.org')
 days = integer(min=1, max=360, default=7)
 sync = boolean(default=False)
 """
-
 
 # ---------------------------------------------------------
 # Date Functions
@@ -117,7 +115,7 @@ def get_future(tdate, days):
 # Sync Back
 # TODO Rewrite to sync from orgzly FILES to org inbox
 # ----------------------------------------------------------
-def sync_back(org_files, orgzly_files, org_inbox):
+def sync_back(orgzly_files, org_inbox):
     to_sync = []
     for k in orgzly_files:
         f1 = orgparse.load(os.path.expanduser(org_inbox))
@@ -134,7 +132,6 @@ def sync_back(org_files, orgzly_files, org_inbox):
         w.writelines(str(n))
         w.write("\n")
         w.close()
-        print("Added new entries to org file.")
     print("New entries added to inbox")
 
 # ---------------------------------------------------------------------
@@ -147,31 +144,22 @@ def gen_file(org_files, orgzly_inbox, days):
         file = orgparse.load(os.path.expanduser(org_file))
         entries = list(file.children)
         ent_num = len(entries)
-        print("Number of entries is: " + str(ent_num))
         dr = list(range(0, ent_num))
         for y in dr:
-            print("Selected: " + str(y))
             try:
                 entry = file.children[y]
                 if bool(entry.todo):
-                    print("It has a todo")
                     ndate = date_test(entry)
-                    print("Meets Date Requirements!")
                     newdate = extract_date(ndate) # < ---- Change this to orgdate and use context to extract what is needed.
-                    print("Deadline date is" + str(newdate))
                     tdate = date.today()
                     y1, m1, d1 = [int(x) for x in newdate.split('-')]
                     date_org = datetime.date(y1, m1, d1)
                     y2, m2, d2 = [int(x) for x in str(tdate).split('-')]
                     date_today = datetime.date(y2, m2, d2)
-                    print("Generating future_date")
                     future_date = get_future(tdate, days)
-                    print("Future date is now Generated!")
                     if date_today >= date_org and future_date >= date_org:
-                        print("Entry meets all requirements")
                         if entry not in to_write:
                             to_write.append(entry)
-                            print("Entry added to list")
                     else:
                         if future_date <= date_org:
                             print("Dates do not fall within acceptable parameters. Due to: " + str(future_date) + " is less than " + str(date_org))
@@ -180,7 +168,7 @@ def gen_file(org_files, orgzly_inbox, days):
                         else:
                             print("There appears to be something wrong with: " + str(date_org))
             except IndexError:
-                print("none found")
+                print("No entry was found with a todo keyword")
         print(orgzly_inbox[0])
         inbox = os.path.expanduser(orgzly_inbox[0])
         for x in to_write:
@@ -188,9 +176,7 @@ def gen_file(org_files, orgzly_inbox, days):
             w.writelines(str(entry))
             w.write("\n")
             w.close()
-            print("Entry added to file")
-                    
-            
+
 # -------------------------------------------------------------------------------------------------------------------
 # Define Args
 # -------------------------------------------------------------------------------------------------------------------
@@ -206,7 +192,7 @@ def get_parser():
     parser.add_argument('-d', '--days', dest='days', metavar='Days', const=int, action='store_const', help='Number of days you want parsed for orgzly')
     parser.add_argument('-s', '--sync', action='store_false', help='Enables pulling entries from orgzly to org')
     return parser
-                
+
 # --------------------------------------------------------------------------------------------------------------------
 # The startup command
 # https://pyquestions.com/lists-in-configparser
@@ -215,16 +201,13 @@ def main(**args):
     parser = get_parser()
     args = parser.parse_args()
     # Set filename
-    filename = None
-    if filename is None:
-        filename = CONFIG_FILE
+    filename = CONFIG_FILE
     # Initiate config obj and spec
     spec = cfg.split("\n")
-    config = ConfigObj(filename, configspec=spec)
     if os.path.isfile(filename):
-        configspec = ConfigObj(CONFIGSPEC, encoding='UTF8', list_values=False)
-        config = ConfigObj(filename, configspec=configspec)
+        config = ConfigObj(filename, configspec=spec)
     else:
+        config = ConfigObj(filename, configspec=spec)
         config.filename = filename
         validator = validate.Validator()
         config.validate(validator, copy=True)
@@ -239,8 +222,8 @@ def main(**args):
     days = config['days']
     sync = config['sync']
     # Run Functions
-    gen_file(org_files, orgzly_files, days)
-    if sync == True:
+    gen_file(org_files, orgzly_inbox, days)
+    if sync:
         sync_back(org_files, orgzly_files, org_inbox)
         print("Sync Done.")
 
