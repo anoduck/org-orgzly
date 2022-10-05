@@ -17,9 +17,9 @@ A python script to make time management using orgzly more practical.
 
 #### What it does
 
-This script takes a specified file or files, extracts org entries, parses the dates and TODO keyword, tests
-if they fall within the designated time range and if they possess an open status, and then writes those entries
-to a designated file within a designated directory.
+This script takes a list of org files, extracts org entries from them, parses the dates and TODO keywords, tests
+if open entries fall within the designated time range of days, and then writes those entries
+to the inbox file in the orgzly directory.
 
 #### Methodological Assumptions
 
@@ -45,19 +45,37 @@ Required python libraries are:
 
 * orgparse
 * click
+* configobj
+* validate
+
+### The Configuration File
+
+The configuration file should be located in your `XDG_CONFIG_HOME` directory, if not, one should be created for you with the default
+values.
+
+__DO NOT TOUCH THE SPEC FILE, `configspec.ini`!__
 
 ### How to use it:
 
 ```bash
-Usage: main.py [OPTIONS]
+usage: main.py [-h] [-i Org Files] [-o Orgzly File] [-n Org Inbox File] [-p Orgzly Inbox File] [-d] [-s]
 
-Options:
-  --org_file TEXT     File to process
-  --orgzly_file TEXT  Full path to orgzly file to write to
-  --days INTEGER      integer for number of days you want to process for your
-                      file.
+Filters org entries and prepares them for sync with orgzly
 
-  --help              Show this message and exit.
+optional arguments:
+  -h, --help            show this help message and exit
+  -i Org Files, --org_files Org Files
+                        an org file to parse for entries
+  -o Orgzly File, --orgzly_files Orgzly File
+                        orgzly file to push entries to
+  -n Org Inbox File, --org_inbox Org Inbox File
+                        The org file you desire to push entries from orgzly to
+  -p Orgzly Inbox File, --orgzly_inbox Orgzly Inbox File
+                        The orgzly file you desire to push entries from orgzly to
+  -d, --days            Number of days you want parsed for orgzly
+  -s, --sync            Enables pulling entries from orgzly to org
+
+This would be something meaningful
 ```
 
 Navigate to the repository directory and run `python main.py [OPTIONS]` and it should process the desired file
@@ -65,11 +83,14 @@ and generate the other desired file in it's designated location.
 
 The default options are:
 
-| Option      | Default             |
-|-------------|---------------------|
-| org_file    | "~/org/TODO.org"    |
-| orgzly_file | "~/orgzly/todo.org" |
-| days        | 7                   |
+| Option       | Default             |
+|--------------|---------------------|
+| org_files    | "~/org/TODO.org"    |
+| orgzly_files | "~/orgzly/todo.org" |
+| org_inbox    | "~/org/inbox.org"   |
+| orgzly_inbox | "~/orgzly/inbox.org |
+| days         | 7                   |
+| sync         | false               |
 
 
 #### Troubleshooting
@@ -81,10 +102,11 @@ This can simply be done with `touch /path/to/orgzly/todo.org`.
 ### TODO List
 
 - [x] Do not add tasks after one week from today.
-- [ ] Create a configuration file. (Done before)
+- [x] Create a configuration file. (Done before)
+- [ ] Complete updating this dame readme file.
 - [ ] Allow other "todo keywords" other than "TODO", such as "NEXT", "OPEN", and "HOLD".
 - [ ] Allow inserting custom org file headings.
-- [ ] Allow it to handle multiple files. (should be no problem)
+- [x] Allow it to handle multiple files. (should be no problem)
 - [ ] Create an org-capture to add items to the orgzly file.
 - [x] Change node range to equate to count of nodes in file or files.
 
