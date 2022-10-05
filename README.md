@@ -53,7 +53,9 @@ Required python libraries are:
 The configuration file should be located in your `XDG_CONFIG_HOME` directory, if not, one should be created for you with the default
 values.
 
-__DO NOT TOUCH THE SPEC FILE, `configspec.ini`!__
+Copy the configspec file to your `~/.config` dir. (I forgot to do this automatically)
+
+__DO NOT MODIFY THE SPEC FILE, `configspec.ini`!__
 
 ### How to use it:
 
