@@ -39,10 +39,9 @@ import datetime
 from datetime import date
 # import configobj
 from configobj import ConfigObj
-# import validate
+import validate
 from validate import Validator
-# from configobj.validate import Validator
-import argparse
+# import argparse
 import re
 import pathlib
 import os
@@ -70,7 +69,16 @@ org_inbox = string(default='~/org/inbox.org')
 orgzly_inbox = string(default='~/orgzly/inbox.org')
 days = integer(min=1, max=360, default=7)
 sync = boolean(default=False)
+todos = list(min=1, max=10, default=['TODO', 'LATERS', 'HOLD', 'OPEN'])
+dones = list(min=1, max=10, default=['DONE', 'CLOSED', 'CANCELED'])
 """
+
+# ---------------------------------------------------------
+# Load keywords
+# ----------------------------------------------------------
+def load_keys(env, file):
+    add_file_keys = file.env.add_todo_keys
+    add_file_keys(todos=env.todo_keys, dones=env.done_keys)
 
 # ---------------------------------------------------------
 # Date Functions
@@ -98,8 +106,8 @@ def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
     d = d + int(days)
     monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    if y%4==0 or y%400==0 and not y%100==0:
-        monthDays[1]=29
+    if y % 4 == 0 or y % 400 == 0 and not y % 100 == 0:
+        monthDays[1] = 29
     if d > monthDays[m] and m < 12:
         m = m + 1
         d = d - monthDays[m]
@@ -137,18 +145,20 @@ def sync_back(orgzly_files, org_inbox):
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
-def gen_file(org_files, orgzly_inbox, days):
+def gen_file(org_files, env, orgzly_inbox, days):
     to_write = []
     for a in org_files:
         org_file = a
         file = orgparse.load(os.path.expanduser(org_file))
+        add_file_keys = file.env.add_todo_keys
+        add_file_keys(todos=env.todo_keys, dones=env.done_keys)
         entries = list(file.children)
         ent_num = len(entries)
         dr = list(range(0, ent_num))
         for y in dr:
             try:
                 entry = file.children[y]
-                if bool(entry.todo):
+                if bool(entry.env.todo_keys):
                     ndate = date_test(entry)
                     newdate = extract_date(ndate) # < ---- Change this to orgdate and use context to extract what is needed.
                     tdate = date.today()
@@ -177,29 +187,10 @@ def gen_file(org_files, orgzly_inbox, days):
             w.write("\n")
             w.close()
 
-# -------------------------------------------------------------------------------------------------------------------
-# Define Args
-# -------------------------------------------------------------------------------------------------------------------
-def get_parser():
-    parser = argparse.ArgumentParser(
-        description='Filters org entries and prepares them for sync with orgzly',
-        epilog='This would be nice if it were something meaningful')
-
-    parser.add_argument('-i', '--org_files', dest='org-files', action='append', help='an org file to parse for entries')
-    parser.add_argument('-o', '--orgzly_files', dest='orgzly_files', action='append', help='orgzly file to push entries to')
-    parser.add_argument('-n', '--org_inbox', dest='org_inbox', action='store', help='The org file you desire to push entries from orgzly to')
-    parser.add_argument('-p', '--orgzly_inbox', dest='orgzly_inbox', action='store', help='The orgzly file you desire to push entries from orgzly to')
-    parser.add_argument('-d', '--days', dest='days', metavar='Days', const=int, action='store_const', help='Number of days you want parsed for orgzly')
-    parser.add_argument('-s', '--sync', action='store_false', help='Enables pulling entries from orgzly to org')
-    return parser
-
 # --------------------------------------------------------------------------------------------------------------------
 # The startup command
-# https://pyquestions.com/lists-in-configparser
 # --------------------------------------------------------------------------------------------------------------------
-def main(**args):
-    parser = get_parser()
-    args = parser.parse_args()
+def main():
     # Set filename
     filename = CONFIG_FILE
     # Initiate config obj and spec
@@ -221,8 +212,14 @@ def main(**args):
     orgzly_inbox = config['orgzly_inbox']
     days = config['days']
     sync = config['sync']
+
+    # Set Org Environment <-- to avoid duplicates this can only be ran once.
+    env = orgparse.node.OrgEnv()
+    addkeys = env.add_todo_keys
+    addkeys(todos=config[todos], dones=config[dones])
+
     # Run Functions
-    gen_file(org_files, orgzly_inbox, days)
+    gen_file(org_files, env, orgzly_inbox, days)
     if sync:
         sync_back(org_files, orgzly_files, org_inbox)
         print("Sync Done.")
