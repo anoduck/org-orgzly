@@ -4,13 +4,13 @@ from setuptools import setup
 
 setup(
     name='org-orgzly',
-    version='0.0.1b',
+    version='0.0.1b3a',
     py_modules=['org-orgzly'],
     install_requires=[
-        'click',
         'orgparse',
         'configobj',
         'validate',
+        'dropbox',
     ],
     entry_points={
         'console_scripts': [
