@@ -36,11 +36,13 @@
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
+from hashlib import md5
 import orgparse
 import datetime
 from datetime import date
 import argparse
 from configobj import ConfigObj
+from six import b
 import validate
 import dropbox
 from dropbox import DropboxOAuth2FlowNoRedirect, files, exceptions
@@ -55,8 +57,9 @@ import time
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
 
 HOME = os.path.expanduser('~')
-XDG_CONFIG_HOME = os.getenv('XDG_CONFIG_HOME', os.path.join(HOME, '.config'))
+XDG_CONFIG_HOME = os.getenv('XDG_CONFIG_DIR', os.path.join(HOME, '.config'))
 CONFIG_FILE = os.path.join(XDG_CONFIG_HOME, 'org-orgzly', 'config.ini')
+DBX_CONFIG_FILE = os.path.join(XDG_CONFIG_HOME, 'org-orgzly', '.dbx.ini')
 CONFIGSPEC = os.path.join(XDG_CONFIG_HOME, 'org-orgzly', 'configspec.ini')
 ORG_HOME = os.path.join(HOME, 'org')
 ORGZLY_HOME = os.path.join(HOME, 'orgzly')
@@ -82,6 +85,7 @@ todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
 dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 """
 
+dbx_cfg = """refresh_token = string(default=REFRESH_TOKEN)"""
 # ---------------------------------------------------------
 # Date Functions
 # ---------------------------------------------------------
@@ -117,6 +121,43 @@ def get_future(tdate, days):
     print(d)
     future_date = datetime.date(y, m, d)
     return future_date
+
+# ---------------------------------------------------------------------
+# Dedupe
+# - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - --
+# Notes: Difficulties here are ensuring that hash generated from entries
+# Stay in sync with the respective entries that has was generated from.
+# So that unique entries are returned and not the hash that was used for
+# checking the duplicates.
+# ---------------------------------------------------------------------
+# def get_uniq_entries(control, test):
+#     cfile = orgparse.load(os.path.expanduser(control))
+#     tfile = orgparse.load(os.path.expanduser(test))
+#     cdr = list(range(0, len(cfile.children)))
+#     tdr = list(range(0, len(tfile.children)))
+#     uniq = []
+#     for q in cdr:
+#         ch_set = set()
+#         ce_set = set()
+#         c_entry = cfile.children[q]
+#         c_enc = str(c_entry).encode()
+#         c_hash = md5(c_enc()).hexdigest()
+#         if c_hash not in ch_set:
+#             ch_set.add(c_hash)
+#         if c_entry not in ce_set:
+#             ce_set.add(c_entry)
+#     for p in tdr:
+#         t_set = set()
+#         t_entry = tfile.children[p]
+#         t_enc = str(t_entry).encode()
+#         t_hash = md5(t_enc()).digest()
+#         if t_hash not in ch_set:
+#             if t_hash not in t_set:
+#                 t_set.add(t_hash)
+#     for r in t_set and r in t_entry:
+#         if r not in uniq:
+#             uniq.append(r)
+#     return uniq
 
 # ---------------------------------------------------------------------
 # The main function
@@ -210,80 +251,83 @@ def sync_back(orgzly_files, org_inbox):
 # --------------------------------------------------------------------------------------------------------------------
 # https://github.com/dropbox/dropbox-sdk-python/blob/master/example/updown.py
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-# Below is no longer in use.
-# -----------------------------------------------------------------------------
-# def list_folder(dbx, folder):
-#     """List a folder.
-#     Return a dict mapping unicode filenames to
-#     FileMetadata|FolderMetadata entries.
-#     """
-#     path = '/%s' % (folder)
-#     while '//' in path:
-#         path = path.replace('//', '/')
-#     path = path.rstrip('/')
-#     try:
-#         res = dbx.files_list_folder(path)
-#     except exceptions.ApiError as err:
-#         print('Folder listing failed for', path, '-- assumed empty:', err)
-#         return {}
-#     else:
-#         rv = {}
-#         for entry in res.entries:
-#             rv[entry.name] = entry
-#         folder_list = list(rv.keys())
-#         return folder_list
-# -------------------------------------------------------------------------------
 
 # Dropbox upload
-def dropbox_upload(dbx, fullname, folder, name, overwrite=False):
+def dropbox_upload(app_key, app_secret, fullname, folder, name, overwrite=True):
     """Upload a file.
     Return the request response, or None in case of error.
     """
-    path = '/%s/%s' % (folder, name)
-    print('path should be "/orgzly/todo.org" but is: ' + str(path))
-    while '//' in path:
-        path = path.replace('//', '/')
-    mode = (dropbox.files.WriteMode.overwrite
-            if overwrite
-            else dropbox.files.WriteMode.add)
-    print(fullname)
-    mtime = os.path.getmtime(fullname)
-    print(mtime)
-    with open(fullname, 'rb') as f:
-        data = f.read()
-    try:
-        res = dbx.files_upload(
-            data, path, mode,
-            client_modified=datetime.datetime(*time.gmtime(mtime)[:6]),
-            mute=True)
-    except exceptions.ApiError as err:
-        print('*** API error', err)
-        return None
-    print('uploaded as', res.name.encode('utf8'))
-    return res
+    config_dbx = ConfigObj(DBX_CONFIG_FILE)
+    REFRESH_TOKEN = config_dbx['dropbox_token']
+    with dropbox.Dropbox(
+            oauth2_refresh_token=str(REFRESH_TOKEN), app_key=app_key,
+            app_secret=app_secret) as dbx:
+        path = '/%s/%s' % (folder, name)
+        while '//' in path:
+            path = path.replace('//', '/')
+        mode = (dropbox.files.WriteMode.overwrite
+                if overwrite
+                else dropbox.files.WriteMode.add)
+        mtime = os.path.getmtime(fullname)
+        client_modified = datetime.datetime(*time.gmtime(mtime)[:6])
+        with open(fullname, 'rb') as f:
+            data = f.read()
+        try:
+            res = dbx.files_upload(
+                data, path, mode, client_modified=client_modified, mute=True)
+        except exceptions.ApiError as err:
+            print('*** API error', err)
+            return None
+        # print('uploaded as', res.name.encode('utf8'))
+        return res
 
 # Dropbox Download
-def dropbox_download(dbx, folder, name):
+def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
     Return the bytes of the file, or None if it doesn't exist.
     """
-    path = '/%s/%s' % (folder, name)
-    while '//' in path:
-        path = path.replace('//', '/')
-    try:
-        md, res = dbx.files_download(path)
-    except exceptions.HttpError as err:
-        print('*** HTTP error', err)
-        return None
-    data = res.content
-    print(len(data), 'bytes; md:', md)
-    return data
+    config_dbx = ConfigObj(DBX_CONFIG_FILE)
+    REFRESH_TOKEN = config_dbx['dropbox_token']
+    # with dropbox.Dropbox(oauth2_refresh_token=token, app_key=app_key) as dbx:
+    with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
+                         app_key=app_key, app_secret=app_secret) as dbx:
+        path = '/%s/%s' % (folder, name)
+        while '//' in path:
+            path = path.replace('//', '/')
+        try:
+            md, res = dbx.files_download(path)
+        except exceptions.HttpError as err:
+            print('*** HTTP error', err)
+            return None
+        data = res.content
+        # print(len(data), 'bytes; md:', md)
+        return data
+
+# -------------------------------------------------------------------------------------
+# Write refresh_token
+# -------------------------------------------------------------------------------------
+def write_refresh(REFRESH_TOKEN):
+    filename = DBX_CONFIG_FILE
+    if not os.path.isfile(filename):
+        # config = ConfigObj(filename, configspec=dbx_cfg)
+        config = ConfigObj()
+        config['dropbox_token'] = REFRESH_TOKEN
+        # validator = validate.Validator()
+        # config.validate(validator, copy=True)
+        config.filename = filename
+        config.write()
+    else:
+        config = ConfigObj(filename, configspec=dbx_cfg)
+        config['dropbox_token'] = REFRESH_TOKEN
+        config.write()
+    print('Dropbox refresh token acuired and saved')
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
 # -------------------------------------------------------------------------------------
 def get_access_token(key, sec):
-    auth_flow = DropboxOAuth2FlowNoRedirect(key, sec)
+    auth_flow = DropboxOAuth2FlowNoRedirect(key, sec,
+                                            token_access_type='offline')
     authorize_url = auth_flow.start
     print("1. Go to: " + str(authorize_url()))
     print("2. Click \"Allow\" (you might have to log in first).")
@@ -296,15 +340,13 @@ def get_access_token(key, sec):
         print('Error: %s' % (e,))
         exit(1)
 
-    ACCESS_TOKEN = oauth_result.access_token
-    return ACCESS_TOKEN
+    # ACCESS_TOKEN = oauth_result.access_token
+    write_refresh(oauth_result.refresh_token)
 
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_folder):
     upl = []
-    ACCESS_TOKEN = get_access_token(app_key, app_secret)
-    dbx = dropbox.Dropbox(ACCESS_TOKEN)
     folder = dropbox_folder
     orgzly_path = os.path.expanduser(orgzly_folder)
     dirlist = os.listdir(orgzly_path)
@@ -315,15 +357,13 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_folder):
             real_file = str(orgzly_path) + '/' + str(k)
             fullname = os.path.realpath(real_file)
             name = os.path.basename(real_file)
-            dropbox_upload(dbx, fullname, folder, name)
+            dropbox_upload(app_key, app_secret, fullname, folder, name)
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_inbox):
-    ACCESS_TOKEN = get_access_token(app_key, app_secret)
-    dbx = dropbox.Dropbox(ACCESS_TOKEN)
     inbox_path = os.path.expanduser(orgzly_inbox)
     folder = dropbox_folder
     name = os.path.basename(inbox_path)
-    data = dropbox_download(dbx, folder, name)
+    data = dropbox_download(app_key, app_secret, folder, name)
     fullname = inbox_path
     stuff = str(data).rsplit("\\n")
     sr = list(range(0, len(stuff)))
@@ -341,7 +381,6 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_inbox):
 # --------------------------------------------------------------------------------------------------------------------
 def main():
     filename = CONFIG_FILE
-    print(filename)
     # Setup of ConfigObj
     config = ConfigObj()
     spec = cfg.split("\n")
@@ -360,7 +399,8 @@ def main():
     # ArgParse Setup
     p = argparse.ArgumentParser(
             prog='org-orgzly',
-            usage='%(prog)s.py [ --push | --pull | --put | --get ]',
+            usage='%(prog)s.py [ --push | --pull | --put | --get ] '
+            'or --dropbox_token',
             description='Makes managing your org schedule '
             'easier for mobile, by reducing the amount of entries '
             'you take with you.',
@@ -377,6 +417,8 @@ def main():
                    help='Upload orgzly files to dropbox')
     p.add_argument('--get', action='store_true',
                    help='Download orgzly files from dropbox')
+    p.add_argument('--dropbox_token', action='store_true',
+                   help='Fetch initial Access Token')
 
     args = p.parse_args()
 
@@ -401,6 +443,8 @@ def main():
     if args.get:
         dropbox_get(config['app_key'], config['app_secret'],
                     config['dropbox_folder'], config['orgzly_inbox'])
+    if args.dropbox_token:
+        get_access_token(config['app_key'], config['app_secret'])
 
 if __name__ == '__main__':
     main()
