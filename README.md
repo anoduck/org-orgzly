@@ -65,8 +65,8 @@ The default configuration varables are as follows:
 | app_secret   | "Change This"       |
 | dropbox_folder | "/orgzly"         |
 | orgzly_folder | "~/orgzly"         |
-| org_files    | "~/org/todo.org"    |
-| orgzly_files | "~/orgzly/todo.org" |
+| org_files    | ["~/org/todo.org", "~/org/inbox.org"] |
+| orgzly_files | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] |
 | org_inbox    | "~/org/inbox.org"   |
 | orgzly_inbox | "~/orgzly/inbox.org |
 | days         | 7                   |

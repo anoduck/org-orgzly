@@ -42,7 +42,6 @@ import datetime
 from datetime import date
 import argparse
 from configobj import ConfigObj
-from six import b
 import validate
 import dropbox
 from dropbox import DropboxOAuth2FlowNoRedirect, files, exceptions
@@ -67,7 +66,7 @@ CWD = os.path.curdir
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.1b2c'
+VERSION = '0.0.3'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -77,7 +76,7 @@ app_secret = string(default='Replace with your dropbox app secret')
 dropbox_folder = string(default='orgzly')
 orgzly_folder = string(default='~/orgzly')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
-orgzly_files = list(default=list('~/orgzly/todo.org',))
+orgzly_files = list(default=list('~/orgzly/todo.org', '~/orgzly/inbox.org'))
 org_inbox = string(default='~/org/inbox.org')
 orgzly_inbox = string(default='~/orgzly/inbox.org')
 days = integer(default=7)
@@ -124,40 +123,29 @@ def get_future(tdate, days):
 
 # ---------------------------------------------------------------------
 # Dedupe
-# - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - -- - --
-# Notes: Difficulties here are ensuring that hash generated from entries
-# Stay in sync with the respective entries that has was generated from.
-# So that unique entries are returned and not the hash that was used for
-# checking the duplicates.
 # ---------------------------------------------------------------------
-# def get_uniq_entries(control, test):
-#     cfile = orgparse.load(os.path.expanduser(control))
-#     tfile = orgparse.load(os.path.expanduser(test))
-#     cdr = list(range(0, len(cfile.children)))
-#     tdr = list(range(0, len(tfile.children)))
-#     uniq = []
-#     for q in cdr:
-#         ch_set = set()
-#         ce_set = set()
-#         c_entry = cfile.children[q]
-#         c_enc = str(c_entry).encode()
-#         c_hash = md5(c_enc()).hexdigest()
-#         if c_hash not in ch_set:
-#             ch_set.add(c_hash)
-#         if c_entry not in ce_set:
-#             ce_set.add(c_entry)
-#     for p in tdr:
-#         t_set = set()
-#         t_entry = tfile.children[p]
-#         t_enc = str(t_entry).encode()
-#         t_hash = md5(t_enc()).digest()
-#         if t_hash not in ch_set:
-#             if t_hash not in t_set:
-#                 t_set.add(t_hash)
-#     for r in t_set and r in t_entry:
-#         if r not in uniq:
-#             uniq.append(r)
-#     return uniq
+def get_uniq_entries(test, control):
+    tfile = orgparse.load(os.path.expanduser(test))
+    cfile = orgparse.load(os.path.expanduser(control))
+    uniq = []
+    for t in tfile.children:
+        test_dict = {}
+        if t.todo is not None:
+            test_enc = str(t).encode()
+            test_hash = md5(test_enc).hexdigest()
+            if test_hash not in list(test_dict.keys()):
+                test_dict.setdefault(test_hash, t)
+    for c in cfile.children:
+        if c.todo is not None:
+            con_list = []
+            c_enc = str(c).encode()
+            c_hash = md5(c_enc).hexdigest()
+            if c_hash not in con_list:
+                con_list.append(c_hash)
+    for m in list(test_dict.keys()):
+        if m not in con_list:
+            uniq.append(test_dict[m])
+    return uniq
 
 # ---------------------------------------------------------------------
 # The main function
@@ -216,19 +204,18 @@ def gen_file(env, org_files, orgzly_inbox, days):
 # Sync Back
 # ----------------------------------------------------------
 def sync_back(orgzly_files, org_inbox):
-    to_sync = []
-    for k in orgzly_files:
-        f1 = orgparse.load(os.path.expanduser(org_inbox))
-        f2 = orgparse.load(os.path.expanduser(k))
-        ent1 = list(f1.env.nodes)
-        ent2 = list(f2.env.nodes)
-        dr = list(range(0, len(f2.env.nodes)))
-        for q in dr:
-            for x in ent2[q]:
-                if x not in ent1:
-                    if x not in to_sync:
-                        to_sync.append(x)
-    for n in to_sync:
+    node_list = []
+    for e in orgzly_files:
+        uniq = get_uniq_entries(e, org_inbox)
+        node_list.extend(uniq)
+    for o in node_list:
+        hash_dict = {}
+        if o.todo is not None:
+            o_enc = str(o).encode()
+            o_hash = md5(o_enc).hexdigest()
+            if o_hash not in list(hash_dict.keys()):
+                hash_dict.setdefault(o_hash, o)
+    for n in list(hash_dict.values()):
         w = open(os.path.expanduser(org_inbox),
                  "a", encoding="utf-8", newline="\n")
         w.writelines(str(n))
@@ -278,7 +265,6 @@ def dropbox_upload(app_key, app_secret, fullname, folder, name, overwrite=True):
         except exceptions.ApiError as err:
             print('*** API error', err)
             return None
-        # print('uploaded as', res.name.encode('utf8'))
         return res
 
 # Dropbox Download
@@ -288,7 +274,6 @@ def dropbox_download(app_key, app_secret, folder, name):
     """
     config_dbx = ConfigObj(DBX_CONFIG_FILE)
     REFRESH_TOKEN = config_dbx['dropbox_token']
-    # with dropbox.Dropbox(oauth2_refresh_token=token, app_key=app_key) as dbx:
     with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
                          app_key=app_key, app_secret=app_secret) as dbx:
         path = '/%s/%s' % (folder, name)
@@ -300,7 +285,6 @@ def dropbox_download(app_key, app_secret, folder, name):
             print('*** HTTP error', err)
             return None
         data = res.content
-        # print(len(data), 'bytes; md:', md)
         return data
 
 # -------------------------------------------------------------------------------------
@@ -309,11 +293,8 @@ def dropbox_download(app_key, app_secret, folder, name):
 def write_refresh(REFRESH_TOKEN):
     filename = DBX_CONFIG_FILE
     if not os.path.isfile(filename):
-        # config = ConfigObj(filename, configspec=dbx_cfg)
         config = ConfigObj()
         config['dropbox_token'] = REFRESH_TOKEN
-        # validator = validate.Validator()
-        # config.validate(validator, copy=True)
         config.filename = filename
         config.write()
     else:
@@ -340,7 +321,6 @@ def get_access_token(key, sec):
         print('Error: %s' % (e,))
         exit(1)
 
-    # ACCESS_TOKEN = oauth_result.access_token
     write_refresh(oauth_result.refresh_token)
 
 # -------------------------------------------------------------------------------------
@@ -359,25 +339,30 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_folder):
             name = os.path.basename(real_file)
             dropbox_upload(app_key, app_secret, fullname, folder, name)
 
-def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_inbox):
-    inbox_path = os.path.expanduser(orgzly_inbox)
+def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_folder):
+    dwl = []
     folder = dropbox_folder
-    name = os.path.basename(inbox_path)
-    data = dropbox_download(app_key, app_secret, folder, name)
-    fullname = inbox_path
-    stuff = str(data).rsplit("\\n")
-    sr = list(range(0, len(stuff)))
-    for h in sr:
-        line = stuff[h]
-        with open(fullname, "a", encoding="utf-8", newline="\n") as w:
-            w.write(line)
-            w.write("\n")
-            w.close()
+    dirlist = os.listdir(os.path.expanduser(orgzly_folder))
+    for j in dirlist:
+        if j not in dwl:
+            dwl.append(j)
+        for k in dwl:
+            real_file = os.path.join(orgzly_folder, k)
+            fullname = os.path.realpath(real_file)
+            name = os.path.basename(real_file)
+            data = dropbox_download(app_key, app_secret, folder, name)
+            stuff = str(data).rsplit("\\n")
+            sr = list(range(0, len(stuff)))
+            for h in sr:
+                line = stuff[h]
+                with open(fullname, "a", encoding="utf-8", newline="\n") as w:
+                    w.write(line)
+                    w.write("\n")
+                    w.close()
     print('Get Complete')
 
 # --------------------------------------------------------------------------------------------------------------------
 # The startup command
-# https://bw2.github.io/ConfigArgParse/configargparse.ArgumentParser.html
 # --------------------------------------------------------------------------------------------------------------------
 def main():
     filename = CONFIG_FILE
@@ -409,6 +394,8 @@ def main():
 
     p.add_argument('--version', action='version',
                    version='org-orgzly ' + VERSION)
+    p.add_argument('--dropbox_token', action='store_true',
+                   help='Fetch initial Access Token')
     p.add_argument('--push', action='store_true',
                    help='Parse files and push them to orgzly')
     p.add_argument('--pull', action='store_true',
@@ -417,12 +404,9 @@ def main():
                    help='Upload orgzly files to dropbox')
     p.add_argument('--get', action='store_true',
                    help='Download orgzly files from dropbox')
-    p.add_argument('--dropbox_token', action='store_true',
-                   help='Fetch initial Access Token')
 
     args = p.parse_args()
 
-    # Set Org Environment <-- to avoid duplicates this can only be ran once.
     env = orgparse.node.OrgEnv()
     addkeys = env.add_todo_keys
     addkeys(todos=config['todos'], dones=config['dones'])
@@ -442,7 +426,7 @@ def main():
                     config['dropbox_folder'], config['orgzly_folder'])
     if args.get:
         dropbox_get(config['app_key'], config['app_secret'],
-                    config['dropbox_folder'], config['orgzly_inbox'])
+                    config['dropbox_folder'], config['orgzly_files'])
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
 
