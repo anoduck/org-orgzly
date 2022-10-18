@@ -128,6 +128,7 @@ def get_uniq_entries(test, control):
     tfile = orgparse.load(os.path.expanduser(test))
     cfile = orgparse.load(os.path.expanduser(control))
     uniq = []
+    con_list = []
     for t in tfile.children:
         test_dict = {}
         if t.todo is not None:
@@ -137,7 +138,6 @@ def get_uniq_entries(test, control):
                 test_dict.setdefault(test_hash, t)
     for c in cfile.children:
         if c.todo is not None:
-            con_list = []
             c_enc = str(c).encode()
             c_hash = md5(c_enc).hexdigest()
             if c_hash not in con_list:
@@ -146,6 +146,7 @@ def get_uniq_entries(test, control):
         if m not in con_list:
             uniq.append(test_dict[m])
     return uniq
+
 
 # ---------------------------------------------------------------------
 # The main function
@@ -399,6 +400,8 @@ def main():
     env = orgparse.node.OrgEnv()
     addkeys = env.add_todo_keys
     addkeys(todos=config['todos'], dones=config['dones'])
+
+    # check that files exist and create if missing:
 
     # Run the gambit of args vs config
     if args.push:
