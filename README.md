@@ -64,7 +64,6 @@ The default configuration varables are as follows:
 | app_key      | "Change This"       |
 | app_secret   | "Change This"       |
 | dropbox_folder | "/orgzly"         |
-| orgzly_folder | "~/orgzly"         |
 | org_files    | ["~/org/todo.org", "~/org/inbox.org"] |
 | orgzly_files | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] |
 | org_inbox    | "~/org/inbox.org"   |
@@ -79,7 +78,6 @@ For redundancy, the configuration file spec is as follows:
 app_key = string(default='Replace with your dropbox app key')
 app_secret = string(default='Replace with your dropbox app secret')
 dropbox_folder = string(default='orgzly')
-orgzly_folder = string(default='~/orgzly')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
 orgzly_files = list(default=list('~/orgzly/todo.org',))
 org_inbox = string(default='~/org/inbox.org')

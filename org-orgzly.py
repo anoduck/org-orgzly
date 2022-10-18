@@ -40,8 +40,8 @@ from hashlib import md5
 import orgparse
 import datetime
 from datetime import date
-import argparse
 from configobj import ConfigObj
+import argparse
 import validate
 import dropbox
 from dropbox import DropboxOAuth2FlowNoRedirect, files, exceptions
@@ -63,6 +63,7 @@ CONFIGSPEC = os.path.join(XDG_CONFIG_HOME, 'org-orgzly', 'configspec.ini')
 ORG_HOME = os.path.join(HOME, 'org')
 ORGZLY_HOME = os.path.join(HOME, 'orgzly')
 CWD = os.path.curdir
+PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
@@ -74,7 +75,6 @@ cfg = """
 app_key = string(default='Replace with your dropbox app key')
 app_secret = string(default='Replace with your dropbox app secret')
 dropbox_folder = string(default='orgzly')
-orgzly_folder = string(default='~/orgzly')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
 orgzly_files = list(default=list('~/orgzly/todo.org', '~/orgzly/inbox.org'))
 org_inbox = string(default='~/org/inbox.org')
@@ -85,6 +85,7 @@ dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 """
 
 dbx_cfg = """refresh_token = string(default=REFRESH_TOKEN)"""
+
 # ---------------------------------------------------------
 # Date Functions
 # ---------------------------------------------------------
@@ -117,7 +118,6 @@ def get_future(tdate, days):
         m = m - 12
         y = y + 1
         d = d - monthDays[m]
-    print(d)
     future_date = datetime.date(y, m, d)
     return future_date
 
@@ -325,40 +325,29 @@ def get_access_token(key, sec):
 
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
-def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_folder):
-    upl = []
+def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
-    orgzly_path = os.path.expanduser(orgzly_folder)
-    dirlist = os.listdir(orgzly_path)
-    for j in dirlist:
-        if j not in upl:
-            upl.append(j)
-        for k in upl:
-            real_file = str(orgzly_path) + '/' + str(k)
-            fullname = os.path.realpath(real_file)
-            name = os.path.basename(real_file)
-            dropbox_upload(app_key, app_secret, fullname, folder, name)
+    for k in orgzly_files:
+        path = os.path.expanduser(k)
+        fullname = os.path.realpath(path)
+        name = os.path.basename(path)
+        dropbox_upload(app_key, app_secret, fullname, folder, name)
 
-def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_folder):
-    dwl = []
+def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
-    dirlist = os.listdir(os.path.expanduser(orgzly_folder))
-    for j in dirlist:
-        if j not in dwl:
-            dwl.append(j)
-        for k in dwl:
-            real_file = os.path.join(orgzly_folder, k)
-            fullname = os.path.realpath(real_file)
-            name = os.path.basename(real_file)
-            data = dropbox_download(app_key, app_secret, folder, name)
-            stuff = str(data).rsplit("\\n")
-            sr = list(range(0, len(stuff)))
-            for h in sr:
-                line = stuff[h]
-                with open(fullname, "a", encoding="utf-8", newline="\n") as w:
-                    w.write(line)
-                    w.write("\n")
-                    w.close()
+    for k in orgzly_files:
+        path = os.path.expanduser(k)
+        fullname = os.path.realpath(path)
+        name = os.path.basename(path)
+        data = dropbox_download(app_key, app_secret, folder, name)
+        stuff = str(data).rsplit("\\n")
+        sr = list(range(0, len(stuff)))
+        for h in sr:
+            line = stuff[h]
+            with open(fullname, "a", encoding="utf-8", newline="\n") as w:
+                w.write(line)
+                w.write("\n")
+                w.close()
     print('Get Complete')
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -423,7 +412,7 @@ def main():
         sync_back(orgzly_files, org_inbox)
     if args.put:
         dropbox_put(config['app_key'], config['app_secret'],
-                    config['dropbox_folder'], config['orgzly_folder'])
+                    config['dropbox_folder'], config['orgzly_files'])
     if args.get:
         dropbox_get(config['app_key'], config['app_secret'],
                     config['dropbox_folder'], config['orgzly_files'])
