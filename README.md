@@ -116,6 +116,8 @@ and run it where ever. All should work since I like to keep things together in a
 The intention of the above "flagged commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
 
+![Intended WorkFlow](https://www.plantuml.com/plantuml/svg/RP5DJiCm48NNzIc6R08B8q5PiOXAnJqYaqn-L2SJJHof17ftFBLJMZMhLlC-lVTPsOtEi9iwgnvSWnr2Oue3igh8biX0N8CP_G_yg4tLMeIs_wBZy-MUjtqC79LqTNUaJbSji_sMmDAysYJ1QfK4eQl1ewcfbx9yC3oYfES_bwYS1jiMnc5UD5WS1F0dL8MbgOHFfi4lolwT5mUl5J6EOlTc7Cms9oz735fdGGVU8Nby-NY2LEjX6fiK7CMfH0L2M4jp8FVhfEHQ_sR04NoDd4kzuVAQH77avAbXUnksQ_HanTJziuBSZ6_tw-WoduLFV6RVuhwraLrCTzYNKsV_0000)
+
 ```plantuml
 @startuml
 collections org as or {
