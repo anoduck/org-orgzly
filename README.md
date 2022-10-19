@@ -1,9 +1,9 @@
-<pre>
+```
   ___  ___  ___    ___  ___  ___ _____ __   __
  / _ \| _ \/ __|  / _ \| _ \/ __|_  / |\ \ / /
 | (_) |   / (_ | | (_) |   / (_ |/ /| |_\ V /
  \___/|_|_\\___|  \___/|_|_\\___/___|____|_|
-</pre>
+```
 
 ## Org-Orgzly
 
@@ -14,9 +14,10 @@ managing your org schedule easier._
 
 #### What it does
 
-This script takes a specified list of org files, extracts org entries, parses dates and TODOs to match parameters, provides allowances
-for leap years, and then writes those entries to the inbox file of the orgzly directory. It also can be used to then later parse
-entries from within your orgzly directory and writes them to your org inbox file.
+This script takes a specified list of org files, extracts org entries, filters out entries that do not meet specified TODO and Date
+parameters, provides allowances for days in a month and leap years, and then writes those entries to the designated orgzly inbox. It
+then uploads designated orgzly files to Dropbox. Then it allows the user to download those files from Dropbox, and add newly added or
+changed entries found within the orgzly inbox to the org inbox for categorization and re-filing.  
 
 #### Features
 
@@ -28,20 +29,18 @@ entries from within your orgzly directory and writes them to your org inbox file
 
 #### Methodological Assumptions
 
-There are several assumptions made concerning time management, and an individuals use of orgzly:
+There are several assumptions made concerning time management, and an individuals use of orgzly:  
 
 * The user does not desire to sync all org agenda files with orgzly.
 * Mobile management of many org entries is difficult.
 * Duplicate org entries are not cool.
 * Only having a few entries covering the immediate future is all that is needed.
 
-### What is required:
+### What is required / Configuration:
 
 Admittedly, there are many limitations to the application, so don't go all willy nilly on it. In order for the program to discover and
 use your nodes, you will need to use a todo keyword, and either a deadline or a scheduled date. Traversal of multileveled org entries
-should be capable, due to the script processing all entries that possess the previously required properties.
-
-### Configuration:
+should be capable, due to the script processing all entries that possess the previously required properties.  
 
 #### Required python libraries are:
 
@@ -55,22 +54,32 @@ folder, with the default values already filled out for you. If you plan on using
 the Dropbox service, then you will need to change the values of `app_key` and `app_secret` respectively with
 the values corresponding to the app your created in the dropbox
 [App Console](https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps "Dropbox app").
-More information can be found out concerning the dropbox api below.
+More information can be found out concerning the dropbox api below.  
+
+All configuration values are **REQUIRED**, and although they do provide the user to customize the script, there are some systematic
+implementations that must be accommodated in facilitation of your org-task management system. Most notably is the implementation of an
+"Inbox" file to place new and unorganized tasks into. The other is the separation of org and orgzly files in order to ensure the org
+file tree remains clean and protected from any unfortunate circumstances. This separation also allows one to maintain their org files
+in a version control management system without any conflicts with use of Dropbox.  
+
+*Point of information* - The Dropbox API does implement it's own form of version control management in order to prevent file conflicts
+and loss of information within it's internal network.
 
 The default configuration varables are as follows:
 
-| Option       | Default             |
-|--------------|---------------------|
-| app_key      | "Change This"       |
-| app_secret   | "Change This"       |
-| dropbox_folder | "/orgzly"         |
-| org_files    | ["~/org/todo.org", "~/org/inbox.org"] |
-| orgzly_files | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] |
-| org_inbox    | "~/org/inbox.org"   |
-| orgzly_inbox | "~/orgzly/inbox.org |
-| days         | 7                   |
-| todos | ["TODO", "LATERS", "HOLD", "OPEN"] |
-| dones | ["DONE", "CLOSED", "CANCELED"] |
+| Option         | Default                                     | Definitions                                                      |
+|----------------|---------------------------------------------|------------------------------------------------------------------|
+| app_key        | "Change This"                               | Dropbox API App Key                                              |
+| app_secret     | "Change This"                               | Dropbox API APP Secret                                           |
+| dropbox_folder | "/orgzly"                                   | Name of folder for orgzly in dropbox                             |
+| org_files      | ["~/org/todo.org", "~/org/inbox.org"]       | Comma seperated list of org files to process entries/nodes from. |
+| orgzly_files   | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] | Comma seperated orgzly file list to use with this entire system  |
+| org_inbox      | "~/org/inbox.org"                           | Name of org mode inbox file to push new or changed entries to    |
+| orgzly_inbox   | "~/orgzly/inbox.org                         | Name of orgzly inbox to add new or changed entries to            |
+| days           | 7                                           | Number of days to draw entries / nodes for                       |
+| todos          | ["TODO", "LATERS", "HOLD", "OPEN"]          | Org "TODO" keywords defining an uncomplete task                  |
+| dones          | ["DONE", "CLOSED", "CANCELED"]              | Org "DONE" keywords defining a complete task                     |
+|                |                                             |                                                                  |
 
 For redundancy, the configuration file spec is as follows:
 
@@ -89,23 +98,46 @@ dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 
 ### Usage:
 
-__Command line arguments will change in distant releases to better reflect subcommands, rather than flagged commands.__
+__Please note!__ In order to avoid reception of a file conflict error using the Dropbox API, "overwrite mode" has been enabled for the
+dropbox api until a means to handle these conflicts can be worked out.
 
-Navigate to the repository directory and run `python org-orgzly.py` or create a simple script in your `$PATH` that points to the repository
-and run it whereever.
+**PLEASE MAKE BACKUPS OF YOUR FILES**
 
-| Command Flags | What they do       |
-|--------------|---------------------|
-| --push    | Parses org files and copies entries matching parameters to orgzly inbox  |
-| --pull    | Copies newly created entries in orgzly inbox to your og inbox |
-| --put     | Uploads orgzly to Dropbox |
-| --get     | Downloads orgzly files from dropbox |
+Navigate to the repository directory and run `python org-orgzly.py`, or create an alias in your script `rc` file, or create a simple script in your `$PATH` that points to the repository
+and run it where ever. All should work since I like to keep things together in a single file.
 
-The intention of the above "flagged commands" is for them to be run individually to ensure completion and that
-they are executed in the proper order.
+| Command Flags | What they do                                                            |
+|---------------|-------------------------------------------------------------------------|
+| --push        | Parses org files and copies entries matching parameters to orgzly inbox |
+| --pull        | Copies newly created entries in orgzly inbox to your og inbox           |
+| --put         | Uploads orgzly to Dropbox                                               |
+| --get         | Downloads orgzly files from dropbox                                     |
 
-__Please note!__ In order to avoid reception of a file conflict error, "overwrite mode" has been enabled for
-the dropbox api until a means to handle these conflicts can be worked out.
+The intention of the above "flagged commands" is for them to run individually, and for the most part this is required, as not doing so
+could be very messy and lead to data loss. The intended command flow is as follows.
+
+```plantuml
+@startuml
+collections org as or {
+	file inbox.org as or_in
+	file todo.org as or_to
+}
+collections orgzly as loz {
+	file inbox.org as loz_in
+	file todo.org as loz_to
+}
+cloud Dropbox {
+	folder orgzly as roz {
+		file inbox.org as roz_in
+		file todo.org as roz_to
+	}
+}
+or --> loz_in
+loz --^ roz
+roz --^ loz
+loz --> or_in
+@enduml
+```
 
 ### Troubleshooting
 
@@ -132,10 +164,10 @@ app by filling out the required parts.
 5. Select the "Permissions" tab, and make sure the following boxes are checked to enable the correct
    permissions.
 
-   - [ ] files.metadata.write
-   - [ ] files.metadata.read
-   - [ ] files.content.write
-   - [ ] files.content.read
+   - [x] files.metadata.write
+   - [x] files.metadata.read
+   - [x] files.content.write
+   - [x] files.content.read
 
    Without these selected, the app will not be able to upload and download Dropbox files.
 
