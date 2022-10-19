@@ -1,0 +1,25 @@
+@startuml
+!theme hacker
+folder org as or {
+	file inbox.org as or_in
+	file todo.org as or_to
+}
+folder orgzly as loz {
+	file inbox.org as loz_in
+	file todo.org as loz_to
+}
+hexagon org_parse as parse
+hexagon duplicate_check as dupe
+cloud Dropbox {
+	folder orgzly as roz {
+		file inbox.org as roz_in
+		file todo.org as roz_to
+	}
+}
+or --> parse : "(1A) '--push' to orgzly"
+parse --> loz : "(1B) '--push' to orgzly"
+loz --|> roz : "(2) '--put' in Dropbox"
+roz --|> dupe : "(3A) '--get' from Dropbox"
+dupe --> loz : "(3B) '--get' from Dropbox"
+loz --> or_in : "(4) '--pull' from orgzly"
+@enduml
