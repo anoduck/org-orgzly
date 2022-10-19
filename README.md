@@ -115,13 +115,13 @@ and run it where ever. All should work since I like to keep things together in a
 The intention of the above "flagged commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
 
-**To move entries to orgzly**
-1. `--push`: Push to orgzly
-2. `--put`: Put in Dropbox
+**To move entries to orgzly**  
+1. `--push`: Push to orgzly  
+2. `--put`: Put in Dropbox  
 
-**To retrieve entries from orgzly**
-3. `--get`: Get from Dropbox
-4. `--pull`: Pull from orgzly
+**To retrieve entries from orgzly**  
+3. `--get`: Get from Dropbox  
+4. `--pull`: Pull from orgzly  
 
 
 ![Intended Workflow](https://www.plantuml.com/plantuml/svg/3SR13O8X30RGLNG0_-_kDgKW44jBAWtHwUNmadVloXAvXCkjhJK_Ju0jbrIyNkOLf9Q3tpX_73_vmcaZEIat3EgAbzY-PWpv0m00)
