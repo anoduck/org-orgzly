@@ -119,6 +119,7 @@ could be very messy and lead to data loss. The intended command flow is as follo
 1. `--push`: Push to orgzly  
 2. `--put`: Put in Dropbox  
 
+
 **To retrieve entries from orgzly**  
 3. `--get`: Get from Dropbox  
 4. `--pull`: Pull from orgzly  
