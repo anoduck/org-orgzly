@@ -44,7 +44,7 @@ from configobj import ConfigObj
 import argparse
 import validate
 import dropbox
-from dropbox import DropboxOAuth2FlowNoRedirect, files, exceptions
+from dropbox import DropboxOAuth2FlowNoRedirect, exceptions
 import re
 import os
 import sys
@@ -108,9 +108,9 @@ def org_date(entry):
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
     d = d + int(days)
-    monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    monthDays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if y % 4 == 0 or y % 400 == 0 and not y % 100 == 0:
-        monthDays[1] = 29
+        monthDays[2] = 29
     if d > monthDays[m] and m < 12:
         m = m + 1
         d = d - monthDays[m]

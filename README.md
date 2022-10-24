@@ -17,7 +17,7 @@ managing your org schedule easier._
 This script takes a specified list of org files, extracts org entries, filters out entries that do not meet specified TODO and Date
 parameters, provides allowances for days in a month and leap years, and then writes those entries to the designated orgzly inbox. It
 then uploads designated orgzly files to Dropbox. Then it allows the user to download those files from Dropbox, and add newly added or
-changed entries found within the orgzly inbox to the org inbox for categorization and re-filing.  
+changed entries found within the orgzly inbox to the org inbox for categorization and re-filing.
 
 #### Features
 
@@ -29,7 +29,7 @@ changed entries found within the orgzly inbox to the org inbox for categorizatio
 
 #### Methodological Assumptions
 
-There are several assumptions made concerning time management, and an individuals use of orgzly:  
+There are several assumptions made concerning time management, and an individuals use of orgzly:
 
 * The user does not desire to sync all org agenda files with orgzly.
 * Mobile management of many org entries is difficult.
@@ -40,7 +40,7 @@ There are several assumptions made concerning time management, and an individual
 
 Admittedly, there are many limitations to the application, so don't go all willy nilly on it. In order for the program to discover and
 use your nodes, you will need to use a todo keyword, and either a deadline or a scheduled date. Traversal of multileveled org entries
-should be capable, due to the script processing all entries that possess the previously required properties.  
+should be capable, due to the script processing all entries that possess the previously required properties.
 
 #### Required python libraries are:
 
@@ -54,13 +54,13 @@ folder, with the default values already filled out for you. If you plan on using
 the Dropbox service, then you will need to change the values of `app_key` and `app_secret` respectively with
 the values corresponding to the app your created in the dropbox
 [App Console](https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps "Dropbox app").
-More information can be found out concerning the dropbox api below.  
+More information can be found out concerning the dropbox api below.
 
 All configuration values are **REQUIRED**, and although they do provide the user to customize the script, there are some systematic
 implementations that must be accommodated in facilitation of your org-task management system. Most notably is the implementation of an
 "Inbox" file to place new and unorganized tasks into. The other is the separation of org and orgzly files in order to ensure the org
 file tree remains clean and protected from any unfortunate circumstances. This separation also allows one to maintain their org files
-in a version control management system without any conflicts with use of Dropbox.  
+in a version control management system without any conflicts with use of Dropbox.
 
 *Point of information* - The Dropbox API does implement it's own form of version control management in order to prevent file conflicts
 and loss of information within it's internal network. It is this internal version control management system that is often the cause of
@@ -108,10 +108,11 @@ Navigate to the repository directory and run `python org-orgzly.py`, or create a
 script in your `$PATH` that points to the repository and run it where ever, or even add it to cron. All should work since things are
 kept together in a single file. An example of creating an alias for ZSH or Bash is below:
 
-```bash
-alias org-orgzly="/path/to/python /path/to/org-orgzly/org-orgzly.py"
-```
+```sh
 
+alias org-orgzly="/path/to/python /path/to/org-orgzly/org-orgzly.py"
+
+```
 
 Below are the four commands available for org-orgzly. See __usage__ for instructions on what order to execute them.
 
@@ -125,18 +126,16 @@ Below are the four commands available for org-orgzly. See __usage__ for instruct
 The intention of the above "flagged commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
 
-
 #### Recommended workflow
 
-* First, move entries to orgzly, and use __push__ and __put__ 
-* Then, at a later point in time, retrieve entries from orgzly, and use __get__ and __pull__ 
+* First, move entries to orgzly, and use __push__ and __put__
+* Then, at a later point in time, retrieve entries from orgzly, and use __get__ and __pull__
 
 ##### Sequence of execution
-1. `--push`: Push to orgzly  
-2. `--put`: Put in Dropbox  
-3. `--get`: Get from Dropbox  
-4. `--pull`: Pull from orgzly  
-
+1. `--push`: Push to orgzly
+2. `--put`: Put in Dropbox
+3. `--get`: Get from Dropbox
+4. `--pull`: Pull from orgzly
 
 ![Cycle of Operation](https://www.plantuml.com/plantuml/svg/3SR13O8X30RGLNG0_-_kDgKW44jBAWtHwUNmadVloXAvXCkjhJK_Ju0jbrIyNkOLf9Q3tpX_73_vmcaZEIat3EgAbzY-PWpv0m00)
 
