@@ -37,6 +37,8 @@
 # Imports
 # --------------------------------------------------------
 from hashlib import md5
+# import cryptography
+# from cryptography.fernet import Fernet
 import orgparse
 import datetime
 from datetime import date
@@ -44,11 +46,12 @@ from configobj import ConfigObj
 import argparse
 import validate
 import dropbox
-from dropbox import DropboxOAuth2FlowNoRedirect, files, exceptions
+from dropbox import DropboxOAuth2FlowNoRedirect, exceptions
 import re
 import os
 import sys
 import time
+import tempfile
 
 # --------------------------------------------------------
 # Variables
@@ -67,7 +70,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.3'
+VERSION = '0.0.4-dev'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -87,8 +90,14 @@ dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 dbx_cfg = """refresh_token = string(default=REFRESH_TOKEN)"""
 
 # ---------------------------------------------------------
+# for mkstemp
+# ---------------------------------------------------------
+mode = 0o666
+flags = os.O_RDWR | os.O_CREAT
+# ---------------------------------------------------------
 # Date Functions
 # ---------------------------------------------------------
+
 
 def org_date(entry):
     ndate = ""
@@ -105,26 +114,28 @@ def org_date(entry):
     # multiple of 400 and not a multiple of 100.
     # return int(years / 4) - int(years / 100) + int(years / 400)
 
+
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
     d = d + int(days)
-    monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    monthDays = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     if y % 4 == 0 or y % 400 == 0 and not y % 100 == 0:
-        monthDays[1] = 29
+        monthDays[2] = 29
     if d > monthDays[m] and m < 12:
         m = m + 1
         d = d - monthDays[m]
-    elif d > monthDays[m] and m >= 12:
+    if d > monthDays[m] and m >= 12:
         m = m - 12
         y = y + 1
         d = d - monthDays[m]
     future_date = datetime.date(y, m, d)
     return future_date
 
+
 # ---------------------------------------------------------------------
 # Dedupe
 # ---------------------------------------------------------------------
-def get_uniq_entries(test, control):
+def dedupe_files(test, control):
     tfile = orgparse.load(os.path.expanduser(test))
     cfile = orgparse.load(os.path.expanduser(control))
     uniq = []
@@ -148,6 +159,66 @@ def get_uniq_entries(test, control):
     return uniq
 
 
+def dedupe_sec_temp(sf, control):
+    os.lseek(sf, 0, 0)
+    org_string = os.read(sf, os.path.getsize(sf))
+    tfile = orgparse.loads(org_string.decode())
+    cfile = orgparse.load(os.path.expanduser(control))
+    nodes = []
+    con_list = []
+    for t in tfile.children:
+        test_dict = {}
+        if t.todo is not None:
+            test_enc = str(t).encode()
+            test_hash = md5(test_enc).hexdigest()
+            if test_hash not in list(test_dict.keys()):
+                test_dict.setdefault(test_hash, t)
+    for c in cfile.children:
+        if c.todo is not None:
+            c_enc = str(c).encode()
+            c_hash = md5(c_enc).hexdigest()
+            if c_hash not in con_list:
+                con_list.append(c_hash)
+    for m in list(test_dict.keys()):
+        if m not in con_list:
+            nodes.append(test_dict[m])
+    return nodes
+
+
+def dedupe_single(org_file):
+    file = orgparse.load(os.path.expanduser(org_file))
+    nodes = []
+    for node in file.children:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in nodes:
+                nodes.append(node)
+    return nodes
+
+
+def dedupe_lists(test, control):
+    uniq = []
+    test_dict = {}
+    con_list = []
+    for node in test:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in list(test_dict.keys()):
+                test_dict.setdefault(node_hash, node)
+    for node in control:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in con_list:
+                con_list.append(node_hash)
+    for node_hash in list(test_dict.keys()):
+        if node_hash not in con_list:
+            uniq.append(test_dict[node_hash])
+    return uniq
+
+
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -155,6 +226,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
     for orgfile in org_files:
         to_write = []
         to_write.clear
+        print('Processing: ' + orgfile)
         file = orgparse.load(os.path.expanduser(orgfile))
         add_file_keys = file.env.add_todo_keys
         add_file_keys(todos=env.todo_keys, dones=env.done_keys)
@@ -195,11 +267,20 @@ def gen_file(env, org_files, orgzly_inbox, days):
                             print("There appears to be something wrong with: "
                                   + str(date_org))
         inbox_path = os.path.expanduser(orgzly_inbox)
-        for x in to_write:
-            w = open(inbox_path, "a", encoding="utf-8", newline="\n")
-            w.writelines(str(x))
-            w.write("\n")
-            w.close()
+        sec_temp = tempfile.mkstemp(suffix='_.org', prefix='oroz_', text=True)
+        sf = os.open(sec_temp[1], flags, mode)
+        for z in to_write:
+            os.write(sf, str.encode(str(z)))
+            os.write(sf, str.encode('\n'))
+        nodes = dedupe_sec_temp(sf, inbox_path)
+        os.unlink(sec_temp[1])
+        for x in nodes:
+            with open(inbox_path, "a", encoding="utf-8", newline="\n") as w:
+                w.writelines(str(x))
+                w.write("\n")
+                w.close()
+    print('Successfully pushed org nodes to orgzly!')
+
 
 # ----------------------------------------------------------
 # Sync Back
@@ -207,7 +288,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
 def sync_back(orgzly_files, org_inbox):
     node_list = []
     for e in orgzly_files:
-        uniq = get_uniq_entries(e, org_inbox)
+        uniq = dedupe_files(e, org_inbox)
         node_list.extend(uniq)
     for o in node_list:
         hash_dict = {}
@@ -224,6 +305,7 @@ def sync_back(orgzly_files, org_inbox):
         w.close()
     print("New entries added to inbox")
 
+
 # -------------------------------------------------------------------------------------------------------------------
 # Dropbox's setup:
 # Which can be seen as a way to discourage / mitigate api abuse.
@@ -231,17 +313,19 @@ def sync_back(orgzly_files, org_inbox):
     """Dropbox Variables Defined:
 
         dbx = dropbox Instance
-        folder = Both name of the local folder and name of the remote folder to sync betwix, no path. eg: "Dropbox"
-        fullname = fullpath of the file. ( fullpath + name + extension) eg: "/home/user/Dropbox/art.txt"
-        name = Solely the name and extension of the file (name + extension) eg: "art.txt"
+        folder = Both name of local folder and name of remote folder
+        fullname = fullpath of the file. ( fullpath + name + extension)
+        name = Solely the name and extension of the file (name + extension)
 
     """
 # --------------------------------------------------------------------------------------------------------------------
 # https://github.com/dropbox/dropbox-sdk-python/blob/master/example/updown.py
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
+
 # Dropbox upload
-def dropbox_upload(app_key, app_secret, fullname, folder, name, overwrite=True):
+def dropbox_upload(app_key, app_secret,
+                   fullname, folder, name, overwrite=True):
     """Upload a file.
     Return the request response, or None in case of error.
     """
@@ -268,6 +352,7 @@ def dropbox_upload(app_key, app_secret, fullname, folder, name, overwrite=True):
             return None
         return res
 
+
 # Dropbox Download
 def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
@@ -288,6 +373,7 @@ def dropbox_download(app_key, app_secret, folder, name):
         data = res.content
         return data
 
+
 # -------------------------------------------------------------------------------------
 # Write refresh_token
 # -------------------------------------------------------------------------------------
@@ -303,6 +389,7 @@ def write_refresh(REFRESH_TOKEN):
         config['dropbox_token'] = REFRESH_TOKEN
         config.write()
     print('Dropbox refresh token acuired and saved')
+
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
@@ -324,6 +411,7 @@ def get_access_token(key, sec):
 
     write_refresh(oauth_result.refresh_token)
 
+
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
@@ -334,22 +422,30 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
         name = os.path.basename(path)
         dropbox_upload(app_key, app_secret, fullname, folder, name)
 
+
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
     for k in orgzly_files:
+        sec_temp = tempfile.mkstemp(prefix='oroz_', suffix='_.org', text=True)
         path = os.path.expanduser(k)
         fullname = os.path.realpath(path)
         name = os.path.basename(path)
         data = dropbox_download(app_key, app_secret, folder, name)
         stuff = str(data).rsplit("\\n")
-        sr = list(range(0, len(stuff)))
-        for h in sr:
-            line = stuff[h]
-            with open(fullname, "a", encoding="utf-8", newline="\n") as w:
-                w.write(line)
-                w.write("\n")
-                w.close()
+        sec_temp = tempfile.mkstemp(suffix='_.org', prefix='oroz_', text=True)
+        sf = os.open(sec_temp[1], flags, mode)
+        for line in stuff:
+            os.write(sf, str.encode(str(line)))
+            os.write(sf, str.encode('\n'))
+        nodes = dedupe_sec_temp(sf, fullname)
+        os.unlink(sec_temp[1])
+        for node in nodes:
+            with open(fullname, "a", encoding="utf-8", newline="\n") as q:
+                q.writelines(str(node))
+                q.write("\n")
+                q.close()
     print('Get Complete')
+
 
 # --------------------------------------------------------------------------------------------------------------------
 # The startup command
@@ -421,6 +517,7 @@ def main():
                     config['dropbox_folder'], config['orgzly_files'])
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
+
 
 if __name__ == '__main__':
     main()
