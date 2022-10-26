@@ -158,6 +158,7 @@ def dedupe_files(test, control):
     return uniq
 
 
+<<<<<<< HEAD
 def dedupe_sec_temp(sf, control):
     os.lseek(sf, 0, 0)
     org_string = os.read(sf, os.path.getsize(sf))
@@ -184,6 +185,69 @@ def dedupe_sec_temp(sf, control):
     return nodes
 
 
+||||||| parent of fae2071 (updated with dedupe)
+=======
+def dedupe_sec_temp(sf, control):
+    os.lseek(sf, 0, 0)
+    org_string = os.read(sf, os.path.getsize(sf))
+    tfile = orgparse.loads(org_string.decode())
+    cfile = orgparse.load(os.path.expanduser(control))
+    nodes = []
+    con_list = []
+    for t in tfile.children:
+        test_dict = {}
+        if t.todo is not None:
+            test_enc = str(t).encode()
+            test_hash = md5(test_enc).hexdigest()
+            if test_hash not in list(test_dict.keys()):
+                test_dict.setdefault(test_hash, t)
+    for c in cfile.children:
+        if c.todo is not None:
+            c_enc = str(c).encode()
+            c_hash = md5(c_enc).hexdigest()
+            if c_hash not in con_list:
+                con_list.append(c_hash)
+    for m in list(test_dict.keys()):
+        if m not in con_list:
+            nodes.append(test_dict[m])
+    return nodes
+
+
+def dedupe_single(org_file):
+    file = orgparse.load(os.path.expanduser(org_file))
+    nodes = []
+    for node in file.children:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in nodes:
+                nodes.append(node)
+    return nodes
+
+
+def dedupe_lists(test, control):
+    uniq = []
+    test_dict = {}
+    con_list = []
+    for node in test:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in list(test_dict.keys()):
+                test_dict.setdefault(node_hash, node)
+    for node in control:
+        if node.todo is not None:
+            node_enc = str(node).encode()
+            node_hash = md5(node_enc).hexdigest()
+            if node_hash not in con_list:
+                con_list.append(node_hash)
+    for node_hash in list(test_dict.keys()):
+        if node_hash not in con_list:
+            uniq.append(test_dict[node_hash])
+    return uniq
+
+
+>>>>>>> fae2071 (updated with dedupe)
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -411,6 +475,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
                 q.close()
     print('Get Complete')
 
+<<<<<<< HEAD
 
 # --------------------------------------------------------------------------------------------------------------------
 # File Check
@@ -430,6 +495,10 @@ def file_check(org_files, org_inbox, orgzly_files, orgzly_inbox):
     return True
 
 
+||||||| parent of fae2071 (updated with dedupe)
+=======
+
+>>>>>>> fae2071 (updated with dedupe)
 # --------------------------------------------------------------------------------------------------------------------
 # The startup command
 # --------------------------------------------------------------------------------------------------------------------
