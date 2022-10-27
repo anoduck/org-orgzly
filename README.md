@@ -1,12 +1,5 @@
-<style>
-.logo {
-      text-align: center;
-      width: 300px;
-   }
-</style>
-<div class="log">
-![org-orgzly](./org-orgzly_logo.png)
-</div>
+<img style="display: block; margin-left: auto; margin-right: auto; width: 30%;" src="./org-orgzly_logo.png" alt="Org-Orgzly Logo">
+</img>
 
 <pre>
   ___  ___  ___    ___  ___  ___ _____ __   __
