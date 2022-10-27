@@ -1,9 +1,19 @@
-```
+<style>
+.logo {
+      text-align: center;
+      width: 300px;
+   }
+</style>
+<div class="log">
+![org-orgzly](./org-orgzly_logo.png)
+</div>
+
+<pre>
   ___  ___  ___    ___  ___  ___ _____ __   __
  / _ \| _ \/ __|  / _ \| _ \/ __|_  / |\ \ / /
 | (_) |   / (_ | | (_) |   / (_ |/ /| |_\ V /
  \___/|_|_\\___|  \___/|_|_\\___/___|____|_|
-```
+</pre>
 
 ## Org-Orgzly
 
