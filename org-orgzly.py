@@ -37,8 +37,6 @@
 # Imports
 # --------------------------------------------------------
 from hashlib import md5
-# import cryptography
-# from cryptography.fernet import Fernet
 import orgparse
 import datetime
 from datetime import date
@@ -271,6 +269,7 @@ def sync_back(orgzly_files, org_inbox):
         w.write("\n")
         w.close()
     print("New entries added to inbox")
+
 
 # -------------------------------------------------------------------------------------------------------------------
 # Dropbox's setup:
