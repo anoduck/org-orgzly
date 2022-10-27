@@ -39,11 +39,23 @@ There are several assumptions made concerning time management, and an individual
 * Duplicate org entries are not cool.
 * Only having a few entries covering the immediate future is all that is needed.
 
-### What is required / Configuration:
+### What is required
 
 Admittedly, there are many limitations to the application, so don't go all willy nilly on it. In order for the program to discover and
 use your nodes, you will need to use a todo keyword, and either a deadline or a scheduled date. Traversal of multileveled org entries
 should be capable, due to the script processing all entries that possess the previously required properties.
+
+#### Installation
+
+Since in order to make use of this library it is assumed one has reasonable apprehension of EMACS use, is
+familiar with using git, and knows how to execute a python script inside of their represpective shell.
+
+##### Preferred installation method:
+
+It would be to the user's benefit to clone the source directly from the repository using
+`git clone https://codeberg.org/anoduck/org-orgzly`. As this would provide the user with the most recent
+version of the script with all newly added features. Please consider the releases as existing for historical
+notation.
 
 #### Required python libraries are:
 
@@ -109,8 +121,6 @@ dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 __Please note!__ In order to avoid reception of a file conflict error using the Dropbox API, "overwrite mode" has been enabled for the
 dropbox api until a means to handle these conflicts can be worked out.
 
-**PLEASE MAKE BACKUPS OF YOUR FILES IN CASE OF THE UNFORTUNATE**
-
 Navigate to the repository directory and run `python org-orgzly.py`, or create an alias in your script `rc` file, create a simple
 script in your `$PATH` that points to the repository and run it where ever, or even add it to cron. All should work since things are
 kept together in a single file. An example of creating an alias for ZSH or Bash is below:
@@ -148,9 +158,11 @@ could be very messy and lead to data loss. The intended command flow is as follo
 
 ### Troubleshooting
 
-If you receive an error while running the script referring to a `file not found`, then please take the time to ensure all org files do
-exist and are located in their designated folders according to the configuration file. If any file needs to be created, this can simply be
-done with a `touch /path/to/missing/file.org`.
+As long as the option `create_missing` is set to `True`, any missing file defined in the configuration file
+will be automatically created for the user in the defined folder located in the user's home directory.
+
+The script automatically creates backup files for the user in order to prevent crucial data loss. Those files
+can be found in the `.backup` directory located in their orgzly folder.
 
 If you encounter any issues or bugs, please feel free to submit and issue for us to assisst. If there are also
 any desired feature requests, you may also fill out an issue labeling it as a "Feature Request".
@@ -192,7 +204,7 @@ create your app by filling out the required parts.
 ### Thanks
 
 This application is dedicated to [karlicoss](https://github.com/karlicoss) to whom without it would have never been possible. All the
-credit goes to his [orgparse](https://github.com/karlicoss/orgparse) library that allows parsing org files in python.
+credit goes to the [orgparse](https://github.com/karlicoss/orgparse) library that allows parsing org files in python.
 
 And, of course, as usual, an additional thanks goes out to the [org-mode development team](https://orgmode.org "Org Mode"), who have diligently maintained the
 most brilliant organizational systems ever.
