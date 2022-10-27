@@ -539,7 +539,7 @@ def main():
                 org_inbox = config['org_inbox']
                 sync_back(orgzly_files, org_inbox)
             if args.put:
-                dropbox_getbox_put(config['app_key'], config['app_secret'],
+                dropbox_put(config['app_key'], config['app_secret'],
                             config['dropbox_folder'], config['orgzly_files'])
             if args.get:
                 dropbox_get(config['app_key'], config['app_secret'],
