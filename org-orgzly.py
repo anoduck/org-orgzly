@@ -421,8 +421,13 @@ def backup_files(orgzly_inbox, flist, days):
     for file in dir_list:
         if file is not None:
             bname = os.path.basename(file)
-            bdate = bname.split('_')
-            if bdate > date.today():
+            dstring = bname.split('_')[0]
+            y, m, d = [int(x) for x in dstring.split('-')]
+            exp_date = date(y, m, d)
+            expiration = exp_date.strftime('%Y-%m-%d')
+            today = date.today()
+            cur_date = today.strftime('%Y-%m-%d')
+            if cur_date >= expiration:
                 os.remove(os.path.realpath(file))
                 print('Old backup file removed: ' + file)
     for file in flist:
@@ -437,10 +442,12 @@ def backup_files(orgzly_inbox, flist, days):
         else:
             print('Error occurred in the creation of a backup file.')
 
+
 # --------------------------------------------------------------------------------------------------------------------
 # File Check
 # --------------------------------------------------------------------------------------------------------------------
-def file_check(create_missing, org_files, org_inbox, orgzly_files, orgzly_inbox):
+def file_check(create_missing, org_files, org_inbox,
+               orgzly_files, orgzly_inbox):
     flist = org_files + orgzly_files
     inboxes = [org_inbox, orgzly_inbox]
     for inbox in inboxes:
@@ -456,13 +463,13 @@ def file_check(create_missing, org_files, org_inbox, orgzly_files, orgzly_inbox)
                     cf.close()
                 print('File Created: ' + user_path)
             else:
-                print('File path does not exist, and creation of missing files '
-                    'has been disabled.')
+                print('File path does not exist, and creation of missing files'
+                      ' has been disabled.')
                 print('Missing file is: ' + user_path)
                 print('Creation of missing files is set to: ' + create_missing)
                 print('Please review your file paths in the config file,'
-                    ' or enable creation of missing files with "True", '
-                    'an then try again.')
+                      ' or enable creation of missing files with "True", '
+                      'an then try again.')
                 return False
                 exit(0)
     return True, flist
@@ -520,11 +527,11 @@ def main():
 
     # check that files exist and create if missing:
     fcheck, flist = file_check(config['create_missing'], config['org_files'],
-                        config['org_inbox'], config['orgzly_files'],
-                        config['orgzly_inbox'])
+                               config['org_inbox'], config['orgzly_files'],
+                               config['orgzly_inbox'])
 
     if fcheck and config['backup']:
-        backup_files( config['orgzly_inbox'], flist, config['days'])
+        backup_files(config['orgzly_inbox'], flist, config['days'])
 
     # Run the gambit of args vs config
     if not args.dropbox_token:
