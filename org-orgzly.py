@@ -77,6 +77,7 @@ VERSION = '0.0.4-dev'
 cfg = """
 app_key = string(default='Replace with your dropbox app key')
 app_secret = string(default='Replace with your dropbox app secret')
+create_missing = boolean(default=True)
 dropbox_folder = string(default='orgzly')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
 orgzly_files = list(default=list('~/orgzly/todo.org', '~/orgzly/inbox.org'))
@@ -185,40 +186,6 @@ def dedupe_sec_temp(sf, control):
     return nodes
 
 
-def dedupe_single(org_file):
-    file = orgparse.load(os.path.expanduser(org_file))
-    nodes = []
-    for node in file.children:
-        if node.todo is not None:
-            node_enc = str(node).encode()
-            node_hash = md5(node_enc).hexdigest()
-            if node_hash not in nodes:
-                nodes.append(node)
-    return nodes
-
-
-def dedupe_lists(test, control):
-    uniq = []
-    test_dict = {}
-    con_list = []
-    for node in test:
-        if node.todo is not None:
-            node_enc = str(node).encode()
-            node_hash = md5(node_enc).hexdigest()
-            if node_hash not in list(test_dict.keys()):
-                test_dict.setdefault(node_hash, node)
-    for node in control:
-        if node.todo is not None:
-            node_enc = str(node).encode()
-            node_hash = md5(node_enc).hexdigest()
-            if node_hash not in con_list:
-                con_list.append(node_hash)
-    for node_hash in list(test_dict.keys()):
-        if node_hash not in con_list:
-            uniq.append(test_dict[node_hash])
-    return uniq
-
-
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -304,7 +271,6 @@ def sync_back(orgzly_files, org_inbox):
         w.write("\n")
         w.close()
     print("New entries added to inbox")
-
 
 # -------------------------------------------------------------------------------------------------------------------
 # Dropbox's setup:
@@ -448,6 +414,24 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
 
 
 # --------------------------------------------------------------------------------------------------------------------
+# File Check
+# --------------------------------------------------------------------------------------------------------------------
+def file_check(org_files, org_inbox, orgzly_files, orgzly_inbox):
+    flist = []
+    flist = org_files + orgzly_files + flist
+    flist = flist + [org_inbox, orgzly_inbox]
+    for file in flist:
+        user_path = os.path.expanduser(file)
+        if not os.path.isfile(user_path):
+            with open(user_path, 'w') as cf:
+                cf.write('#Created by org-orgzly')
+                cf.write('\n')
+                cf.close()
+            print('File Created: ' + user_path)
+    return True
+
+
+# --------------------------------------------------------------------------------------------------------------------
 # The startup command
 # --------------------------------------------------------------------------------------------------------------------
 def main():
@@ -498,23 +482,33 @@ def main():
     addkeys(todos=config['todos'], dones=config['dones'])
 
     # check that files exist and create if missing:
+    fcheck = file_check(config['create_missing'], config['org_files'],
+                        config['org_inbox'], config['orgzly_files'],
+                        config['orgzly_inbox'])
 
     # Run the gambit of args vs config
-    if args.push:
-        org_files = config['org_files']
-        orgzly_inbox = config['orgzly_inbox']
-        days = config['days']
-        gen_file(env, org_files, orgzly_inbox, days)
-    if args.pull:
-        orgzly_files = config['orgzly_files']
-        org_inbox = config['org_inbox']
-        sync_back(orgzly_files, org_inbox)
-    if args.put:
-        dropbox_put(config['app_key'], config['app_secret'],
-                    config['dropbox_folder'], config['orgzly_files'])
-    if args.get:
-        dropbox_get(config['app_key'], config['app_secret'],
-                    config['dropbox_folder'], config['orgzly_files'])
+    if not args.dropbox_token:
+        if fcheck:
+            if args.push:
+                org_files = config['org_files']
+                orgzly_inbox = config['orgzly_inbox']
+                days = config['days']
+                gen_file(env, org_files, orgzly_inbox, days)
+            if args.pull:
+                orgzly_files = config['orgzly_files']
+                org_inbox = config['org_inbox']
+                sync_back(orgzly_files, org_inbox)
+            if args.put:
+                dropbox_put(config['app_key'], config['app_secret'],
+                            config['dropbox_folder'], config['orgzly_files'])
+            if args.get:
+                dropbox_get(config['app_key'], config['app_secret'],
+                            config['dropbox_folder'], config['orgzly_files'])
+        else:
+            print('Error occured in creation of necessarily files, '
+                  'or file creation has or file creation has been disabled.'
+                  ' Please check your config and try again.')
+            exit(0)
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
 
