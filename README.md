@@ -76,6 +76,8 @@ The default configuration varables are as follows:
 |----------------|---------------------------------------------|------------------------------------------------------------------|
 | app_key        | "Change This"                               | Dropbox API App Key                                              |
 | app_secret     | "Change This"                               | Dropbox API APP Secret                                           |
+| create_missing | True                                        | Create any missing files from configuration                      |
+| backup         | True                                        | Backup original org files                                        |
 | dropbox_folder | "/orgzly"                                   | Name of folder for orgzly in dropbox                             |
 | org_files      | ["~/org/todo.org", "~/org/inbox.org"]       | Comma seperated list of org files to process entries/nodes from. |
 | orgzly_files   | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] | Comma seperated orgzly file list to use with this entire system  |
@@ -90,6 +92,8 @@ For redundancy, the configuration file spec is as follows:
 ```ini
 app_key = string(default='Replace with your dropbox app key')
 app_secret = string(default='Replace with your dropbox app secret')
+create_missing = boolean(default=True)
+backup = boolean(default=True)
 dropbox_folder = string(default='orgzly')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
 orgzly_files = list(default=list('~/orgzly/todo.org',))
@@ -180,10 +184,10 @@ create your app by filling out the required parts.
 
 ### Future Features
 
-- [ ] Creation of missing org files if any
-- [ ] Single file duplicate removal
-- [ ] Node list duplicate removal
-- [ ] Implement a better CLI
+- [x] Creation of missing org files if any
+- [x] Single file duplicate removal
+- [x] Node list duplicate removal
+- [=] Implement a better CLI
 
 ### Thanks
 
