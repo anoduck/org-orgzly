@@ -412,7 +412,13 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
 # -------------------------------------------------------------------------------------------------------------------
 # Backup Files
 # -------------------------------------------------------------------------------------------------------------------
-def backup_files(orgzly_inbox, flist, days):
+def backup_files(org_files, orgzly_files, orgzly_inbox,
+                 org_inbox, days):
+    flist = org_files + orgzly_files
+    inboxes = [org_inbox, orgzly_inbox]
+    for inbox in inboxes:
+        if inbox not in flist:
+            flist.append(inbox)
     bdirname = os.path.dirname(orgzly_inbox)
     BACKUP_HOME = os.path.join(os.path.expanduser(bdirname), '.backup')
     if not os.path.isdir(BACKUP_HOME):
@@ -472,7 +478,7 @@ def file_check(create_missing, org_files, org_inbox,
                       'an then try again.')
                 return False
                 exit(0)
-    return True, flist
+    return True
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -526,20 +532,22 @@ def main():
     addkeys(todos=config['todos'], dones=config['dones'])
 
     # check that files exist and create if missing:
-    fcheck, flist = file_check(config['create_missing'], config['org_files'],
-                               config['org_inbox'], config['orgzly_files'],
-                               config['orgzly_inbox'])
-
-    if fcheck and config['backup']:
-        backup_files(config['orgzly_inbox'], flist, config['days'])
+    fcheck = file_check(config['create_missing'], config['org_files'],
+                        config['org_inbox'], config['orgzly_files'],
+                        config['orgzly_inbox'])
 
     # Run the gambit of args vs config
     if not args.dropbox_token:
         if fcheck:
             if args.push:
                 org_files = config['org_files']
+                orgzly_files = config['orgzly_files']
+                org_inbox = config['org_inbox']
                 orgzly_inbox = config['orgzly_inbox']
                 days = config['days']
+                if config['backup']:
+                    backup_files(org_files, orgzly_files,
+                                 orgzly_inbox, org_inbox, days)
                 gen_file(env, org_files, orgzly_inbox, days)
             if args.pull:
                 orgzly_files = config['orgzly_files']
