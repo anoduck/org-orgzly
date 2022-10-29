@@ -65,7 +65,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.4.1-RELEASE'
+VERSION = '0.0.4d-dev'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -84,7 +84,9 @@ todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
 dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 """
 
-dbx_cfg = """refresh_token = string(default=REFRESH_TOKEN)"""
+dbx_cfg = """
+refresh_token = string(default=REFRESH_TOKEN)
+"""
 
 # ---------------------------------------------------------
 # for mkstemp
@@ -137,22 +139,22 @@ def dedupe_files(test, control):
     cfile = orgparse.load(os.path.expanduser(control))
     uniq = []
     con_list = []
-    for t in tfile.children:
-        test_dict = {}
-        if t.todo is not None:
-            test_enc = str(t).encode()
+    test_dict = {}
+    for t_node in tfile.children:
+        if t_node.todo is not None:
+            test_enc = str(t_node).encode()
             test_hash = md5(test_enc).hexdigest()
             if test_hash not in list(test_dict.keys()):
                 test_dict.setdefault(test_hash, t)
-    for c in cfile.children:
-        if c.todo is not None:
-            c_enc = str(c).encode()
+    for c_node in cfile.children:
+        if c_node.todo is not None:
+            c_enc = str(c_node).encode()
             c_hash = md5(c_enc).hexdigest()
             if c_hash not in con_list:
                 con_list.append(c_hash)
-    for m in list(test_dict.keys()):
-        if m not in con_list:
-            uniq.append(test_dict[m])
+    for m_node in list(test_dict.keys()):
+        if m_node not in con_list:
+            uniq.append(test_dict[m_node])
     return uniq
 
 
@@ -163,22 +165,22 @@ def dedupe_sec_temp(sf, control):
     cfile = orgparse.load(os.path.expanduser(control))
     nodes = []
     con_list = []
-    for t in tfile.children:
-        test_dict = {}
-        if t.todo is not None:
-            test_enc = str(t).encode()
+    test_dict = {}
+    for t_node in tfile.children:
+        if t_node.todo is not None:
+            test_enc = str(t_node).encode()
             test_hash = md5(test_enc).hexdigest()
             if test_hash not in list(test_dict.keys()):
-                test_dict.setdefault(test_hash, t)
-    for c in cfile.children:
-        if c.todo is not None:
-            c_enc = str(c).encode()
+                test_dict.setdefault(test_hash, t_node)
+    for c_node in cfile.children:
+        if c_node.todo is not None:
+            c_enc = str(c_node).encode()
             c_hash = md5(c_enc).hexdigest()
             if c_hash not in con_list:
                 con_list.append(c_hash)
-    for m in list(test_dict.keys()):
-        if m not in con_list:
-            nodes.append(test_dict[m])
+    for m_date in list(test_dict.keys()):
+        if m_date not in con_list:
+            nodes.append(test_dict[m_date])
     return nodes
 
 
@@ -221,7 +223,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
                         if future_date <= date_org:
                             print("Dates do not fall within parameters. "
                                   "Due to: " + str(future_date)
-                                  + "is less than " + str(date_org))
+                                  + " is less than " + str(date_org))
                         elif future_date >= date_org:
                             print("Dates do not meet parameters for some "
                                   " unknown reason or due to: "
@@ -268,11 +270,12 @@ def sync_back(orgzly_files, org_inbox):
         w.close()
     print("New entries added to inbox")
 
-# -------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------
 # Dropbox's setup:
 # Which can be seen as a way to discourage / mitigate api abuse.
-# -------------------------------------------------------------------------------------------------------------------
-    """Dropbox Variables Defined:
+# ----------------------------------------------------------------
+    """
+        Dropbox Variables Defined:
 
         dbx = dropbox Instance
         folder = Both name of local folder and name of remote folder
@@ -280,7 +283,7 @@ def sync_back(orgzly_files, org_inbox):
         name = Solely the name and extension of the file (name + extension)
 
     """
-# --------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # https://github.com/dropbox/dropbox-sdk-python/blob/master/example/updown.py
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
@@ -367,9 +370,9 @@ def get_access_token(key, sec):
 
     try:
         oauth_result = auth_flow.finish(auth_code)
-    except Exception as e:
-        print('Error: %s' % (e,))
-        exit(1)
+    except Exception as e_t:
+        print('Error: %s' % (e_t,))
+        sys.exit()
 
     write_refresh(oauth_result.refresh_token)
 
@@ -402,16 +405,16 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         nodes = dedupe_sec_temp(sf, fullname)
         os.unlink(sec_temp[1])
         for node in nodes:
-            with open(fullname, "a", encoding="utf-8", newline="\n") as q:
-                q.writelines(str(node))
-                q.write("\n")
-                q.close()
+            with open(fullname, "a", encoding="utf-8", newline="\n") as q_w:
+                q_w.writelines(str(node))
+                q_w.write("\n")
+                q_w.close()
     print('Get Complete')
 
 
-# -------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 # Backup Files
-# -------------------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------
 def backup_files(org_files, orgzly_files, orgzly_inbox,
                  org_inbox, days):
     flist = org_files + orgzly_files
@@ -438,20 +441,24 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
                 print('Old backup file removed: ' + file)
     for file in flist:
         userdef_path = os.path.expanduser(file)
+        f_split = os.path.split(userdef_path)
+        f_dirname = os.path.basename(f_split[0])
+        f_basename = os.path.basename(userdef_path)
         fdate = get_future(date.today(), days)
-        back_name = str(fdate) + '_' + os.path.basename(file)
+        back_name = str(fdate) + '_' + f_dirname + '_' + f_basename
         partial_path = os.path.join(BACKUP_HOME, back_name)
         back_fullpath = os.path.expanduser(partial_path)
         shutil.copy2(userdef_path, back_fullpath, follow_symlinks=False)
         if os.path.isfile(back_fullpath):
-            print('File successfully backed up: ' + file)
+            print('File successfully backed up: ' + file +
+                  ' to ' + back_fullpath)
         else:
             print('Error occurred in the creation of a backup file.')
 
 
-# --------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
 # File Check
-# --------------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------
 def file_check(create_missing, org_files, org_inbox,
                orgzly_files, orgzly_inbox):
     flist = org_files + orgzly_files
@@ -463,10 +470,10 @@ def file_check(create_missing, org_files, org_inbox,
         user_path = os.path.expanduser(file)
         if not os.path.isfile(user_path):
             if create_missing:
-                with open(user_path, 'w') as cf:
-                    cf.write('#Created by org-orgzly')
-                    cf.write('\n')
-                    cf.close()
+                with open(user_path, 'w') as c_f:
+                    c_f.write('#Created by org-orgzly')
+                    c_f.write('\n')
+                    c_f.close()
                 print('File Created: ' + user_path)
             else:
                 print('File path does not exist, and creation of missing files'
@@ -477,13 +484,13 @@ def file_check(create_missing, org_files, org_inbox,
                       ' or enable creation of missing files with "True", '
                       'an then try again.')
                 return False
-                exit(0)
+                sys.exit()
     return True
 
 
-# --------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 # The startup command
-# --------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 def main():
     filename = CONFIG_FILE
     # Setup of ConfigObj
@@ -497,7 +504,7 @@ def main():
         config.write()
         print("Configuration file written to "
               "$XDG_CONFIG_HOME/orgzly/config.ini")
-        exit(0)
+        sys.exit()
     else:
         config = ConfigObj(filename, configspec=spec)
 
@@ -563,7 +570,7 @@ def main():
             print('Error occured in creation of necessarily files, '
                   'or file creation has or file creation has been disabled.'
                   ' Please check your config and try again.')
-            exit(0)
+            sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
 
