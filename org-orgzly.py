@@ -110,6 +110,7 @@ def org_date(entry):
     # multiple of 400 and not a multiple of 100.
     # return int(years / 4) - int(years / 100) + int(years / 400)
 
+
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
     d = d + int(days)
@@ -125,6 +126,7 @@ def get_future(tdate, days):
         d = d - monthDays[m]
     future_date = datetime.date(y, m, d)
     return future_date
+
 
 # ---------------------------------------------------------------------
 # Dedupe
@@ -148,11 +150,11 @@ def dedupe_files(test, control):
             uniq.add(m_node)
     return uniq
 
+
 # ---------------------------------------------------------------------
 # Process Entries
 # ---------------------------------------------------------------------
-def process_entries(file_nodes, days):
-    to_write = set()
+def process_entries(file_nodes, to_write, days):
     for entry in file_nodes:
         if entry.todo:
             ndate = False
@@ -187,6 +189,7 @@ def process_entries(file_nodes, days):
                               + str(date_org))
     return to_write
 
+
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -196,18 +199,18 @@ def gen_file(env, org_files, orgzly_inbox, days):
     inbox_nodes = in_file.children
     inbox_set = set()
     inbox_set.clear()
+    to_write = set()
+    to_write.clear()
     for node_i in inbox_nodes:
         if node_i not in inbox_set:
             inbox_set.add(str(node_i))
     for orgfile in org_files:
-        to_write = set()
-        to_write.clear()
         print('Processing: ' + orgfile)
         file = orgparse.load(os.path.expanduser(orgfile))
         add_file_keys = file.env.add_todo_keys
         add_file_keys(todos=env.todo_keys, dones=env.done_keys)
         file_nodes = file.children
-        to_write = process_entries(file_nodes, days)
+        to_write = process_entries(file_nodes, to_write, days)
         nice_set = set()
         for item in to_write:
             if str(item) not in nice_set:
@@ -223,6 +226,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
             w_funky.close()
     print('Successfully pushed org nodes to orgzly!')
 
+
 # ----------------------------------------------------------
 # Sync Back
 # ----------------------------------------------------------
@@ -236,6 +240,7 @@ def sync_back(orgzly_files, org_inbox):
             w_file.write("\n")
             w_file.close()
     print("New entries added to inbox")
+
 
 # ----------------------------------------------------------------
 # Dropbox's setup:
@@ -283,6 +288,7 @@ def dropbox_upload(app_key, app_secret,
             return None
         return res
 
+
 # Dropbox Download
 def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
@@ -303,6 +309,7 @@ def dropbox_download(app_key, app_secret, folder, name):
         data = res.content
         return data
 
+
 # -------------------------------------------------------------------------------------
 # Write refresh_token
 # -------------------------------------------------------------------------------------
@@ -318,6 +325,7 @@ def write_refresh(REFRESH_TOKEN):
         config['dropbox_token'] = REFRESH_TOKEN
         config.write()
     print('Dropbox refresh token acquired and saved')
+
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
@@ -339,6 +347,7 @@ def get_access_token(key, sec):
 
     write_refresh(oauth_result.refresh_token)
 
+
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
@@ -349,6 +358,7 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
         name = os.path.basename(path)
         dropbox_upload(app_key, app_secret, fullname, folder, name)
     print('Upload to Dropbox was successful!')
+
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
@@ -375,6 +385,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
                 q_q.write("\n")
                 q_q.close()
     print('Whew! We appear to have made that shit gold!')
+
 
 # --------------------------------------------------------------------------------
 # Backup Files
@@ -417,6 +428,7 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
             print('Error occurred in the creation of a backup file.')
     print('File backup successful!')
 
+
 # -------------------------------------------------------------------------------------
 # File Check
 # -------------------------------------------------------------------------------------
@@ -446,6 +458,7 @@ def file_check(create_missing, org_files, org_inbox,
                       'an then try again.')
                 return False
     return True
+
 
 # ---------------------------------------------------------------------------------------
 # The startup command
@@ -531,6 +544,7 @@ def main():
             sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
+
 
 if __name__ == '__main__':
     main()
