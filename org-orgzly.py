@@ -34,7 +34,6 @@
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
-from hashlib import md5
 import orgparse
 import datetime
 from datetime import date
@@ -48,7 +47,6 @@ import os
 import sys
 import time
 import shutil
-import tempfile
 
 # --------------------------------------------------------
 # Variables
@@ -65,7 +63,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.4d-dev'
+VERSION = '0.0.4g-dev'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -97,7 +95,6 @@ flags = os.O_RDWR | os.O_CREAT
 # Date Functions
 # ---------------------------------------------------------
 
-
 def org_date(entry):
     ndate = ""
     if bool(entry.deadline):
@@ -112,7 +109,6 @@ def org_date(entry):
     # An year is a leap year if it is a multiple of 4,
     # multiple of 400 and not a multiple of 100.
     # return int(years / 4) - int(years / 100) + int(years / 400)
-
 
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
@@ -130,144 +126,115 @@ def get_future(tdate, days):
     future_date = datetime.date(y, m, d)
     return future_date
 
-
 # ---------------------------------------------------------------------
 # Dedupe
 # ---------------------------------------------------------------------
 def dedupe_files(test, control):
     tfile = orgparse.load(os.path.expanduser(test))
     cfile = orgparse.load(os.path.expanduser(control))
-    uniq = []
-    con_list = []
-    test_dict = {}
+    uniq = set()
+    con_set = set()
+    test_set = set()
     for t_node in tfile.children:
-        if t_node.todo is not None:
-            test_enc = str(t_node).encode()
-            test_hash = md5(test_enc).hexdigest()
-            if test_hash not in list(test_dict.keys()):
-                test_dict.setdefault(test_hash, t)
+        if t_node.todo:
+            if t_node not in test_set:
+                test_set.add(t_node)
     for c_node in cfile.children:
-        if c_node.todo is not None:
-            c_enc = str(c_node).encode()
-            c_hash = md5(c_enc).hexdigest()
-            if c_hash not in con_list:
-                con_list.append(c_hash)
-    for m_node in list(test_dict.keys()):
-        if m_node not in con_list:
-            uniq.append(test_dict[m_node])
+        if c_node.todo:
+            if c_node not in con_set:
+                con_set.add(c_node)
+    for m_node in test_set:
+        if m_node not in con_set:
+            uniq.add(m_node)
     return uniq
 
-
-def dedupe_sec_temp(sf, control):
-    os.lseek(sf, 0, 0)
-    org_string = os.read(sf, os.path.getsize(sf))
-    tfile = orgparse.loads(org_string.decode())
-    cfile = orgparse.load(os.path.expanduser(control))
-    nodes = []
-    con_list = []
-    test_dict = {}
-    for t_node in tfile.children:
-        if t_node.todo is not None:
-            test_enc = str(t_node).encode()
-            test_hash = md5(test_enc).hexdigest()
-            if test_hash not in list(test_dict.keys()):
-                test_dict.setdefault(test_hash, t_node)
-    for c_node in cfile.children:
-        if c_node.todo is not None:
-            c_enc = str(c_node).encode()
-            c_hash = md5(c_enc).hexdigest()
-            if c_hash not in con_list:
-                con_list.append(c_hash)
-    for m_date in list(test_dict.keys()):
-        if m_date not in con_list:
-            nodes.append(test_dict[m_date])
-    return nodes
-
+# ---------------------------------------------------------------------
+# Process Entries
+# ---------------------------------------------------------------------
+def process_entries(file_nodes, days):
+    to_write = set()
+    for entry in file_nodes:
+        if entry.todo:
+            ndate = False
+            if entry.deadline:
+                ndate = str(entry.deadline)
+            if entry.scheduled and not entry.deadline:
+                ndate = str(entry.scheduled)
+            if ndate:
+                t_ndate = re.findall(r'\d+', ndate)
+                r_d = list(map(int, t_ndate))
+                newdate = str(r_d[0]) + '-' + str(r_d[1]) + '-' + str(r_d[2])
+                tdate = date.today()
+                y_1, m_1, d_1 = [int(x) for x in newdate.split('-')]
+                date_org = datetime.date(y_1, m_1, d_1)
+                y_2, m_2, d_2 = [int(x) for x in str(tdate).split('-')]
+                date_today = datetime.date(y_2, m_2, d_2)
+                future_date = get_future(tdate, days)
+                if date_today >= date_org and future_date >= date_org:
+                    if entry not in to_write:
+                        to_write.add(str(entry))
+                else:
+                    if future_date <= date_org:
+                        print("Dates do not fall within parameters. "
+                              "Due to: " + str(future_date)
+                              + " is less than " + str(date_org))
+                    elif future_date >= date_org:
+                        print("Dates do not meet parameters for some "
+                              " unknown reason or due to: "
+                              + str(date_today))
+                    else:
+                        print("There appears to be something wrong with: "
+                              + str(date_org))
+    return to_write
 
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
 def gen_file(env, org_files, orgzly_inbox, days):
+    inbox_path = os.path.expanduser(orgzly_inbox)
+    in_file = orgparse.load(inbox_path)
+    inbox_nodes = in_file.children
+    inbox_set = set()
+    inbox_set.clear()
+    for node_i in inbox_nodes:
+        if node_i not in inbox_set:
+            inbox_set.add(str(node_i))
     for orgfile in org_files:
-        to_write = []
-        to_write.clear
+        to_write = set()
+        to_write.clear()
         print('Processing: ' + orgfile)
         file = orgparse.load(os.path.expanduser(orgfile))
         add_file_keys = file.env.add_todo_keys
         add_file_keys(todos=env.todo_keys, dones=env.done_keys)
-        dr = list(range(0, len(file.children)))
-        for y in dr:
-            entry = file.children[y]
-            if entry.todo is not None:
-                ndate = ""
-                if entry.deadline:
-                    ndate = str(entry.deadline)
-                elif entry.scheduled and not entry.deadline:
-                    ndate = str(entry.scheduled)
-                else:
-                    ndate = None
-                if ndate is not None:
-                    t = re.findall(r'\d+', ndate)
-                    rd = list(map(int, t))
-                    newdate = str(rd[0]) + '-' + str(rd[1]) + '-' + str(rd[2])
-                    tdate = date.today()
-                    y1, m1, d1 = [int(x) for x in newdate.split('-')]
-                    date_org = datetime.date(y1, m1, d1)
-                    y2, m2, d2 = [int(x) for x in str(tdate).split('-')]
-                    date_today = datetime.date(y2, m2, d2)
-                    future_date = get_future(tdate, days)
-                    if date_today >= date_org and future_date >= date_org:
-                        if entry not in to_write:
-                            to_write.append(entry)
-                    else:
-                        if future_date <= date_org:
-                            print("Dates do not fall within parameters. "
-                                  "Due to: " + str(future_date)
-                                  + " is less than " + str(date_org))
-                        elif future_date >= date_org:
-                            print("Dates do not meet parameters for some "
-                                  " unknown reason or due to: "
-                                  + str(date_today))
-                        else:
-                            print("There appears to be something wrong with: "
-                                  + str(date_org))
-        inbox_path = os.path.expanduser(orgzly_inbox)
-        sec_temp = tempfile.mkstemp(suffix='_.org', prefix='oroz_', text=True)
-        sf = os.open(sec_temp[1], flags, mode)
-        for z in to_write:
-            os.write(sf, str.encode(str(z)))
-            os.write(sf, str.encode('\n'))
-        nodes = dedupe_sec_temp(sf, inbox_path)
-        os.unlink(sec_temp[1])
-        for x in nodes:
-            with open(inbox_path, "a", encoding="utf-8", newline="\n") as w:
-                w.writelines(str(x))
-                w.write("\n")
-                w.close()
+        file_nodes = file.children
+        to_write = process_entries(file_nodes, days)
+        nice_set = set()
+        for item in to_write:
+            if str(item) not in nice_set:
+                nice_set.add(str(item))
+        prime_set = inbox_set | nice_set
+        prime_list = (list(prime_set))
+    for prime_node in prime_list:
+        print(prime_node)
+        with open(inbox_path, "w",
+                  encoding="utf-8", newline="\n") as w_funky:
+            w_funky.write(prime_node)
+            w_funky.write("\n")
+            w_funky.close()
     print('Successfully pushed org nodes to orgzly!')
-
 
 # ----------------------------------------------------------
 # Sync Back
 # ----------------------------------------------------------
 def sync_back(orgzly_files, org_inbox):
-    node_list = []
-    for e in orgzly_files:
-        uniq = dedupe_files(e, org_inbox)
-        node_list.extend(uniq)
-    for o in node_list:
-        hash_dict = {}
-        if o.todo is not None:
-            o_enc = str(o).encode()
-            o_hash = md5(o_enc).hexdigest()
-            if o_hash not in list(hash_dict.keys()):
-                hash_dict.setdefault(o_hash, o)
-    for n in list(hash_dict.values()):
-        w = open(os.path.expanduser(org_inbox),
-                 "a", encoding="utf-8", newline="\n")
-        w.writelines(str(n))
-        w.write("\n")
-        w.close()
+    for org_file in orgzly_files:
+        uniq = dedupe_files(org_file, org_inbox)
+    for uniq_node in uniq:
+        with open(os.path.expanduser(org_inbox),
+                  "w", encoding="utf-8", newline="\n") as w_file:
+            w_file.writelines(str(uniq_node))
+            w_file.write("\n")
+            w_file.close()
     print("New entries added to inbox")
 
 # ----------------------------------------------------------------
@@ -286,7 +253,6 @@ def sync_back(orgzly_files, org_inbox):
 # ----------------------------------------------------------------------------
 # https://github.com/dropbox/dropbox-sdk-python/blob/master/example/updown.py
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
 
 # Dropbox upload
 def dropbox_upload(app_key, app_secret,
@@ -317,7 +283,6 @@ def dropbox_upload(app_key, app_secret,
             return None
         return res
 
-
 # Dropbox Download
 def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
@@ -331,13 +296,12 @@ def dropbox_download(app_key, app_secret, folder, name):
         while '//' in path:
             path = path.replace('//', '/')
         try:
-            md, res = dbx.files_download(path)
+            md, res = dbx.files_download(path) #<-- Not my code
         except exceptions.HttpError as err:
             print('*** HTTP error', err)
             return None
         data = res.content
         return data
-
 
 # -------------------------------------------------------------------------------------
 # Write refresh_token
@@ -353,8 +317,7 @@ def write_refresh(REFRESH_TOKEN):
         config = ConfigObj(filename, configspec=dbx_cfg)
         config['dropbox_token'] = REFRESH_TOKEN
         config.write()
-    print('Dropbox refresh token acuired and saved')
-
+    print('Dropbox refresh token acquired and saved')
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
@@ -371,11 +334,10 @@ def get_access_token(key, sec):
     try:
         oauth_result = auth_flow.finish(auth_code)
     except Exception as e_t:
-        print('Error: %s' % (e_t,))
+        print("f'Error: %s' % (e_t,)")
         sys.exit()
 
     write_refresh(oauth_result.refresh_token)
-
 
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
@@ -386,31 +348,35 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
         fullname = os.path.realpath(path)
         name = os.path.basename(path)
         dropbox_upload(app_key, app_secret, fullname, folder, name)
-
+    print('Upload to Dropbox was successful!')
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
     for k in orgzly_files:
-        sec_temp = tempfile.mkstemp(prefix='oroz_', suffix='_.org', text=True)
         path = os.path.expanduser(k)
         fullname = os.path.realpath(path)
         name = os.path.basename(path)
         data = dropbox_download(app_key, app_secret, folder, name)
-        stuff = str(data).rsplit("\\n")
-        sec_temp = tempfile.mkstemp(suffix='_.org', prefix='oroz_', text=True)
-        sf = os.open(sec_temp[1], flags, mode)
-        for line in stuff:
-            os.write(sf, str.encode(str(line)))
-            os.write(sf, str.encode('\n'))
-        nodes = dedupe_sec_temp(sf, fullname)
-        os.unlink(sec_temp[1])
-        for node in nodes:
-            with open(fullname, "a", encoding="utf-8", newline="\n") as q_w:
-                q_w.writelines(str(node))
+        debyte = bytes.decode
+        org_blob = debyte(data)
+        org_content_list = org_blob.rsplit("\\n")
+        for node in org_content_list:
+            with open(fullname, "w", encoding="utf-8", newline="\n") as q_w:
+                q_w.write(str(node))
                 q_w.write("\n")
                 q_w.close()
-    print('Get Complete')
-
+        print('Completed download from Dropbox')
+        print('Now purging file of duplicates...we think, at least.')
+        file = orgparse.load(fullname)
+        org_orglets = file.children
+        orglet_set = set(org_orglets)
+        orglet_list = (list(orglet_set))
+        for orglet in orglet_list:
+            with open(fullname, "w", encoding="utf-8", newline="\n") as q_q:
+                q_q.write(str(orglet))
+                q_q.write("\n")
+                q_q.close()
+    print('Whew! We appear to have made that shit gold!')
 
 # --------------------------------------------------------------------------------
 # Backup Files
@@ -449,12 +415,9 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
         partial_path = os.path.join(BACKUP_HOME, back_name)
         back_fullpath = os.path.expanduser(partial_path)
         shutil.copy2(userdef_path, back_fullpath, follow_symlinks=False)
-        if os.path.isfile(back_fullpath):
-            print('File successfully backed up: ' + file +
-                  ' to ' + back_fullpath)
-        else:
+        if not os.path.isfile(back_fullpath):
             print('Error occurred in the creation of a backup file.')
-
+    print('File backup successful!')
 
 # -------------------------------------------------------------------------------------
 # File Check
@@ -470,7 +433,7 @@ def file_check(create_missing, org_files, org_inbox,
         user_path = os.path.expanduser(file)
         if not os.path.isfile(user_path):
             if create_missing:
-                with open(user_path, 'w') as c_f:
+                with open(user_path, 'w', encoding='utf-8') as c_f:
                     c_f.write('#Created by org-orgzly')
                     c_f.write('\n')
                     c_f.close()
@@ -484,9 +447,7 @@ def file_check(create_missing, org_files, org_inbox,
                       ' or enable creation of missing files with "True", '
                       'an then try again.')
                 return False
-                sys.exit()
     return True
-
 
 # ---------------------------------------------------------------------------------------
 # The startup command
@@ -509,30 +470,29 @@ def main():
         config = ConfigObj(filename, configspec=spec)
 
     # ArgParse Setup
-    p = argparse.ArgumentParser(
+    p_arg = argparse.ArgumentParser(
             prog='org-orgzly',
             usage='%(prog)s.py [ --push | --pull | --put | --get ] '
             'or --dropbox_token',
-            description='Makes managing your org schedule '
-            'easier for mobile, by reducing the amount of entries '
-            'you take with you.',
+            description='Makes managing mobile org '
+            'easier, by controling what you take with you.',
             epilog='Dedicated to karlicoss, who made it possible.',
             conflict_handler='resolve')
 
-    p.add_argument('--version', action='version',
-                   version='org-orgzly ' + VERSION)
-    p.add_argument('--dropbox_token', action='store_true',
-                   help='Fetch initial Access Token')
-    p.add_argument('--push', action='store_true',
-                   help='Parse files and push them to orgzly')
-    p.add_argument('--pull', action='store_true',
-                   help='Pull new entries from orgzly to org inbox')
-    p.add_argument('--put', action='store_true',
-                   help='Upload orgzly files to dropbox')
-    p.add_argument('--get', action='store_true',
-                   help='Download orgzly files from dropbox')
+    p_arg.add_argument('--version', action='version',
+                       version='org-orgzly ' + VERSION)
+    p_arg.add_argument('--dropbox_token', action='store_true',
+                       help='Fetch initial Access Token')
+    p_arg.add_argument('--push', action='store_true',
+                       help='Parse files and push them to orgzly')
+    p_arg.add_argument('--pull', action='store_true',
+                       help='Pull new entries from orgzly to org inbox')
+    p_arg.add_argument('--put', action='store_true',
+                       help='Upload orgzly files to dropbox')
+    p_arg.add_argument('--get', action='store_true',
+                       help='Download orgzly files from dropbox')
 
-    args = p.parse_args()
+    args = p_arg.parse_args()
 
     env = orgparse.node.OrgEnv()
     addkeys = env.add_todo_keys
@@ -573,7 +533,6 @@ def main():
             sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
-
 
 if __name__ == '__main__':
     main()
