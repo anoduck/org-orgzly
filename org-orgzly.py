@@ -357,12 +357,10 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         fullname = os.path.realpath(path)
         name = os.path.basename(path)
         data = dropbox_download(app_key, app_secret, folder, name)
-        debyte = bytes.decode
-        org_blob = debyte(data)
-        org_content_list = org_blob.rsplit("\\n")
+        org_content_list = str(data).rsplit("\\n")
         for node in org_content_list:
             with open(fullname, "w", encoding="utf-8", newline="\n") as q_w:
-                q_w.write(str(node))
+                q_w.write(node)
                 q_w.write("\n")
                 q_w.close()
         print('Completed download from Dropbox')
