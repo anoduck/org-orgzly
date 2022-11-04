@@ -157,12 +157,11 @@ def dedupe_files(test, control):
 def process_entries(file_nodes, to_write, days):
     for entry in file_nodes:
         if entry.todo:
-            ndate = False
             if entry.deadline:
                 ndate = str(entry.deadline)
             if entry.scheduled and not entry.deadline:
                 ndate = str(entry.scheduled)
-            if ndate:
+            if ndate is not None:
                 t_ndate = re.findall(r'\d+', ndate)
                 r_d = list(map(int, t_ndate))
                 newdate = str(r_d[0]) + '-' + str(r_d[1]) + '-' + str(r_d[2])
