@@ -110,7 +110,6 @@ def org_date(entry):
     # multiple of 400 and not a multiple of 100.
     # return int(years / 4) - int(years / 100) + int(years / 400)
 
-
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
     d = d + int(days)
@@ -126,7 +125,6 @@ def get_future(tdate, days):
         d = d - monthDays[m]
     future_date = datetime.date(y, m, d)
     return future_date
-
 
 # ---------------------------------------------------------------------
 # Dedupe
@@ -149,7 +147,6 @@ def dedupe_files(test, control):
         if m_node not in con_set:
             uniq.add(m_node)
     return uniq
-
 
 # ---------------------------------------------------------------------
 # Process Entries
@@ -188,7 +185,6 @@ def process_entries(file_nodes, to_write, days):
                               + str(date_org))
     return to_write
 
-
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -225,7 +221,6 @@ def gen_file(env, org_files, orgzly_inbox, days):
             w_funky.close()
     print('Successfully pushed org nodes to orgzly!')
 
-
 # ----------------------------------------------------------
 # Sync Back
 # ----------------------------------------------------------
@@ -239,7 +234,6 @@ def sync_back(orgzly_files, org_inbox):
             w_file.write("\n")
             w_file.close()
     print("New entries added to inbox")
-
 
 # ----------------------------------------------------------------
 # Dropbox's setup:
@@ -287,7 +281,6 @@ def dropbox_upload(app_key, app_secret,
             return None
         return res
 
-
 # Dropbox Download
 def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
@@ -308,7 +301,6 @@ def dropbox_download(app_key, app_secret, folder, name):
         data = res.content
         return data
 
-
 # -------------------------------------------------------------------------------------
 # Write refresh_token
 # -------------------------------------------------------------------------------------
@@ -324,7 +316,6 @@ def write_refresh(REFRESH_TOKEN):
         config['dropbox_token'] = REFRESH_TOKEN
         config.write()
     print('Dropbox refresh token acquired and saved')
-
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
@@ -346,7 +337,6 @@ def get_access_token(key, sec):
 
     write_refresh(oauth_result.refresh_token)
 
-
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
@@ -357,7 +347,6 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
         name = os.path.basename(path)
         dropbox_upload(app_key, app_secret, fullname, folder, name)
     print('Upload to Dropbox was successful!')
-
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
@@ -385,7 +374,6 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
                 q_q.close()
     print('Whew! We appear to have made that shit gold!')
 
-
 # --------------------------------------------------------------------------------
 # Backup Files
 # --------------------------------------------------------------------------------
@@ -396,23 +384,22 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
     for inbox in inboxes:
         if inbox not in flist:
             flist.append(inbox)
-    bdirname = os.path.dirname(orgzly_inbox)
-    BACKUP_HOME = os.path.join(os.path.expanduser(bdirname), '.backup')
+    bdirname = os.path.dirname(os.path.expanduser(orgzly_inbox))
+    BACKUP_HOME = os.path.join(bdirname, '.backup')
     if not os.path.isdir(BACKUP_HOME):
         os.mkdir(BACKUP_HOME)
     dir_list = os.listdir(BACKUP_HOME)
     for file in dir_list:
-        if file is not None:
-            bname = os.path.basename(file)
-            dstring = bname.split('_')[0]
-            y, m, d = [int(x) for x in dstring.split('-')]
-            exp_date = date(y, m, d)
-            expiration = exp_date.strftime('%Y-%m-%d')
-            today = date.today()
-            cur_date = today.strftime('%Y-%m-%d')
-            if cur_date >= expiration:
-                os.remove(os.path.realpath(file))
-                print('Old backup file removed: ' + file)
+        bname = os.path.basename(file)
+        dstring = bname.split('_')[0]
+        y, m, d = [int(x) for x in dstring.split('-')]
+        exp_date = date(y, m, d)
+        expiration = exp_date.strftime('%Y-%m-%d')
+        today = date.today()
+        cur_date = today.strftime('%Y-%m-%d')
+        if cur_date >= expiration:
+            os.remove(os.path.realpath(file))
+            print('Old backup file removed: ' + file)
     for file in flist:
         userdef_path = os.path.expanduser(file)
         f_split = os.path.split(userdef_path)
@@ -426,7 +413,6 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
         if not os.path.isfile(back_fullpath):
             print('Error occurred in the creation of a backup file.')
     print('File backup successful!')
-
 
 # -------------------------------------------------------------------------------------
 # File Check
@@ -457,7 +443,6 @@ def file_check(create_missing, org_files, org_inbox,
                       'an then try again.')
                 return False
     return True
-
 
 # ---------------------------------------------------------------------------------------
 # The startup command
@@ -543,7 +528,6 @@ def main():
             sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
-
 
 if __name__ == '__main__':
     main()
