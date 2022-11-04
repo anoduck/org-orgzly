@@ -101,10 +101,11 @@ def org_date(entry):
         ndate = str(entry.deadline)
     elif bool(entry.scheduled) and not bool(entry.deadline):
         ndate = str(entry.scheduled)
-    t = re.findall(r'\d+', ndate)
-    rd = list(map(int, t))
-    bdate = str(rd[0]) + '-' + str(rd[1]) + '-' + str(rd[2])
-    return str(bdate)
+    t_reg = re.findall(r'\d+', ndate)
+    reg_d = list(map(int, t_reg))
+    ddate = str(reg_d[0]) + '-' + str(reg_d[1]) + '-' + str(reg_d[2])
+    bdate = str(ddate)
+    return bdate
 
     # An year is a leap year if it is a multiple of 4,
     # multiple of 400 and not a multiple of 100.
