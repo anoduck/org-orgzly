@@ -389,19 +389,19 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
     if not os.path.isdir(BACKUP_HOME):
         os.mkdir(BACKUP_HOME)
     dir_list = os.listdir(BACKUP_HOME)
-    for file in dir_list:
-        bname = os.path.basename(file)
-        dstring = bname.split('_')[0]
+    for dir_file in dir_list:
+        dstring = str(dir_file).split('_')[0]
         y, m, d = [int(x) for x in dstring.split('-')]
         exp_date = date(y, m, d)
         expiration = exp_date.strftime('%Y-%m-%d')
         today = date.today()
         cur_date = today.strftime('%Y-%m-%d')
         if cur_date >= expiration:
-            os.remove(os.path.realpath(file))
-            print('Old backup file removed: ' + file)
-    for file in flist:
-        userdef_path = os.path.expanduser(file)
+            ffull_path = os.path.join(BACKUP_HOME, dir_file)
+            os.remove(os.path.realpath(ffull_path))
+            print('Old backup file removed: ' + dir_file)
+    for flist_file in flist:
+        userdef_path = os.path.expanduser(flist_file)
         f_split = os.path.split(userdef_path)
         f_dirname = os.path.basename(f_split[0])
         f_basename = os.path.basename(userdef_path)
