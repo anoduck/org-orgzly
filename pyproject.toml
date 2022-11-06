@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "org-orgzly"
+version = "0.0.4"
+description = "Makes managing org easier, by controlling what you take with you."
+authors = ["anoduck <11767-anoduck@users.noreply.gitgud.io>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "org_orgzly"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+orgparse = "^0.3.1"
+configobj = "^5.0.6"
+dropbox = "^11.35.0"
+
+[tool.poetry.group.dev.dependencies]
+bpython = "^0.23"
+black = "^22.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

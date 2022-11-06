@@ -43,7 +43,7 @@ import time
 import shutil
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
 import orgparse
-from orgparse import OrgNode
+from orgparse import load
 from datetime import date
 from configobj import ConfigObj
 import validate
@@ -96,6 +96,7 @@ flags = os.O_RDWR | os.O_CREAT
 # Date Functions
 # ---------------------------------------------------------
 
+
 def org_date(entry):
     ndate = ""
     if bool(entry.deadline):
@@ -111,6 +112,7 @@ def org_date(entry):
     # An year is a leap year if it is a multiple of 4,
     # multiple of 400 and not a multiple of 100.
     # return int(years / 4) - int(years / 100) + int(years / 400)
+
 
 def get_future(tdate, days):
     y, m, d = [int(x) for x in str(tdate).split('-')]
@@ -128,6 +130,7 @@ def get_future(tdate, days):
     future_date = datetime.date(y, m, d)
     return future_date
 
+
 # ---------------------------------------------------------------------
 # Dedupe
 # ---------------------------------------------------------------------
@@ -137,11 +140,11 @@ def dedupe_files(test, control):
     uniq = set()
     con_set = set()
     test_set = set()
-    for t_node in tfile.env.nodes:
+    for t_node in tfile[1:]:
         if t_node.todo:
             if t_node not in test_set:
                 test_set.add(t_node)
-    for c_node in cfile.env.nodes:
+    for c_node in cfile[1:]:
         if c_node.todo:
             if c_node not in con_set:
                 con_set.add(c_node)
@@ -150,18 +153,19 @@ def dedupe_files(test, control):
             uniq.add(m_node)
     return uniq
 
+
 # ---------------------------------------------------------------------
 # Process Entries
 # ---------------------------------------------------------------------
-def process_entries(orgfile_nodes, days):
+def process_entries(orgfile, days):
     to_write = []
-    for local_node in orgfile_nodes:
-        if orgparse.OrgNode.todo:
+    for node in orgfile[1:]:
+        if node.todo:
             ndate = False
-            if entry.deadline:
-                ndate = str(entry.deadline)
-            if entry.scheduled and not entry.deadline:
-                ndate = str(entry.scheduled)
+            if node.deadline:
+                ndate = str(node.deadline)
+            if node.scheduled and not node.deadline:
+                ndate = str(node.scheduled)
             if ndate:
                 t_ndate = re.findall(r'\d+', ndate)
                 r_d = list(map(int, t_ndate))
@@ -173,8 +177,8 @@ def process_entries(orgfile_nodes, days):
                 date_today = datetime.date(y_2, m_2, d_2)
                 future_date = get_future(tdate, days)
                 if date_today >= date_org and future_date >= date_org:
-                    if entry not in to_write:
-                        to_write.append(str(entry))
+                    if node not in to_write:
+                        to_write.append(str(node))
                 else:
                     if future_date <= date_org:
                         print("Dates do not fall within parameters. "
@@ -187,8 +191,8 @@ def process_entries(orgfile_nodes, days):
                     else:
                         print("There appears to be something wrong with: "
                               + str(date_org))
-    print(to_write)
     return to_write
+
 
 # ---------------------------------------------------------------------
 # The main function
@@ -207,8 +211,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
         file = orgparse.load(os.path.expanduser(orgfile))
         add_file_keys = file.env.add_todo_keys
         add_file_keys(todos=env.todo_keys, dones=env.done_keys)
-        orgfile_nodes = file.env.nodes
-        to_write = process_entries(orgfile_nodes, days)
+        to_write = process_entries(file, days)
         prime_set = prime_set | set(inbox_list) | set(to_write)
     prime_list = (list(prime_set))
     for prime_node in prime_list:
@@ -220,6 +223,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
             w_funky.close()
     prime_set.clear()
     print('Successfully pushed org nodes to orgzly!')
+
 
 # ----------------------------------------------------------
 # Sync Back
@@ -281,6 +285,7 @@ def dropbox_upload(app_key, app_secret,
             return None
         return res
 
+
 # Dropbox Download
 def dropbox_download(app_key, app_secret, folder, name):
     """Download a file.
@@ -301,6 +306,7 @@ def dropbox_download(app_key, app_secret, folder, name):
         data = res.content
         return data
 
+
 # -------------------------------------------------------------------------------------
 # Write refresh_token
 # -------------------------------------------------------------------------------------
@@ -316,6 +322,7 @@ def write_refresh(REFRESH_TOKEN):
         config['dropbox_token'] = REFRESH_TOKEN
         config.write()
     print('Dropbox refresh token acquired and saved')
+
 
 # -------------------------------------------------------------------------------------
 # Get the authentication token:
@@ -337,6 +344,7 @@ def get_access_token(key, sec):
 
     write_refresh(oauth_result.refresh_token)
 
+
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
@@ -347,6 +355,7 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
         name = os.path.basename(path)
         dropbox_upload(app_key, app_secret, fullname, folder, name)
     print('Upload to Dropbox was successful!')
+
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     folder = dropbox_folder
@@ -373,6 +382,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         #         q_q.write("\n")
         #         q_q.close()
     print('Dropbox getting was successful')
+
 
 # --------------------------------------------------------------------------------
 # Backup Files
@@ -414,6 +424,7 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
             print('Error occurred in the creation of a backup file.')
     print('File backup successful!')
 
+
 # -------------------------------------------------------------------------------------
 # File Check
 # -------------------------------------------------------------------------------------
@@ -443,6 +454,7 @@ def file_check(create_missing, org_files, org_inbox,
                       'an then try again.')
                 return False
     return True
+
 
 # ---------------------------------------------------------------------------------------
 # The startup command
@@ -528,6 +540,7 @@ def main():
             sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
+
 
 if __name__ == '__main__':
     main()
