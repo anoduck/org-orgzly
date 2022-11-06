@@ -164,8 +164,10 @@ def process_entries(orgfile, days):
             ndate = False
             if node.deadline:
                 ndate = str(node.deadline)
-            if node.scheduled and not node.deadline:
+            elif node.scheduled and not node.deadline:
                 ndate = str(node.scheduled)
+            else:
+                pass
             if ndate:
                 t_ndate = re.findall(r'\d+', ndate)
                 r_d = list(map(int, t_ndate))
@@ -176,21 +178,22 @@ def process_entries(orgfile, days):
                 y_2, m_2, d_2 = [int(x) for x in str(tdate).split('-')]
                 date_today = datetime.date(y_2, m_2, d_2)
                 future_date = get_future(tdate, days)
-                if date_today >= date_org and future_date >= date_org:
-                    if node not in to_write:
-                        to_write.append(str(node))
-                else:
-                    if future_date <= date_org:
-                        print("Dates do not fall within parameters. "
-                              "Due to: " + str(future_date)
-                              + " is less than " + str(date_org))
-                    elif future_date >= date_org:
-                        print("Dates do not meet parameters for some "
-                              " unknown reason or due to: "
-                              + str(date_today))
-                    else:
-                        print("There appears to be something wrong with: "
-                              + str(date_org))
+                if date_today >= date_org:
+                    if future_date >= date_org:
+                        if str(node) not in to_write:
+                            to_write.append(str(node))
+                        else:
+                            if future_date <= date_org:
+                                print("Dates do not fall within parameters. "
+                                      "Due to: " + str(future_date)
+                                      + " is less than " + str(date_org))
+                            elif future_date >= date_org:
+                                print("Dates do not meet parameters for some "
+                                      " unknown reason or due to: "
+                                      + str(date_today))
+                            else:
+                                print("There appears to be something wrong: "
+                                      + str(date_org))
     return to_write
 
 
@@ -216,7 +219,7 @@ def gen_file(env, org_files, orgzly_inbox, days):
     prime_list = (list(prime_set))
     for prime_node in prime_list:
         print(prime_node)
-        with open(inbox_path, "w",
+        with open(inbox_path, "a",
                   encoding="utf-8", newline="\n") as w_funky:
             w_funky.write(prime_node)
             w_funky.write("\n")
@@ -233,7 +236,7 @@ def sync_back(orgzly_files, org_inbox):
         uniq = dedupe_files(org_file, org_inbox)
     for uniq_node in uniq:
         with open(os.path.expanduser(org_inbox),
-                  "w", encoding="utf-8", newline="\n") as w_file:
+                  "a", encoding="utf-8", newline="\n") as w_file:
             w_file.writelines(str(uniq_node))
             w_file.write("\n")
             w_file.close()
@@ -255,6 +258,7 @@ def sync_back(orgzly_files, org_inbox):
 # ----------------------------------------------------------------------------
 # https://github.com/dropbox/dropbox-sdk-python/blob/master/example/updown.py
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
 
 # Dropbox upload
 def dropbox_upload(app_key, app_secret,
@@ -366,21 +370,21 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         data = dropbox_download(app_key, app_secret, folder, name)
         org_content_list = str(data).rsplit("\\n")
         for node in org_content_list:
-            with open(fullname, "w", encoding="utf-8", newline="\n") as q_w:
+            with open(fullname, "a", encoding="utf-8", newline="\n") as q_w:
                 q_w.write(node)
                 q_w.write("\n")
                 q_w.close()
-        # print('Completed download from Dropbox')
-        # print('Now purging file of duplicates...we think, at least.')
-        # file = orgparse.load(fullname)
-        # org_orglets = file.children
-        # orglet_set = set(org_orglets)
-        # orglet_list = (list(orglet_set))
-        # for orglet in orglet_list:
-        #     with open(fullname, "w", encoding="utf-8", newline="\n") as q_q:
-        #         q_q.write(str(orglet))
-        #         q_q.write("\n")
-        #         q_q.close()
+        print('Completed download from Dropbox')
+        print('Now purging file of duplicates.')
+        file = orgparse.load(fullname)
+        org_orglets = file.children
+        orglet_set = set(org_orglets)
+        orglet_list = (list(orglet_set))
+        for orglet in orglet_list:
+            with open(fullname, "a", encoding="utf-8", newline="\n") as q_q:
+                q_q.write(str(orglet))
+                q_q.write("\n")
+                q_q.close()
     print('Dropbox getting was successful')
 
 
@@ -437,10 +441,20 @@ def file_check(create_missing, org_files, org_inbox,
             flist.append(inbox)
     for file in flist:
         user_path = os.path.expanduser(file)
+        file_title = os.path.basename(user_path).strip('.org')
+        title_label = ' '.join(['#+TITLE: ', file_title])
+        date_string = date.today().strftime('%Y-%m-%d %A')
+        date_label = ' '.join(['#+DATE: ', date_string])
         if not os.path.isfile(user_path):
             if create_missing:
-                with open(user_path, 'w', encoding='utf-8') as c_f:
+                with open(user_path, 'a', encoding='utf-8') as c_f:
+                    c_f.write(title_label)
+                    c_f.write('\n')
+                    c_f.write(date_label)
+                    c_f.write('\n')
                     c_f.write('#Created by org-orgzly')
+                    c_f.write('\n')
+                    c_f.write('#----------------------')
                     c_f.write('\n')
                     c_f.close()
                 print('File Created: ' + user_path)
