@@ -180,8 +180,8 @@ def process_entries(orgfile, days):
                 future_date = get_future(tdate, days)
                 if date_today >= date_org:
                     if future_date >= date_org:
-                        if str(node) not in to_write:
-                            to_write.append(str(node))
+                        if node not in to_write:
+                            to_write.append(node)
                         else:
                             if future_date <= date_org:
                                 print("Dates do not fall within parameters. "
@@ -206,9 +206,10 @@ def gen_file(env, org_files, orgzly_inbox, days):
     inbox_nodes = in_file.env.nodes
     inbox_list = []
     prime_set = set()
+    uniq_set = set()
     for node_i in inbox_nodes:
         if node_i not in inbox_list:
-            inbox_list.append(str(node_i))
+            inbox_list.append(node_i)
     for orgfile in org_files:
         print('Processing: ' + orgfile)
         file = orgparse.load(os.path.expanduser(orgfile))
@@ -216,12 +217,20 @@ def gen_file(env, org_files, orgzly_inbox, days):
         add_file_keys(todos=env.todo_keys, dones=env.done_keys)
         to_write = process_entries(file, days)
         prime_set = prime_set | set(inbox_list) | set(to_write)
-    prime_list = (list(prime_set))
-    for prime_node in prime_list:
-        print(prime_node)
+    for node in prime_set:
+        node_id = node.get_property('ID')
+        if node_id:
+            if node_id not in {x.get_property('ID') for x in uniq_set}:
+                uniq_set.add(node)
+        else:
+            if node.heading not in {x.heading for x in prime_set}:
+                uniq_set.add(node)
+    print("Duplicates removed using node id and node heading.")
+    for uniq_node in uniq_set:
+        # print(node_to_use)
         with open(inbox_path, "a",
                   encoding="utf-8", newline="\n") as w_funky:
-            w_funky.write(prime_node)
+            w_funky.write(str(uniq_node))
             w_funky.write("\n")
             w_funky.close()
     prime_set.clear()
