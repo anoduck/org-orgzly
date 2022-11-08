@@ -137,6 +137,7 @@ could be very messy and lead to data loss. The intended command flow is as follo
 
 #+NAME: plantuml.svg
 [[Resources/README/plantuml.svg]]
+
 *** Troubleshooting
 As long as the option =create_missing= is set to =True=, any missing file defined in the configuration file
 will be automatically created for the user in the defined folder located in the user's home directory. The file will be created with a
