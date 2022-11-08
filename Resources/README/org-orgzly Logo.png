@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en-US" class="theme-">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>org-orgzly/org-orgzly_logo.png at master -  org-orgzly - Codeberg.org</title>
+	<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQ29kZWJlcmcub3JnIiwic2hvcnRfbmFtZSI6IkNvZGViZXJnLm9yZyIsInN0YXJ0X3VybCI6Imh0dHBzOi8vY29kZWJlcmcub3JnLyIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2NvZGViZXJnLm9yZy9hc3NldHMvaW1nL2xvZ28ucG5nIiwidHlwZSI6ImltYWdlL3BuZyIsInNpemVzIjoiNTEyeDUxMiJ9LHsic3JjIjoiaHR0cHM6Ly9jb2RlYmVyZy5vcmcvYXNzZXRzL2ltZy9sb2dvLnN2ZyIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwic2l6ZXMiOiI1MTJ4NTEyIn1dfQ==">
+	<meta name="theme-color" content="#2185D0">
+	<meta name="default-theme" content="codeberg-auto">
+	<meta name="author" content="anoduck">
+	<meta name="description" content="org-orgzly - Script to parse a chosen org file or files, check if an entry meets required parameters, and if it does, write the entry in a new file located inside the folder you desire to sync with orgzly.
+
+Also, mirrored at https://github.com/anoduck/org-orgzly">
+	<meta name="keywords" content="git,non-profit,foss,oss,free,software,open,source,code,hosting">
+	<meta name="referrer" content="no-referrer">
+
+
+	<link rel="alternate" type="application/atom+xml" title="" href="https://codeberg.org/anoduck/org-orgzly.atom">
+	<link rel="alternate" type="application/rss+xml" title="" href="https://codeberg.org/anoduck/org-orgzly.rss">
+
+	<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+	<link rel="alternate icon" href="/assets/img/favicon.png" type="image/png">
+	<link rel="stylesheet" href="/assets/css/index.css?v=1.17.3~87-ge4b8341">
+	
+<script>
+	<!--   -->
+	window.addEventListener('error', function(e) {window._globalHandlerErrors=window._globalHandlerErrors||[]; window._globalHandlerErrors.push(e);});
+	window.config = {
+		appVer: '1.17.3\u002b87-ge4b8341',
+		appUrl: 'https:\/\/codeberg.org\/',
+		appSubUrl: '',
+		assetVersionEncoded: encodeURIComponent('1.17.3~87-ge4b8341'), 
+		assetUrlPrefix: '\/assets',
+		runModeIsProd:  true ,
+		customEmojis: {"codeberg":":codeberg:","git":":git:","gitea":":gitea:","github":":github:","gitlab":":gitlab:","gogs":":gogs:"},
+		useServiceWorker:  false ,
+		csrfToken: 'Zth_infxnQynEv7QfAJlwUthaP06MTY2Nzg5NTkxMzc1MzYxNTI3Mg',
+		pageData: {},
+		requireTribute:  null ,
+		notificationSettings: {"EventSourceUpdateTime":10000,"MaxTimeout":60000,"MinTimeout":10000,"TimeoutStep":10000}, 
+		enableTimeTracking:  true ,
+		
+		mermaidMaxSourceCharacters:  5000 ,
+		
+		i18n: {
+			copy_success: 'Copied!',
+			copy_error: 'Copy failed',
+			error_occurred: 'An error occurred',
+			network_error: 'Network error',
+		},
+	};
+	
+	window.config.pageData = window.config.pageData || {};
+</script>
+
+	<noscript>
+		<style>
+			.dropdown:hover > .menu { display: block; }
+			.ui.secondary.menu .dropdown.item > .menu { margin-top: 0; }
+		</style>
+	</noscript>
+
+	
+		<meta property="og:title" content="org-orgzly">
+		<meta property="og:url" content="https://codeberg.org/anoduck/org-orgzly">
+		
+			<meta property="og:description" content="Script to parse a chosen org file or files, check if an entry meets required parameters, and if it does, write the entry in a new file located inside the folder you desire to sync with orgzly.
+
+Also, mirrored at https://github.com/anoduck/org-orgzly">
+		
+	
+	<meta property="og:type" content="object">
+	
+		<meta property="og:image" content="https://codeberg.org/repo-avatars/64640-bdb8a2db8a62351a10d03cdb67362714">
+	
+
+<meta property="og:site_name" content="Codeberg.org">
+
+	<link rel="stylesheet" href="/assets/css/theme-codeberg-auto.css?v=1.17.3~87-ge4b8341">
+
+	
+	<link rel="icon" href="https://design.codeberg.org/logo-kit/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="https://design.codeberg.org/logo-kit/favicon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="https://design.codeberg.org/logo-kit/apple-touch-icon.png" />
+
+	<link rel="stylesheet" href="https://design.codeberg.org/design-kit/codeberg.css" />
+	<script defer src="https://design.codeberg.org/design-kit/codeberg.js"></script>
+	<script defer type="module" src="https://design.codeberg.org/components/codeberg-components.js"></script>
+
+	<link href="https://fonts.codeberg.org/dist/inter/Inter%20Web/inter.css" rel="stylesheet" />
+
+	
+	<link rel="stylesheet" href="/assets/codeberg.css">
+	
+	<script async src="/assets/stlview.js"></script>
+
+	
+	<link rel="icon" href="https://design.codeberg.org/logo-kit/favicon.ico" type="image/x-icon" />
+	<link rel="icon" href="https://design.codeberg.org/logo-kit/favicon.svg" type="image/svg+xml" />
+	<link rel="apple-touch-icon" href="https://design.codeberg.org/logo-kit/apple-touch-icon.png" />
+
+	<link rel="stylesheet" href="https://design.codeberg.org/design-kit/codeberg.css" />
+	<script defer src="https://design.codeberg.org/design-kit/codeberg.js"></script>
+	<script defer type="module" src="https://design.codeberg.org/components/codeberg-components.js"></script>
+
+	<link href="https://fonts.codeberg.org/dist/inter/Inter%20Web/inter.css" rel="stylesheet" />
+	
+
+</head>
+<body>
+	
+
+	<div class="full height">
+		<noscript>This website works better with JavaScript.</noscript>
+
+		
+
+		
+			<div class="ui top secondary stackable main menu following bar light no-vertical-tabs">
+				<div class="ui container" id="navbar">
+	
+	
+	<div class="item brand" style="justify-content: space-between;">
+		<a href="/" aria-label="Home">
+			<img class="ui mini image" width="26" height="26" src="https://design.codeberg.org/logo-kit/icon_inverted.svg">
+		</a>
+		
+		<div class="ui basic icon button mobile-only" id="navbar-expand-toggle">
+			<i class="sidebar icon"></i>
+		</div>
+	</div>
+
+	
+		<a class="item " href="/explore/repos">Explore</a>
+	
+
+	
+
+	
+
+
+	
+		<a class="item" target="_blank" rel="noopener noreferrer" href="https://docs.codeberg.org">Help</a>
+		<div class="right stackable menu">
+			
+				<a class="item" href="/user/sing_up">
+					<svg viewBox="0 0 16 16" class="svg octicon-person" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M10.5 5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zm.061 3.073a4 4 0 1 0-5.123 0 6.004 6.004 0 0 0-3.431 5.142.75.75 0 0 0 1.498.07 4.5 4.5 0 0 1 8.99 0 .75.75 0 1 0 1.498-.07 6.005 6.005 0 0 0-3.432-5.142z"/></svg> Register
+				</a>
+			
+			<a class="item" rel="nofollow" href="/user/login?redirect_to=%2fanoduck%2forg-orgzly%2fsrc%2fbranch%2fmaster%2forg-orgzly_logo.png">
+				<svg viewBox="0 0 16 16" class="svg octicon-sign-in" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2 2.75C2 1.784 2.784 1 3.75 1h2.5a.75.75 0 0 1 0 1.5h-2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h2.5a.75.75 0 0 1 0 1.5h-2.5A1.75 1.75 0 0 1 2 13.25V2.75zm6.56 4.5 1.97-1.97a.75.75 0 1 0-1.06-1.06L6.22 7.47a.75.75 0 0 0 0 1.06l3.25 3.25a.75.75 0 1 0 1.06-1.06L8.56 8.75h5.69a.75.75 0 0 0 0-1.5H8.56z"/></svg> Sign In
+			</a>
+		</div>
+	
+</div>
+
+			</div>
+		
+
+
+
+<div class="page-content repository file list ">
+	<div class="header-wrapper">
+
+	<div class="ui container">
+		<div class="repo-header">
+			<div class="repo-title-wrap df fc">
+				<div class="repo-title">
+					
+					
+						<img class="ui avatar image mr-3" src="/repo-avatars/64640-bdb8a2db8a62351a10d03cdb67362714" title="anoduck/org-orgzly" width="32" height="32"/>
+					
+					<a href="/anoduck">anoduck</a>
+					<div class="mx-2">/</div>
+					<a href="/anoduck/org-orgzly">org-orgzly</a>
+					<a href="/anoduck/org-orgzly.rss"><i class="ui grey icon tooltip ml-3" data-content="RSS Feed" data-position="top center"><svg viewBox="0 0 16 16" class="svg octicon-rss" width="18" height="18" aria-hidden="true"><path fill-rule="evenodd" d="M2.002 2.725a.75.75 0 0 1 .797-.699C8.79 2.42 13.58 7.21 13.974 13.201a.75.75 0 1 1-1.497.098 10.502 10.502 0 0 0-9.776-9.776.75.75 0 0 1-.7-.798zM2 13a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm.84-5.95a.75.75 0 0 0-.179 1.489c2.509.3 4.5 2.291 4.8 4.8a.75.75 0 1 0 1.49-.178A7.003 7.003 0 0 0 2.838 7.05z"/></svg></i></a>
+					<div class="labels df ac fw">
+						
+						
+							
+								
+							
+						
+						
+					</div>
+				</div>
+				
+				
+				
+			</div>
+			
+				<div class="repo-buttons">
+					
+					<form method="post" action="/anoduck/org-orgzly/action/watch?redirect_to=%2fanoduck%2forg-orgzly%2fsrc%2fbranch%2fmaster%2forg-orgzly_logo.png">
+						<input type="hidden" name="_csrf" value="Zth_infxnQynEv7QfAJlwUthaP06MTY2Nzg5NTkxMzc1MzYxNTI3Mg">
+						<div class="ui labeled button tooltip" tabindex="0" data-content="Sign in to watch this repository." data-position="top center">
+							<button type="submit" class="ui compact small basic button" disabled>
+								<svg viewBox="0 0 16 16" class="svg octicon-eye" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.679 7.932c.412-.621 1.242-1.75 2.366-2.717C5.175 4.242 6.527 3.5 8 3.5c1.473 0 2.824.742 3.955 1.715 1.124.967 1.954 2.096 2.366 2.717a.119.119 0 0 1 0 .136c-.412.621-1.242 1.75-2.366 2.717C10.825 11.758 9.473 12.5 8 12.5c-1.473 0-2.824-.742-3.955-1.715C2.92 9.818 2.09 8.69 1.679 8.068a.119.119 0 0 1 0-.136zM8 2c-1.981 0-3.67.992-4.933 2.078C1.797 5.169.88 6.423.43 7.1a1.619 1.619 0 0 0 0 1.798c.45.678 1.367 1.932 2.637 3.024C4.329 13.008 6.019 14 8 14c1.981 0 3.67-.992 4.933-2.078 1.27-1.091 2.187-2.345 2.637-3.023a1.619 1.619 0 0 0 0-1.798c-.45-.678-1.367-1.932-2.637-3.023C11.671 2.992 9.981 2 8 2zm0 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>Watch
+							</button>
+							<a class="ui basic label" href="/anoduck/org-orgzly/watchers">
+								2
+							</a>
+						</div>
+					</form>
+					
+						<form method="post" action="/anoduck/org-orgzly/action/star?redirect_to=%2fanoduck%2forg-orgzly%2fsrc%2fbranch%2fmaster%2forg-orgzly_logo.png">
+							<input type="hidden" name="_csrf" value="Zth_infxnQynEv7QfAJlwUthaP06MTY2Nzg5NTkxMzc1MzYxNTI3Mg">
+							<div class="ui labeled button tooltip" tabindex="0" data-content="Sign in to star this repository." data-position="top center">
+								<button type="submit" class="ui compact small basic button" disabled>
+									<svg viewBox="0 0 16 16" class="svg octicon-star" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25zm0 2.445L6.615 5.5a.75.75 0 0 1-.564.41l-3.097.45 2.24 2.184a.75.75 0 0 1 .216.664l-.528 3.084 2.769-1.456a.75.75 0 0 1 .698 0l2.77 1.456-.53-3.084a.75.75 0 0 1 .216-.664l2.24-2.183-3.096-.45a.75.75 0 0 1-.564-.41L8 2.694v.001z"/></svg>Star
+								</button>
+								<a class="ui basic label" href="/anoduck/org-orgzly/stars">
+									0
+								</a>
+							</div>
+						</form>
+					
+					
+						<div class="ui labeled button
+							
+								tooltip disabled
+							"
+							
+								data-content="Sign in to fork this repository."
+							
+						data-position="top center" data-variation="tiny" tabindex="0">
+							<a class="ui compact small basic button"
+								
+									
+								
+							>
+								<svg viewBox="0 0 16 16" class="svg octicon-repo-forked" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M5 3.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm0 2.122a2.25 2.25 0 1 0-1.5 0v.878A2.25 2.25 0 0 0 5.75 8.5h1.5v2.128a2.251 2.251 0 1 0 1.5 0V8.5h1.5a2.25 2.25 0 0 0 2.25-2.25v-.878a2.25 2.25 0 1 0-1.5 0v.878a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 5 6.25v-.878zm3.75 7.378a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0zm3-8.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"/></svg>Fork
+							</a>
+							<div class="ui small modal" id="fork-repo-modal">
+								<svg viewBox="0 0 16 16" class="close inside svg octicon-x" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z"/></svg>
+								<div class="header">
+									You&#39;ve already forked org-orgzly
+								</div>
+								<div class="content tl">
+									<div class="ui list">
+										
+									</div>
+									
+								</div>
+							</div>
+							<a class="ui basic label" href="/anoduck/org-orgzly/forks">
+								1
+							</a>
+						</div>
+					
+				</div>
+			
+		</div>
+	</div>
+
+	<div class="ui tabs container">
+		
+			<div class="ui tabular stackable menu navbar">
+				
+				<a class="active item" href="/anoduck/org-orgzly">
+					<svg viewBox="0 0 16 16" class="svg octicon-code" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4.72 3.22a.75.75 0 0 1 1.06 1.06L2.06 8l3.72 3.72a.75.75 0 1 1-1.06 1.06L.47 8.53a.75.75 0 0 1 0-1.06l4.25-4.25zm6.56 0a.75.75 0 1 0-1.06 1.06L13.94 8l-3.72 3.72a.75.75 0 1 0 1.06 1.06l4.25-4.25a.75.75 0 0 0 0-1.06l-4.25-4.25z"/></svg> Code
+				</a>
+				
+
+				
+					<a class=" item" href="/anoduck/org-orgzly/issues">
+						<svg viewBox="0 0 16 16" class="svg octicon-issue-opened" width="16" height="16" aria-hidden="true"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path fill-rule="evenodd" d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM1.5 8a6.5 6.5 0 1 1 13 0 6.5 6.5 0 0 1-13 0z"/></svg> Issues
+						
+							<span class="ui primary small label">5</span>
+						
+					</a>
+				
+
+				
+
+				
+					<a class=" item" href="/anoduck/org-orgzly/pulls">
+						<svg viewBox="0 0 16 16" class="svg octicon-git-pull-request" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.177 3.073 9.573.677A.25.25 0 0 1 10 .854v4.792a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354zM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25zM11 2.5h-1V4h1a1 1 0 0 1 1 1v5.628a2.251 2.251 0 1 0 1.5 0V5A2.5 2.5 0 0 0 11 2.5zm1 10.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0zM3.75 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5z"/></svg> Pull Requests
+						
+					</a>
+				
+
+				
+
+				
+					<a href="/anoduck/org-orgzly/projects" class=" item">
+						<svg viewBox="0 0 16 16" class="svg octicon-project" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.75 0A1.75 1.75 0 0 0 0 1.75v12.5C0 15.216.784 16 1.75 16h12.5A1.75 1.75 0 0 0 16 14.25V1.75A1.75 1.75 0 0 0 14.25 0H1.75zM1.5 1.75a.25.25 0 0 1 .25-.25h12.5a.25.25 0 0 1 .25.25v12.5a.25.25 0 0 1-.25.25H1.75a.25.25 0 0 1-.25-.25V1.75zM11.75 3a.75.75 0 0 0-.75.75v7.5a.75.75 0 0 0 1.5 0v-7.5a.75.75 0 0 0-.75-.75zm-8.25.75a.75.75 0 0 1 1.5 0v5.5a.75.75 0 0 1-1.5 0v-5.5zM8 3a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5A.75.75 0 0 0 8 3z"/></svg> Projects
+						
+							<span class="ui primary small label">2</span>
+						
+					</a>
+				
+
+				
+				<a class=" item" href="/anoduck/org-orgzly/releases">
+					<svg viewBox="0 0 16 16" class="svg octicon-tag" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 7.775V2.75a.25.25 0 0 1 .25-.25h5.025a.25.25 0 0 1 .177.073l6.25 6.25a.25.25 0 0 1 0 .354l-5.025 5.025a.25.25 0 0 1-.354 0l-6.25-6.25a.25.25 0 0 1-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775zM6 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> Releases
+					
+						<span class="ui primary small label">3</span>
+					
+				</a>
+				
+
+				
+
+				
+					<a class=" item" href="/anoduck/org-orgzly/activity">
+						<svg viewBox="0 0 16 16" class="svg octicon-pulse" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6 2a.75.75 0 0 1 .696.471L10 10.731l1.304-3.26A.75.75 0 0 1 12 7h3.25a.75.75 0 0 1 0 1.5h-2.742l-1.812 4.528a.75.75 0 0 1-1.392 0L6 4.77 4.696 8.03A.75.75 0 0 1 4 8.5H.75a.75.75 0 0 1 0-1.5h2.742l1.812-4.529A.75.75 0 0 1 6 2z"/></svg> Activity
+					</a>
+				
+
+				
+
+				
+			</div>
+		
+	</div>
+	<div class="ui tabs divider"></div>
+</div>
+
+	<div class="ui container ">
+		
+
+
+
+		<div class="ui repo-description">
+			<div id="repo-desc">
+				
+				<span class="description">Script to parse a chosen org file or files, check if an entry meets required parameters, and if it does, write the entry in a new file located inside the folder you desire to sync with orgzly.
+
+Also, mirrored at <a href="https://github.com/anoduck/org-orgzly" target="_blank" rel="noopener noreferrer nofollow">https://github.com/anoduck/org-orgzly</a></span>
+				<a class="link" href=""></a>
+			</div>
+			
+		</div>
+		<div class="mt-3" id="repo-topics">
+		
+			
+				<a class="ui repo-topic large label topic" href="/explore/repos?q=org&topic=1">org</a>
+			
+		
+			
+				<a class="ui repo-topic large label topic" href="/explore/repos?q=org-mode&topic=1">org-mode</a>
+			
+		
+			
+				<a class="ui repo-topic large label topic" href="/explore/repos?q=dropbox&topic=1">dropbox</a>
+			
+		
+			
+				<a class="ui repo-topic large label topic" href="/explore/repos?q=orgmode&topic=1">orgmode</a>
+			
+		
+			
+				<a class="ui repo-topic large label topic" href="/explore/repos?q=orgzly&topic=1">orgzly</a>
+			
+		
+		
+		</div>
+		
+		<div class="hide" id="validate_prompt">
+			<span id="count_prompt">You can not select more than 25 topics</span>
+			<span id="format_prompt">Topics must start with a letter or number, can include dashes (&#39;-&#39;) and can be up to 35 characters long.</span>
+		</div>
+
+		
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+	
+	
+
+
+
+	
+	
+
+
+
+	
+	
+
+
+
+	
+	
+
+
+
+
+
+		
+		<div class="ui segments repository-summary repository-summary-language-stats mt-2 mb-0">
+	<div class="ui segment sub-menu repository-menu">
+		<div class="ui two horizontal center link list">
+			
+				<div class="item">
+					<a class="ui" href="/anoduck/org-orgzly/commits/branch/master"><svg viewBox="0 0 16 16" class="svg octicon-history" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.643 3.143.427 1.927A.25.25 0 0 0 0 2.104V5.75c0 .138.112.25.25.25h3.646a.25.25 0 0 0 .177-.427L2.715 4.215a6.5 6.5 0 1 1-1.18 4.458.75.75 0 1 0-1.493.154 8.001 8.001 0 1 0 1.6-5.684zM7.75 4a.75.75 0 0 1 .75.75v2.992l2.028.812a.75.75 0 0 1-.557 1.392l-2.5-1A.75.75 0 0 1 7 8.25v-3.5A.75.75 0 0 1 7.75 4z"/></svg> <b>60</b> Commits</a>
+				</div>
+				<div class="item">
+					<a class="ui" href="/anoduck/org-orgzly/branches"><svg viewBox="0 0 16 16" class="svg octicon-git-branch" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0z"/></svg> <b>2</b> Branches</a>
+				</div>
+				
+					<div class="item">
+						<a class="ui" href="/anoduck/org-orgzly/tags"><svg viewBox="0 0 16 16" class="svg octicon-tag" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 7.775V2.75a.25.25 0 0 1 .25-.25h5.025a.25.25 0 0 1 .177.073l6.25 6.25a.25.25 0 0 1 0 .354l-5.025 5.025a.25.25 0 0 1-.354 0l-6.25-6.25a.25.25 0 0 1-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775zM6 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> <b>3</b> Tags</a>
+					</div>
+				
+				<div class="item">
+					<span class="ui"><svg viewBox="0 0 16 16" class="svg octicon-database" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 3.5c0-.133.058-.318.282-.55.227-.237.592-.484 1.1-.708C4.899 1.795 6.354 1.5 8 1.5c1.647 0 3.102.295 4.117.742.51.224.874.47 1.101.707.224.233.282.418.282.551 0 .133-.058.318-.282.55-.227.237-.592.484-1.1.708C11.101 5.205 9.646 5.5 8 5.5c-1.647 0-3.102-.295-4.117-.742-.51-.224-.874-.47-1.101-.707-.224-.233-.282-.418-.282-.551zM1 3.5c0-.626.292-1.165.7-1.59.406-.422.956-.767 1.579-1.041C4.525.32 6.195 0 8 0c1.805 0 3.475.32 4.722.869.622.274 1.172.62 1.578 1.04.408.426.7.965.7 1.591v9c0 .626-.292 1.165-.7 1.59-.406.422-.956.767-1.579 1.041C11.476 15.68 9.806 16 8 16c-1.805 0-3.475-.32-4.721-.869-.623-.274-1.173-.62-1.579-1.04-.408-.426-.7-.965-.7-1.591v-9zM2.5 8V5.724c.241.15.503.286.779.407C4.525 6.68 6.195 7 8 7c1.805 0 3.475-.32 4.722-.869.275-.121.537-.257.778-.407V8c0 .133-.058.318-.282.55-.227.237-.592.484-1.1.708C11.101 9.705 9.646 10 8 10c-1.647 0-3.102-.295-4.117-.742-.51-.224-.874-.47-1.101-.707C2.558 8.318 2.5 8.133 2.5 8zm0 2.225V12.5c0 .133.058.318.282.55.227.237.592.484 1.1.708 1.016.447 2.471.742 4.118.742 1.647 0 3.102-.295 4.117-.742.51-.224.874-.47 1.101-.707.224-.233.282-.418.282-.551v-2.275c-.241.15-.503.285-.778.406-1.247.549-2.917.869-4.722.869-1.805 0-3.475-.32-4.721-.869a6.236 6.236 0 0 1-.779-.406z"/></svg> <b>1.7 MiB</b></span>
+				</div>
+			
+		</div>
+	</div>
+	
+	<div class="ui segment sub-menu language-stats-details" style="display: none">
+		<div class="ui horizontal center link list">
+			
+			<div class="item df ac jc">
+				<i class="color-icon mr-3" style="background-color: #3572A5"></i>
+				<span class="bold mr-3">
+					
+						Python
+					
+				</span>
+				100%
+			</div>
+			
+		</div>
+	</div>
+	<a class="ui segment language-stats">
+		
+		<div class="bar" style="width: 100%; background-color: #3572A5">&nbsp;</div>
+		
+	</a>
+	
+</div>
+
+		<div class="repo-button-row df ac sb fw">
+			<div class="df ac">
+				
+
+
+
+<div class="fitted item choose reference mr-1">
+	<div class="ui floating filter dropdown custom"
+		data-branch-form=""
+		data-can-create-branch="false"
+		data-no-results="No results found."
+		data-set-action="" data-submit-form=""
+		data-view-type="branch"
+		data-ref-name="master"
+		data-branch-url-prefix="/anoduck/org-orgzly/src/branch/"
+		data-branch-url-suffix="/org-orgzly_logo.png"
+		data-tag-url-prefix="/anoduck/org-orgzly/src/tag/"
+		data-tag-url-suffix="/org-orgzly_logo.png">
+		<div class="branch-dropdown-button ellipsis ui basic small compact button" @click="menuVisible = !menuVisible" @keyup.enter="menuVisible = !menuVisible">
+			<span class="text">
+				
+					<span :class="{visible: isViewTag}" v-if="isViewTag" v-cloak><svg viewBox="0 0 16 16" class="svg octicon-tag" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 7.775V2.75a.25.25 0 0 1 .25-.25h5.025a.25.25 0 0 1 .177.073l6.25 6.25a.25.25 0 0 1 0 .354l-5.025 5.025a.25.25 0 0 1-.354 0l-6.25-6.25a.25.25 0 0 1-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775zM6 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg> Tag:</span>
+					<span :class="{visible: isViewBranch}" v-if="isViewBranch" ><svg viewBox="0 0 16 16" class="svg octicon-git-branch" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0z"/></svg> Branch:</span>
+					<span :class="{visible: isViewTree}" v-if="isViewTree" v-cloak><svg viewBox="0 0 16 16" class="svg octicon-git-branch" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0z"/></svg> Tree:</span>
+					<strong ref="dropdownRefName">master</strong>
+				
+			</span>
+			<svg viewBox="0 0 16 16" class="dropdown icon svg octicon-triangle-down" width="14" height="14" aria-hidden="true"><path d="m4.427 7.427 3.396 3.396a.25.25 0 0 0 .354 0l3.396-3.396A.25.25 0 0 0 11.396 7H4.604a.25.25 0 0 0-.177.427z"/></svg>
+		</div>
+		<div class="data" style="display: none" data-mode="branches">
+			
+				
+					<div class="item branch " data-url="dev">dev</div>
+				
+					<div class="item branch selected" data-url="master">master</div>
+				
+			
+			
+				
+					
+						<div class="item tag " data-url="0.0.3-pre">0.0.3-pre</div>
+					
+				
+					
+						<div class="item tag " data-url="v0.0.3a">v0.0.3a</div>
+					
+				
+					
+						<div class="item tag " data-url="v0.0.4.2-RELEASE">v0.0.4.2-RELEASE</div>
+					
+				
+			
+		</div>
+		<div class="menu transition" :class="{visible: menuVisible}" v-if="menuVisible" v-cloak>
+			<div class="ui icon search input">
+				<i class="icon df ac jc m-0"><svg viewBox="0 0 16 16" class="svg octicon-filter" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M.75 3a.75.75 0 0 0 0 1.5h14.5a.75.75 0 0 0 0-1.5H.75zM3 7.75A.75.75 0 0 1 3.75 7h8.5a.75.75 0 0 1 0 1.5h-8.5A.75.75 0 0 1 3 7.75zm3 4a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75z"/></svg></i>
+				<input name="search" ref="searchField" autocomplete="off" v-model="searchTerm" @keydown="keydown($event)" placeholder="Filter branch or tag...">
+			</div>
+			
+				<div class="header branch-tag-choice">
+					<div class="ui grid">
+						<div class="two column row">
+							<a class="reference column" href="#" @click="createTag = false; mode = 'branches'; focusSearchField()">
+								<span class="text" :class="{black: mode == 'branches'}">
+									<svg viewBox="0 0 16 16" class="mr-2 svg octicon-git-branch" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0z"/></svg>Branches
+								</span>
+							</a>
+							
+								<a class="reference column" href="#" @click="createTag = true; mode = 'tags'; focusSearchField()">
+									<span class="text" :class="{black: mode == 'tags'}">
+										<svg viewBox="0 0 16 16" class="mr-2 svg octicon-tag" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 7.775V2.75a.25.25 0 0 1 .25-.25h5.025a.25.25 0 0 1 .177.073l6.25 6.25a.25.25 0 0 1 0 .354l-5.025 5.025a.25.25 0 0 1-.354 0l-6.25-6.25a.25.25 0 0 1-.073-.177zm-1.5 0V2.75C1 1.784 1.784 1 2.75 1h5.025c.464 0 .91.184 1.238.513l6.25 6.25a1.75 1.75 0 0 1 0 2.474l-5.026 5.026a1.75 1.75 0 0 1-2.474 0l-6.25-6.25A1.75 1.75 0 0 1 1 7.775zM6 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg>Tags
+									</span>
+								</a>
+							
+						</div>
+					</div>
+				</div>
+			
+			<div class="scrolling menu" ref="scrollContainer">
+				<div v-for="(item, index) in filteredItems" :key="item.name" class="item" :class="{selected: item.selected, active: active == index}" @click="selectItem(item)" :ref="'listItem' + index">${ item.name }</div>
+				<div class="item" v-if="showCreateNewBranch" :class="{active: active == filteredItems.length}" :ref="'listItem' + filteredItems.length">
+					<a href="#" @click="createNewBranch()">
+						<div v-show="createTag">
+							<i class="reference tags icon"></i>
+							Create tag <strong>${ searchTerm }</strong>
+						</div>
+						<div v-show="!createTag">
+							<svg viewBox="0 0 16 16" class="svg octicon-git-branch" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zm-2.25.75a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.492 2.492 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25zM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5zM3.5 3.25a.75.75 0 1 1 1.5 0 .75.75 0 0 1-1.5 0z"/></svg>
+							Create branch <strong>${ searchTerm }</strong>
+						</div>
+						<div class="text small">
+							
+								from &#39;master&#39;
+							
+						</div>
+					</a>
+					<form ref="newBranchForm" action="/anoduck/org-orgzly/branches/_new/branch/master" method="post">
+						<input type="hidden" name="_csrf" value="Zth_infxnQynEv7QfAJlwUthaP06MTY2Nzg5NTkxMzc1MzYxNTI3Mg">
+						<input type="hidden" name="new_branch_name" v-model="searchTerm">
+						<input type="hidden" name="create_tag" v-model="createTag">
+					</form>
+				</div>
+			</div>
+			<div class="message" v-if="showNoResults">${ noResults }</div>
+		</div>
+	</div>
+</div>
+
+				
+				
+				
+				
+				
+				
+					<span class="ui breadcrumb repo-path"><a class="section" href="/anoduck/org-orgzly/src/branch/master" title="org-orgzly">org-orgzly</a><span class="divider">/</span><span class="active section" title="org-orgzly_logo.png">org-orgzly_logo.png</span></span>
+				
+			</div>
+			<div class="df ac">
+				
+				
+				
+				
+			</div>
+		</div>
+		
+			<div class="tab-size-8 non-diff-file-content">
+	<h4 class="file-header ui top attached header df ac sb">
+		<div class="file-header-left df ac pr-4">
+			
+				<div class="file-info text grey normal mono">
+					
+					
+					
+						<div class="file-info-entry">
+							263 KiB
+						</div>
+					
+					
+				</div>
+			
+		</div>
+		<div class="file-header-right file-actions df ac">
+			
+			
+				<div class="ui buttons mr-2">
+					<a class="ui mini basic button" href="/anoduck/org-orgzly/raw/branch/master/org-orgzly_logo.png">Raw</a>
+					
+						<a class="ui mini basic button" href="/anoduck/org-orgzly/src/commit/a05313a8753126e17a2ce58f5e113b828492667c/org-orgzly_logo.png">Permalink</a>
+					
+					
+					<a class="ui mini basic button" href="/anoduck/org-orgzly/commits/branch/master/org-orgzly_logo.png">History</a>
+					
+				</div>
+				<a download href="/anoduck/org-orgzly/raw/branch/master/org-orgzly_logo.png"><span class="btn-octicon tooltip" data-content="Download file" data-position="bottom center"><svg viewBox="0 0 16 16" class="svg octicon-download" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.47 10.78a.75.75 0 0 0 1.06 0l3.75-3.75a.75.75 0 0 0-1.06-1.06L8.75 8.44V1.75a.75.75 0 0 0-1.5 0v6.69L4.78 5.97a.75.75 0 0 0-1.06 1.06l3.75 3.75zM3.75 13a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5z"/></svg></span></a>
+				
+					
+						<span class="btn-octicon tooltip disabled" data-content="Binary files cannot be edited in the web interface." data-position="bottom center"><svg viewBox="0 0 16 16" class="svg octicon-pencil" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25a1.75 1.75 0 0 1 .445-.758l8.61-8.61zm1.414 1.06a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354l-1.086-1.086zM11.189 6.25 9.75 4.81l-6.286 6.287a.25.25 0 0 0-.064.108l-.558 1.953 1.953-.558a.249.249 0 0 0 .108-.064l6.286-6.286z"/></svg></span>
+					
+					
+						<span class="btn-octicon tooltip disabled" data-content="You must have write access to make or propose changes to this file." data-position="bottom center"><svg viewBox="0 0 16 16" class="svg octicon-trash" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M6.5 1.75a.25.25 0 0 1 .25-.25h2.5a.25.25 0 0 1 .25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1 0-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 1 0-1.492.15l.66 6.6A1.75 1.75 0 0 0 5.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 0 0-1.492-.149l-.66 6.6a.25.25 0 0 1-.249.225h-5.19a.25.25 0 0 1-.249-.225l-.66-6.6z"/></svg></span>
+					
+				
+			
+		</div>
+	</h4>
+	<div class="ui attached table unstackable segment">
+		
+
+		<div class="file-view">
+			
+				<div class="view-raw ui center">
+					
+						<img src="/anoduck/org-orgzly/raw/branch/master/org-orgzly_logo.png">
+					
+				</div>
+			
+		</div>
+	</div>
+</div>
+
+		
+	</div>
+</div>
+
+
+	
+
+	</div>
+
+	
+
+	<footer>
+	<div class="grid">
+		<div class="branding not-mobile">
+			<img src="https://design.codeberg.org/logo-kit/icon_inverted.svg">
+		</div>
+		<div>
+			<b>Codeberg</b>
+			<ul>
+				<li><a href="https://docs.codeberg.org" target="_blank">Documentation</a></li>
+				<li><a href="/Codeberg/Community/issues">Community Issues</a></li>
+				
+				
+					<li><a href="/api/swagger">API</a></li>
+				
+				<li><a href="https://docs.codeberg.org/contact/#abuse" target="_blank">Report Abuse</a>
+			</ul>
+		</div>
+		<div>
+			<b>Codeberg e.V.</b>
+			<ul>
+				<li><a href="https://docs.codeberg.org/getting-started/what-is-codeberg/#what-is-codeberg-e.v.%3F" target="_blank">What is that?</a></li>
+				<li><a href="/codeberg/org/src/en/bylaws.md" target="_blank">Bylaws/Satzung</a></li>
+				<li><a href="https://docs.codeberg.org/improving-codeberg/#donate-to-codeberg" target="_blank">Donate</a></li>
+				<li><a href="https://join.codeberg.org" target="_blank">Join / Support</a></li>
+				<li><a href="https://docs.codeberg.org/contact/" target="_blank">Contact</a></li>
+			</ul>
+		</div>
+		<div>
+			<b>Service</b>
+			<ul>
+				<li><a href="https://codeberg.page" target="_blank">Codeberg Pages</a></li>
+				<li><a href="https://translate.codeberg.org" target="_blank">Weblate Translations</a></li>
+				<li><a href="/Codeberg-CI/request-access/issues" target="_blank">Woodpecker CI</a></li>
+				<li><a href="https://status.codeberg.eu" target="_blank">Status Page</a></li>
+			</ul>
+		</div>
+		<div>
+			<b>Legal</b>
+			<ul>
+				<li><a href="/codeberg/org/src/Imprint.md" target="_blank">Imprint/Impressum</a></li>
+				<li><a href="/codeberg/org/src/PrivacyPolicy.md" target="_blank">Privacy Policy</a></li>
+				<li><a href="/assets/js/licenses.txt">Licenses</a></li>
+				<li><a href="/codeberg/org/src/TermsOfUse.md">Terms of Use</a></li>
+			</ul>
+		</div>
+	</div>
+	<center>
+		<a href="https://blog.codeberg.org" target="_blank">Blog</a> |
+		<a href="https://social.anoxinon.de/@Codeberg" target="_blank" rel="noopener noreferrer">Mastodon</a> |
+		<a href="https://matrix.to/#/#codeberg-space:matrix.org" target="_blank" rel="noopener noreferrer">Matrix Space</a> |
+		<a href="https://twitter.com/codeberg_org" target="_blank" rel="noopener noreferrer">Twitter</a>
+	</center>
+	<div class="ui right">
+		<div class="ui language bottom floating slide up dropdown link item button">
+			<svg viewBox="0 0 16 16" class="svg octicon-globe" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M1.543 7.25h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.506 6.506 0 0 0-4.666 5.5zm2.733 1.5H1.543a6.506 6.506 0 0 0 4.666 5.5 11.13 11.13 0 0 1-.352-.552c-.715-1.192-1.437-2.874-1.581-4.948zm1.504 0h4.44a9.637 9.637 0 0 1-1.363 4.177c-.306.51-.612.919-.857 1.215a9.978 9.978 0 0 1-.857-1.215A9.637 9.637 0 0 1 5.78 8.75zm4.44-1.5H5.78a9.637 9.637 0 0 1 1.363-4.177c.306-.51.612-.919.857-1.215.245.296.55.705.857 1.215A9.638 9.638 0 0 1 10.22 7.25zm1.504 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.506 6.506 0 0 0 4.666-5.5h-2.733zm2.733-1.5h-2.733c-.144-2.074-.866-3.756-1.58-4.948a11.738 11.738 0 0 0-.353-.552 6.506 6.506 0 0 1 4.666 5.5zM8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0z"/></svg>
+			<div class="text">English</div>
+			<div class="menu language-menu">
+				
+					<a lang="id-ID" data-url="/?lang=id-ID" class="item ">Bahasa Indonesia</a>
+				
+					<a lang="de-DE" data-url="/?lang=de-DE" class="item ">Deutsch</a>
+				
+					<a lang="en-US" data-url="/?lang=en-US" class="item active selected">English</a>
+				
+					<a lang="es-ES" data-url="/?lang=es-ES" class="item ">Español</a>
+				
+					<a lang="fr-FR" data-url="/?lang=fr-FR" class="item ">Français</a>
+				
+					<a lang="it-IT" data-url="/?lang=it-IT" class="item ">Italiano</a>
+				
+					<a lang="lv-LV" data-url="/?lang=lv-LV" class="item ">Latviešu</a>
+				
+					<a lang="hu-HU" data-url="/?lang=hu-HU" class="item ">Magyar nyelv</a>
+				
+					<a lang="nl-NL" data-url="/?lang=nl-NL" class="item ">Nederlands</a>
+				
+					<a lang="pl-PL" data-url="/?lang=pl-PL" class="item ">Polski</a>
+				
+					<a lang="pt-PT" data-url="/?lang=pt-PT" class="item ">Português de Portugal</a>
+				
+					<a lang="pt-BR" data-url="/?lang=pt-BR" class="item ">Português do Brasil</a>
+				
+					<a lang="fi-FI" data-url="/?lang=fi-FI" class="item ">Suomi</a>
+				
+					<a lang="sv-SE" data-url="/?lang=sv-SE" class="item ">Svenska</a>
+				
+					<a lang="tr-TR" data-url="/?lang=tr-TR" class="item ">Türkçe</a>
+				
+					<a lang="cs-CZ" data-url="/?lang=cs-CZ" class="item ">Čeština</a>
+				
+					<a lang="el-GR" data-url="/?lang=el-GR" class="item ">Ελληνικά</a>
+				
+					<a lang="bg-BG" data-url="/?lang=bg-BG" class="item ">Български</a>
+				
+					<a lang="ru-RU" data-url="/?lang=ru-RU" class="item ">Русский</a>
+				
+					<a lang="sr-SP" data-url="/?lang=sr-SP" class="item ">Српски</a>
+				
+					<a lang="uk-UA" data-url="/?lang=uk-UA" class="item ">Українська</a>
+				
+					<a lang="fa-IR" data-url="/?lang=fa-IR" class="item ">فارسی</a>
+				
+					<a lang="ml-IN" data-url="/?lang=ml-IN" class="item ">മലയാളം</a>
+				
+					<a lang="ja-JP" data-url="/?lang=ja-JP" class="item ">日本語</a>
+				
+					<a lang="zh-CN" data-url="/?lang=zh-CN" class="item ">简体中文</a>
+				
+					<a lang="zh-TW" data-url="/?lang=zh-TW" class="item ">繁體中文（台灣）</a>
+				
+					<a lang="zh-HK" data-url="/?lang=zh-HK" class="item ">繁體中文（香港）</a>
+				
+					<a lang="ko-KR" data-url="/?lang=ko-KR" class="item ">한국어</a>
+				
+			</div>
+		</div>
+	</div>
+</footer>
+
+
+
+
+	<script src="/assets/js/index.js?v=1.17.3~87-ge4b8341" onerror="alert('Failed to load asset files from ' + this.src + ', please make sure the asset files can be accessed and the ROOT_URL setting in app.ini is correct.')"></script>
+
+</body>
+</html>
+
