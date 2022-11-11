@@ -79,8 +79,8 @@ The default configuration variables are as follows:
 | dropbox_folder | =/orgzly=                                   | Name of folder for orgzly in dropbox                             |
 | org_files      | ="~/org/todo.org", "~/org/inbox.org"=       | Comma seperated list of org files to process entries/nodes from. |
 | orgzly_files   | ="~/orgzly/todo.org", "~/orgzly/inbox.org"= | Comma seperated orgzly file list to use with this entire system  |
-| org_inbox      | =~/org/inbox.org=                           | Name of org mode inbox file to push new or changed entries to    |
-| orgzly_inbox   | =~/orgzly/inbox.org=                        | Name of orgzly inbox to add new or changed entries to            |
+| org_inbox      | ="~/org/inbox.org"=                         | Name of org mode inbox file to push new or changed entries to    |
+| orgzly_inbox   | ="~/orgzly/inbox.org"=                      | Name of orgzly inbox to add new or changed entries to            |
 | days           | =7=                                         | Number of days to draw entries / nodes for                       |
 | todos          | ="TODO", "LATERS", "HOLD", "OPEN"=          | Org "TODO" keywords defining an uncomplete task                  |
 | dones          | ="DONE", "CLOSED", "CANCELED"=              | Org "DONE" keywords defining a complete task                     |
@@ -119,12 +119,12 @@ Below are the four commands available for org-orgzly. See _workflow_ below for i
 
 | Command Flags | What they do                                                            |
 |---------------+-------------------------------------------------------------------------|
-| --up          | Combines =--push= and =--put=, in that order                            |
-| --down        | Combines =--get= and =--pull=, in that order                            |
-| --push        | Parses org files and copies entries matching parameters to orgzly inbox |
-| --pull        | Copies newly created entries in orgzly inbox to your og inbox           |
-| --put         | Uploads orgzly to Dropbox                                               |
-| --get         | Downloads orgzly files from Dropbox                                    |
+| ~--up~        | Combines =--push= and =--put=, in that order                            |
+| ~--down~      | Combines =--get= and =--pull=, in that order                            |
+| ~--push~      | Parses org files and copies entries matching parameters to orgzly inbox |
+| ~--pull~      | Copies newly created entries in orgzly inbox to your og inbox           |
+| ~--put~       | Uploads orgzly to Dropbox                                               |
+| ~--get~       | Downloads orgzly files from Dropbox                                     |
 
 The intention of the above "flag commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
