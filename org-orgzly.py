@@ -64,7 +64,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.4h-dev'
+VERSION = '0.0.5-dev'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -154,6 +154,35 @@ def dedupe_files(test, control):
     return uniq
 
 
+# ----------------------------------------------------------------------
+# Process events
+# ----------------------------------------------------------------------
+def process_event(node, days, to_write):
+    active_stamp = node.get_timestamps(active=True, inactive=False,
+                                       range=True, point=True)
+    if active_stamp:
+        if node.deadline:
+            ndate = str(node.deadline)
+        elif node.scheduled and not node.deadline:
+            ndate = str(node.scheduled)
+        else:
+            ndate = str(active_stamp)
+        if ndate:
+            t_ndate = re.findall(r'\d+', ndate)
+            r_d = list(map(int, t_ndate))
+            newdate = str(r_d[0]) + '-' + str(r_d[1]) + '-' + str(r_d[2])
+            y_1, m_1, d_1 = [int(x) for x in newdate.split('-')]
+            date_org = datetime.date(y_1, m_1, d_1)
+            tdate = date.today()
+            y_2, m_2, d_2 = [int(x) for x in str(tdate).split('-')]
+            date_today = datetime.date(y_2, m_2, d_2)
+            future_date = get_future(tdate, days)
+            if date_today >= date_org:
+                if future_date >= date_org:
+                    to_write.append(node)
+    return to_write
+
+
 # ---------------------------------------------------------------------
 # Process Entries
 # ---------------------------------------------------------------------
@@ -194,6 +223,8 @@ def process_entries(orgfile, days):
                             else:
                                 print("There appears to be something wrong: "
                                       + str(date_org))
+        else:
+            to_write = process_event(node, days, to_write)
     return to_write
 
 
@@ -502,7 +533,8 @@ def main():
     # ArgParse Setup
     p_arg = argparse.ArgumentParser(
             prog='org-orgzly',
-            usage='%(prog)s.py [ --push | --pull | --put | --get ] '
+            usage='%(prog)s.py [--up | --down | --push |'
+                  ' --pull | --put | --get ] '
             'or --dropbox_token',
             description='Makes managing mobile org '
             'easier, by controling what you take with you.',
@@ -513,6 +545,10 @@ def main():
                        version='org-orgzly ' + VERSION)
     p_arg.add_argument('--dropbox_token', action='store_true',
                        help='Fetch initial Access Token')
+    p_arg.add_argument('--up', action='store_true',
+                       help='push to orgzly and up to dropbox')
+    p_arg.add_argument('--down', action='store_true',
+                       help='down from dropbox and pull from orgzly')
     p_arg.add_argument('--push', action='store_true',
                        help='Parse files and push them to orgzly')
     p_arg.add_argument('--pull', action='store_true',
@@ -536,20 +572,28 @@ def main():
     # Run the gambit of args vs config
     if not args.dropbox_token:
         if fcheck:
-            if args.push:
-                org_files = config['org_files']
-                orgzly_files = config['orgzly_files']
-                org_inbox = config['org_inbox']
-                orgzly_inbox = config['orgzly_inbox']
-                days = config['days']
+            if args.up:
                 if config['backup']:
-                    backup_files(org_files, orgzly_files,
-                                 orgzly_inbox, org_inbox, days)
-                gen_file(env, org_files, orgzly_inbox, days)
+                    backup_files(config['org_files'], config['orgzly_files'],
+                                 config['orgzly_inbox'], config['org_inbox'],
+                                 config['days'])
+                gen_file(env, config['org_files'], config['orgzly_inbox'],
+                         config['days'])
+                dropbox_put(config['app_key'], config['app_secret'],
+                            config['dropbox_folder'], config['orgzly_files'])
+            if args.down:
+                dropbox_get(config['app_key'], config['app_secret'],
+                            config['dropbox_folder'], config['orgzly_files'])
+                sync_back(config['orgzly_files'], config['org_inbox'])
+            if args.push:
+                if config['backup']:
+                    backup_files(config['org_files'], config['orgzly_files'],
+                                 config['orgzly_inbox'], config['org_inbox'],
+                                 config['days'])
+                gen_file(env, config['org_files'], config['orgzly_inbox'],
+                         config['days'])
             if args.pull:
-                orgzly_files = config['orgzly_files']
-                org_inbox = config['org_inbox']
-                sync_back(orgzly_files, org_inbox)
+                sync_back(config['orgzly_files'], config['org_inbox'])
             if args.put:
                 dropbox_put(config['app_key'], config['app_secret'],
                             config['dropbox_folder'], config['orgzly_files'])
@@ -558,7 +602,7 @@ def main():
                             config['dropbox_folder'], config['orgzly_files'])
         else:
             print('Error occured in creation of necessarily files, '
-                  'or file creation has or file creation has been disabled.'
+                  'or file creation has been disabled.\n'
                   ' Please check your config and try again.')
             sys.exit()
     if args.dropbox_token:
