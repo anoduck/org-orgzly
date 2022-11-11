@@ -15,7 +15,7 @@
 
 #+end_src
 * Org-orgzly
-/A python application to parse and generate org files for orgzly, in a practical manner making managing your org schedule easier./
+/A python application to parse and generate org files for orgzly practically, by making managing your org schedule easier./
 *** About
 **** What it does
 This script takes a specified list of org files, extracts org entries, filters out entries that do not meet specified TODO and Date
@@ -41,17 +41,17 @@ use your nodes, you will need to use a todo keyword, and either a deadline or a 
 should be capable, due to the script processing all entries that possess the previously required properties.
 **** Installation
 Since in order to make use of this library it is assumed one has reasonable apprehension of EMACS use, is
-familiar with using git, and knows how to execute a python script inside of their represpective shell.
+familiar with using git, and knows how to execute a python script inside shell.
 **** Preferred installation method
 It would be to the user's benefit to clone the source directly from the repository using
-`git clone https://codeberg.org/anoduck/org-orgzly`. As this would provide the user with the most recent
+~git clone https://codeberg.org/anoduck/org-orgzly~. As, this would provide the user with the most recent
 version of the script with all newly added features. Please consider the releases as existing for historical
 notation.
 **** Required Python libraries
 - orgparse
 - configobj
 **** The 'ini' file
-The configuration file, =config.ini= will be automatically generated for you in your =XDG_CONFIG_HOME= directory under the =org-orgzly=
+The configuration file, =config.ini= will be automatically generated for you in your ~XDG_CONFIG_HOME~ directory under the =org-orgzly=
 folder, with the default values already filled out for you. If you plan on using this script in conjunction with
 the Dropbox service, then you will need to change the values of =app_key= and =app_secret= respectively with
 the values corresponding to the app your created in the dropbox [[https://www.dropbox.com/developers/apps?_tk=pilot_lp&_ad=topbar4&_camp=myapps][Dropbox App Console]]. More information can be found out concerning the
@@ -63,27 +63,27 @@ implementations that must be accommodated in facilitation of your org-task manag
 file tree remains clean and protected from any unfortunate circumstances. This separation also allows one to maintain their org files
 in a version control management system without any conflicts with use of Dropbox.
 
-/Point of information/ - The Dropbox API does implement it's own form of version control management in order to prevent file conflicts
+/Point of information:/ The Dropbox API does implement it's own form of version control management in order to prevent file conflicts
 and loss of information within it's internal network. It is this internal version control management system that is often the cause of
 problems when newly created file content is overwritten and/or lost. This is the benefit of using a direct upload approach to managing
 files on the Dropbox platform. Updates are instantaneous and take priority.
 
-The default configuration variables are as follows
+The default configuration variables are as follows:
 
 | Option         | Default                                     | Definitions                                                      |
 |----------------+---------------------------------------------+------------------------------------------------------------------|
-| app_key        | "Change This"                               | Dropbox API App Key                                              |
-| app_secret     | "Change This"                               | Dropbox API APP Secret                                           |
-| create_missing | True                                        | Create any missing files from configuration                      |
-| backup         | True                                        | Backup original org files                                        |
-| dropbox_folder | "/orgzly"                                   | Name of folder for orgzly in dropbox                             |
-| org_files      | ["~/org/todo.org", "~/org/inbox.org"]       | Comma seperated list of org files to process entries/nodes from. |
-| orgzly_files   | ["~/orgzly/todo.org", "~/orgzly/inbox.org"] | Comma seperated orgzly file list to use with this entire system  |
-| org_inbox      | "~/org/inbox.org"                           | Name of org mode inbox file to push new or changed entries to    |
-| orgzly_inbox   | "~/orgzly/inbox.org                         | Name of orgzly inbox to add new or changed entries to            |
-| days           | 7                                           | Number of days to draw entries / nodes for                       |
-| todos          | ["TODO", "LATERS", "HOLD", "OPEN"]          | Org "TODO" keywords defining an uncomplete task                  |
-| dones          | ["DONE", "CLOSED", "CANCELED"]              | Org "DONE" keywords defining a complete task                     |
+| app_key        | =Change This=                               | Dropbox API App Key                                              |
+| app_secret     | =Change This=                               | Dropbox API APP Secret                                           |
+| create_missing | =True=                                      | Create any missing files from configuration                      |
+| backup         | =True=                                      | Backup original org files                                        |
+| dropbox_folder | =/orgzly=                                   | Name of folder for orgzly in dropbox                             |
+| org_files      | ="~/org/todo.org", "~/org/inbox.org"=       | Comma seperated list of org files to process entries/nodes from. |
+| orgzly_files   | ="~/orgzly/todo.org", "~/orgzly/inbox.org"= | Comma seperated orgzly file list to use with this entire system  |
+| org_inbox      | =~/org/inbox.org=                           | Name of org mode inbox file to push new or changed entries to    |
+| orgzly_inbox   | =~/orgzly/inbox.org=                        | Name of orgzly inbox to add new or changed entries to            |
+| days           | =7=                                         | Number of days to draw entries / nodes for                       |
+| todos          | ="TODO", "LATERS", "HOLD", "OPEN"=          | Org "TODO" keywords defining an uncomplete task                  |
+| dones          | ="DONE", "CLOSED", "CANCELED"=              | Org "DONE" keywords defining a complete task                     |
 
 For redundancy, the configuration file spec is as follows:
 
@@ -105,8 +105,8 @@ dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 *Please note!* In order to avoid reception of a file conflict error using the Dropbox API, "overwrite mode" has been enabled for the
 dropbox api until a means to handle these conflicts can be worked out.
 
-Navigate to the repository directory and run =python org-orgzly.py=, or create an alias in your script =rc= file, create a simple
-script in your =$PATH= that points to the repository and run it where ever, or even add it to cron. All should work since things are
+Navigate to the repository directory and run ~python org-orgzly.py~, or create an alias in your shell =rc= file, or create a simple
+script in your ~$PATH~ that points to the repository and run it where ever, or even add it to cron. All should work since things are
 kept together in a single file. An example of creating an alias for ZSH or Bash is below:
 
 #+begin_src bash
@@ -118,22 +118,28 @@ alias org-orgzly="/path/to/python /path/to/org-orgzly/org-orgzly.py"
 Below are the four commands available for org-orgzly. See _workflow_ below for instructions on what order to execute them.
 
 | Command Flags | What they do                                                            |
-|---------------|-------------------------------------------------------------------------|
+|---------------+-------------------------------------------------------------------------|
+| --up          | Combines =--push= and =--put=, in that order                            |
+| --down        | Combines =--get= and =--pull=, in that order                            |
 | --push        | Parses org files and copies entries matching parameters to orgzly inbox |
 | --pull        | Copies newly created entries in orgzly inbox to your og inbox           |
 | --put         | Uploads orgzly to Dropbox                                               |
-| --get         | Downloads orgzly files from dropbox                                     |
+| --get         | Downloads orgzly files from Dropbox                                    |
 
-The intention of the above "flagged commands" is for them to run individually, and for the most part this is required, as not doing so
+The intention of the above "flag commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
 **** Recommended Workflow
-- First, move entries to orgzly, use _push_ and _put_.
-- Then, at a later point in time, retrieve entries from orgzly, use _get_ and _pull_
+- Use ~--up~ to parse org nodes and move them to dropbox.
+- Retrieve entries from orgzly with ~--down~.
 **** Sequence of Operation
-1. `--push`: Push to orgzly
-2. `--put`: Put in Dropbox
-3. `--get`: Get from Dropbox
-4. `--pull`: Pull from orgzly
+1. ~--up~:
+   1. ~--push~: Push to orgzly
+   2. ~--put~: Put in Dropbox
+   
+2. ~--down~:
+   1. ~--get~: Get from Dropbox
+   2. ~--pull~: Pull from orgzly
+
 
 #+NAME: plantuml.svg
 [[./Resources/README/flow.png]]
@@ -144,14 +150,14 @@ will be automatically created for the user in the defined folder located in the 
 basic ~#+TITLE~ and ~#+DATE~ heading.
 
 The script automatically creates backup files for the user in order to prevent crucial data loss. Those files
-can be found in the =.backup= directory located in their orgzly folder.
+can be found in the ~.backup~ directory located in their orgzly folder.
 
-If you encounter any issues or bugs, please feel free to submit and issue for us to assisst. If there are also
+If you encounter any issues or bugs, please feel free to submit an issue for assistance. If there are also
 any desired feature requests, you may also fill out an issue labeling it as a "Feature Request".
 *** Dropbox App Creation and Credentials
-Creating a new dropbox app is not that difficult as long as you have a pre-existing Dropbox account. All you
+Creating a new dropbox app is not that difficult as long as you have a preexisting Dropbox account. All you
 need to do is [login to Dropbox](https://www.dropbox.com/login "Dropbox Login") browse over to the [Dropbox developers
-site](https://developers.dropbox.com/ "Dropbox Developers") and click the `App Console` button located in the top right corner of the
+site](https://developers.dropbox.com/ "Dropbox Developers") and click the =App Console= button located in the top right corner of the
 site. From there you will see a list of all apps you have created, if you have created any previously. Under the drop down menu of your
 Dropbox Name, and to the right of the title "My Apps", you will see a bright blue button labeled "Create app". Click it, and then
 create your app by filling out the required parts.
@@ -176,5 +182,5 @@ Without these selected, the app will not be able to upload and download Dropbox 
 This application is dedicated to [[https://github.com/karlicoss][Karlicoss]] to whom without it would have never been possible. All the
 credit goes to the [[https://github.com/karlicoss/orgparse][python orgparse library]] that allows parsing org files in python.
 
-And, of course, as usual, an additional thanks goes out to the [[https://orgmode.org/][Org Mode]], who have diligently maintained the
+And, of course, thanks goes out to the [[https://orgmode.org/][Org Mode]], who have diligently maintained the
 most brilliant organizational systems ever.
