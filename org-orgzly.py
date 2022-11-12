@@ -300,6 +300,29 @@ def sync_back(orgzly_files, org_inbox):
 # -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 
+def dbx_list(response):
+    rv = {}
+    for entry in response.entries:
+        rv[entry.name] = entry
+    return rv
+
+
+def list_orgzly(app_key, app_secret, dropbox_folder):
+    config_dbx = ConfigObj(DBX_CONFIG_FILE)
+    REFRESH_TOKEN = config_dbx['dropbox_token']
+    with dropbox.Dropbox(
+            oauth2_refresh_token=str(REFRESH_TOKEN), app_key=app_key,
+            app_secret=app_secret) as dbx:
+        folder = '/' + str(dropbox_folder)
+        response = dbx.files_list_folder(folder)
+        resp_dir = dbx_list(response)
+    files_as_keys = resp_dir.keys()
+    print('Files in dropbox folder ' + '"' + folder + '"' + ' are: [ ')
+    for key in files_as_keys:
+        print(key)
+    print('] --> Done.')
+
+
 # Dropbox upload
 def dropbox_upload(app_key, app_secret,
                    fullname, folder, name, overwrite=True):
@@ -417,8 +440,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         print('Completed download from Dropbox')
         print('Now purging file of duplicates.')
         file = orgparse.load(fullname)
-        org_orglets = file.children
-        orglet_set = set(org_orglets)
+        orglet_set = set(file[1:])
         orglet_list = (list(orglet_set))
         for orglet in orglet_list:
             with open(fullname, "a", encoding="utf-8", newline="\n") as q_q:
@@ -545,6 +567,8 @@ def main():
                        version='org-orgzly ' + VERSION)
     p_arg.add_argument('--dropbox_token', action='store_true',
                        help='Fetch initial Access Token')
+    p_arg.add_argument('--list', action='store_true',
+                       help='list files in orgzly directory in dropbox')
     p_arg.add_argument('--up', action='store_true',
                        help='push to orgzly and up to dropbox')
     p_arg.add_argument('--down', action='store_true',
@@ -607,6 +631,9 @@ def main():
             sys.exit()
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
+    if args.list:
+        list_orgzly(config['app_key'], config['app_secret'],
+                    config['dropbox_folder'])
 
 
 if __name__ == '__main__':
