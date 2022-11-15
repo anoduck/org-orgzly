@@ -441,19 +441,25 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
         file_list = os.listdir(tmpdir)
         for t_file in file_list:
             t_path = os.path.join(tmpdir, t_file)
+            path = os.path.expanduser(orgzly_files[0])
+            orgzly_fname = str(os.path.basename(path))
+            orgzly_dirpath = str(os.path.realpath(path)).strip(orgzly_fname)
+            orgzly_fpath = os.path.join(orgzly_dirpath, t_file)
             node_set = set()
             node_set.clear()
-            node_load = orgparse.load(t_path)
-            for node in node_load[1:]:
-                active_stamp = node.get_timestamps(active=True, range=True, point=True)
+            temp_load = orgparse.load(t_path)
+            oz_load = orgparse.load(orgzly_fpath)
+            for node in temp_load[1:]:
+                active_stamp = node.get_timestamps(active=True,
+                                                   range=True, point=True)
                 if active_stamp:
                     heading = node.heading
-                    if heading not in node_set:
-                        node_set.add(node)
-            path = os.path.expanduser(orgzly_files[0])
-            orgzly_path = str(os.path.realpath(path)).strip(str(os.path.basename(path)))
-            path_to_write = os.path.join(orgzly_path, os.path.basename(t_file))
-            with open(path_to_write, 'w', encoding='utf-8') as w_f:
+                    if heading not in oz_load[1:]:
+                        if heading not in node_set:
+                            node_set.add(node)
+            path_to_write = os.path.join(orgzly_dirpath,
+                                         os.path.basename(t_file))
+            with open(path_to_write, 'a', encoding='utf-8') as w_f:
                 for node in node_set:
                     w_f.write(str(node))
                     w_f.write('\n')
