@@ -34,6 +34,8 @@
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
+import orgparse
+from configobj import ConfigObj
 import datetime
 import argparse
 import re
@@ -41,11 +43,10 @@ import os
 import sys
 import time
 import shutil
+from tempfile import mkdtemp, TemporaryDirectory
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
-import orgparse
 from orgparse import load
 from datetime import date
-from configobj import ConfigObj
 import validate
 import dropbox
 from dropbox import DropboxOAuth2FlowNoRedirect, exceptions
@@ -402,13 +403,11 @@ def get_access_token(key, sec):
     print("2. Click \"Allow\" (you might have to log in first).")
     print("3. Copy the authorization code.")
     auth_code = input("Enter the authorization code here: ").strip()
-
     try:
         oauth_result = auth_flow.finish(auth_code)
     except Exception as e_t:
         print("f'Error: %s' % (e_t,)")
         sys.exit()
-
     write_refresh(oauth_result.refresh_token)
 
 
@@ -425,29 +424,40 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
 
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
-    folder = dropbox_folder
-    for k in orgzly_files:
-        path = os.path.expanduser(k)
-        fullname = os.path.realpath(path)
-        name = os.path.basename(path)
-        data = dropbox_download(app_key, app_secret, folder, name)
-        org_content_list = str(data).rsplit("\\n")
-        for node in org_content_list:
-            with open(fullname, "a", encoding="utf-8", newline="\n") as q_w:
-                q_w.write(node)
-                q_w.write("\n")
-                q_w.close()
-        print('Completed download from Dropbox')
-        print('Now purging file of duplicates.')
-        file = orgparse.load(fullname)
-        orglet_set = set(file[1:])
-        orglet_list = (list(orglet_set))
-        for orglet in orglet_list:
-            with open(fullname, "a", encoding="utf-8", newline="\n") as q_q:
-                q_q.write(str(orglet))
-                q_q.write("\n")
-                q_q.close()
-    print('Dropbox getting was successful')
+    with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
+        for k_file in orgzly_files:
+            path = os.path.expanduser(k_file)
+            name = os.path.basename(path)
+            tmp_path = os.path.join(tmpdir, name)
+            dbx_path = '/' + str(dropbox_folder) + '/' + str(name)
+            config_dbx = ConfigObj(DBX_CONFIG_FILE)
+            REFRESH_TOKEN = config_dbx['dropbox_token']
+            with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
+                                 app_key=app_key,
+                                 app_secret=app_secret) as dbx:
+                dbx.files_download_to_file(download_path=tmp_path,
+                                           path=dbx_path)
+        print('Successfully Downloaded orgfiles to ' + tmpdir)
+        file_list = os.listdir(tmpdir)
+        for t_file in file_list:
+            t_path = os.path.join(tmpdir, t_file)
+            node_set = set()
+            node_set.clear()
+            node_load = orgparse.load(t_path)
+            for node in node_load[1:]:
+                active_stamp = node.get_timestamps(active=True, range=True, point=True)
+                if active_stamp:
+                    heading = node.heading
+                    if heading not in node_set:
+                        node_set.add(node)
+            path = os.path.expanduser(orgzly_files[0])
+            orgzly_path = str(os.path.realpath(path)).strip(str(os.path.basename(path)))
+            path_to_write = os.path.join(orgzly_path, os.path.basename(t_file))
+            with open(path_to_write, 'w', encoding='utf-8') as w_f:
+                for node in node_set:
+                    w_f.write(str(node))
+                    w_f.write('\n')
+    print('Dropbox download was successful')
 
 
 # --------------------------------------------------------------------------------
@@ -555,9 +565,10 @@ def main():
     # ArgParse Setup
     p_arg = argparse.ArgumentParser(
             prog='org-orgzly',
-            usage='%(prog)s.py [--up | --down | --push |'
+            usage='%(prog)s.py [ --up | --down ] or [ --push |'
                   ' --pull | --put | --get ] '
-            'or --dropbox_token',
+                  ' or --list '
+            ' or --dropbox_token',
             description='Makes managing mobile org '
             'easier, by controling what you take with you.',
             epilog='Dedicated to karlicoss, who made it possible.',
@@ -594,41 +605,43 @@ def main():
                         config['orgzly_inbox'])
 
     # Run the gambit of args vs config
-    if not args.dropbox_token:
-        if fcheck:
-            if args.up:
-                if config['backup']:
-                    backup_files(config['org_files'], config['orgzly_files'],
-                                 config['orgzly_inbox'], config['org_inbox'],
-                                 config['days'])
-                gen_file(env, config['org_files'], config['orgzly_inbox'],
-                         config['days'])
-                dropbox_put(config['app_key'], config['app_secret'],
-                            config['dropbox_folder'], config['orgzly_files'])
-            if args.down:
-                dropbox_get(config['app_key'], config['app_secret'],
-                            config['dropbox_folder'], config['orgzly_files'])
-                sync_back(config['orgzly_files'], config['org_inbox'])
-            if args.push:
-                if config['backup']:
-                    backup_files(config['org_files'], config['orgzly_files'],
-                                 config['orgzly_inbox'], config['org_inbox'],
-                                 config['days'])
-                gen_file(env, config['org_files'], config['orgzly_inbox'],
-                         config['days'])
-            if args.pull:
-                sync_back(config['orgzly_files'], config['org_inbox'])
-            if args.put:
-                dropbox_put(config['app_key'], config['app_secret'],
-                            config['dropbox_folder'], config['orgzly_files'])
-            if args.get:
-                dropbox_get(config['app_key'], config['app_secret'],
-                            config['dropbox_folder'], config['orgzly_files'])
-        else:
-            print('Error occured in creation of necessarily files, '
-                  'or file creation has been disabled.\n'
-                  ' Please check your config and try again.')
-            sys.exit()
+    if fcheck:
+        # First the two meta commands: up and down
+        if args.up:
+            if config['backup']:
+                backup_files(config['org_files'], config['orgzly_files'],
+                             config['orgzly_inbox'], config['org_inbox'],
+                             config['days'])
+            gen_file(env, config['org_files'], config['orgzly_inbox'],
+                     config['days'])
+            dropbox_put(config['app_key'], config['app_secret'],
+                        config['dropbox_folder'], config['orgzly_files'])
+        if args.down:
+            dropbox_get(config['app_key'], config['app_secret'],
+                        config['dropbox_folder'], config['orgzly_files'])
+            sync_back(config['orgzly_files'], config['org_inbox'])
+        # Next the four individual commands
+        if args.push:
+            if config['backup']:
+                backup_files(config['org_files'], config['orgzly_files'],
+                             config['orgzly_inbox'], config['org_inbox'],
+                             config['days'])
+            gen_file(env, config['org_files'], config['orgzly_inbox'],
+                     config['days'])
+        if args.pull:
+            sync_back(config['orgzly_files'], config['org_inbox'])
+        if args.put:
+            dropbox_put(config['app_key'], config['app_secret'],
+                        config['dropbox_folder'], config['orgzly_files'])
+        if args.get:
+            dropbox_get(config['app_key'], config['app_secret'],
+                        config['dropbox_folder'], config['orgzly_files'])
+    if not fcheck:
+        print('Error occured in creation of necessarily files, '
+              'or file creation has been disabled.\n'
+              ' Please check your config and try again.')
+        sys.exit()
+    # Last the two "auxilliary commands"
     if args.dropbox_token:
         get_access_token(config['app_key'], config['app_secret'])
     if args.list:
