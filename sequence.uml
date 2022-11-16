@@ -1,0 +1,63 @@
+
+     ┌─────────┐                                ┌────────────┐                                        ┌───────┐                           ┌─────────────┐                               ┌────────┐
+     │org_files│                                │orgzly_files│                                        │tmp_dir│                           │dropbox_files│                               │tmp2_dir│
+     └────┬────┘                                └─────┬──────┘                                        └───┬───┘                           └──────┬──────┘                               └───┬────┘
+          │                                           │                                                   │                                      │                                          │
+          │                                           │                                         ╔════╗    │                                      │                                          │
+══════════╪═══════════════════════════════════════════╪═════════════════════════════════════════╣ up ╠════╪══════════════════════════════════════╪══════════════════════════════════════════╪══════════
+          │                                           │                                         ╚════╝    │                                      │                                          │
+          │                                           │                                                   │                                      │                                          │
+          │    org nodes are added to orgzly inbox    │                                                  ┌┴┐                                     │                                          │
+          │───────────────────────────────────────────>                                                  │ │                                     │                                          │
+          │                                           │                                                  │ │                                     │                                          │
+          │                                           │                                                  │ │ org files are downloaded to tmp dir │                                          │
+          │                                           │                                                  │ │ <───────────────────────────────────│                                          │
+          │                                           │                                                  │ │                                     │                                          │
+          │                                           │ orgzly files are compared with files in tmp dir  \ /                                     │                                         ┌┴┐
+          │                                           │ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>│X│                                     │                                         │ │
+          │                                           │                                                  /┬\                                     │                                         │ │
+          │                                           │                                                   │                 the result is created in a secondary directory                 \ /
+          │                                           │                                                   │ ──────────────────────────────────────────────────────────────────────────────>│X│
+          │                                           │                                                   │                                      │                                         /┬\
+          │                                           │                                                   │                                      │these files are then uploaded to dropbox  │
+          │                                           │                                                   │                                      │<─────────────────────────────────────────│
+          │                                           │                                                   │                                      │                                          │
+          │                                           │                                                   │                                      │                                          │
+          │                                           │                                        ╔══════╗   │                                      │                                          │
+══════════╪═══════════════════════════════════════════╪════════════════════════════════════════╣ down ╠═══╪══════════════════════════════════════╪══════════════════════════════════════════╪══════════
+          │                                           │                                        ╚══════╝   │                                      │                                          │
+          │                                           │                                                   │                                      │                                          │
+          │                                           │                                                  ┌┴┐ dropbox files downloaded to tmpdir  │                                          │
+          │                                           │                                                  │ │ <───────────────────────────────────│                                          │
+          │                                           │                                                  │ │                                     │                                          │
+          │                                           │ orgzly_files are compared the files from dropbox \ /                                     │                                          │
+          │                                           │ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>│X│                                     │                                          │
+          │                                           │                                                  /┬\                                     │                                          │
+          │                                           │           The result is added to orgzly           │                                      │                                          │
+          │                                           │ <─────────────────────────────────────────────────│                                      │                                          │
+          │                                           │                                                   │                                      │                                          │
+          │finally orgzly_files are pushed back to org│                                                   │                                      │                                          │
+          │<───────────────────────────────────────────                                                   │                                      │                                          │
+     ┌────┴────┐                                ┌─────┴──────┐                                        ┌───┴───┐                           ┌──────┴──────┐                               ┌───┴────┐
+     │org_files│                                │orgzly_files│                                        │tmp_dir│                           │dropbox_files│                               │tmp2_dir│
+     └─────────┘                                └────────────┘                                        └───────┘                           └─────────────┘                               └────────┘
+
+@startuml
+== up ==
+org_files -> orgzly_files : org nodes are added to orgzly inbox
+activate tmp_dir
+dropbox_files -> tmp_dir : org files are downloaded to tmp dir
+orgzly_files o<-->o tmp_dir : orgzly files are compared with files in tmp dir
+activate tmp2_dir
+tmp_dir -> tmp2_dir : the result is created in a secondary directory
+destroy tmp_dir
+tmp2_dir ->x dropbox_files : these files are then uploaded to dropbox
+destroy tmp2_dir
+== down ==
+tmp_dir <- dropbox_files : dropbox files downloaded to tmpdir
+activate tmp_dir
+orgzly_files o<-->o tmp_dir : orgzly_files are compared the files from dropbox
+tmp_dir -> orgzly_files : The result is added to orgzly
+destroy tmp_dir
+org_files x<- orgzly_files : finally orgzly_files are pushed back to org
+@enduml
