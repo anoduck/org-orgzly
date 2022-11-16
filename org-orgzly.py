@@ -272,15 +272,25 @@ def gen_file(env, org_files, orgzly_inbox, days):
 # ----------------------------------------------------------
 # Sync Back
 # ----------------------------------------------------------
-def sync_back(orgzly_files, org_inbox):
-    for org_file in orgzly_files:
-        uniq = dedupe_files(org_file, org_inbox)
-    for uniq_node in uniq:
-        with open(os.path.expanduser(org_inbox),
-                  "a", encoding="utf-8", newline="\n") as w_file:
-            w_file.writelines(str(uniq_node))
-            w_file.write("\n")
-            w_file.close()
+def sync_back(orgzly_files, org_inbox, org_files):
+    oznode_set = set()
+    ornode_set = set()
+    for orgzly_file in orgzly_files:
+        oz_path = os.path.expanduser(orgzly_file)
+        oz_parse = orgparse.load(oz_path)
+        oznode_set = oznode_set.union(set(oz_parse[1:]))
+    for org_file in org_files:
+        or_path = os.path.expanduser(org_file)
+        or_parse = orgparse.load(or_path)
+        ornode_set = ornode_set.union(set(or_parse[1:]))
+    for oznode in oznode_set:
+        if oznode not in ornode_set:
+            with open(os.path.expanduser(org_inbox),
+                      "a", encoding="utf-8",
+                      newline="\n") as w_file:
+                w_file.writelines(str(oznode))
+                w_file.write("\n")
+                w_file.close()
     print("New entries added to inbox")
 
 # ----------------------------------------------------------------
@@ -318,10 +328,10 @@ def list_orgzly(app_key, app_secret, dropbox_folder):
         response = dbx.files_list_folder(folder)
         resp_dir = dbx_list(response)
     files_as_keys = resp_dir.keys()
-    print('Files in dropbox folder ' + '"' + folder + '"' + ' are: [ ')
+    print('Files in dropbox folder ' + '"' + folder + '"' + ' are: ')
     for key in files_as_keys:
         print(key)
-    print('] --> Done.')
+    print(' --> Done.')
 
 
 # Dropbox upload
@@ -411,44 +421,74 @@ def get_access_token(key, sec):
     write_refresh(oauth_result.refresh_token)
 
 
+# --------------------------------------------------------------------------------
+# Down to tmp
+# --------------------------------------------------------------------------------
+def down_to_tmp(orgzly_files, app_key, app_secret, dropbox_folder, tmpdir):
+    for k_file in orgzly_files:
+        path = os.path.expanduser(k_file)
+        name = os.path.basename(path)
+        tmp_path = os.path.join(tmpdir, name)
+        dbx_path = '/' + str(dropbox_folder) + '/' + str(name)
+        config_dbx = ConfigObj(DBX_CONFIG_FILE)
+        REFRESH_TOKEN = config_dbx['dropbox_token']
+        with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
+                             app_key=app_key,
+                             app_secret=app_secret) as dbx:
+            dbx.files_download_to_file(download_path=tmp_path,
+                                       path=dbx_path)
+    print('Successfully Downloaded orgfiles to ' + tmpdir)
+    file_list = os.listdir(tmpdir)
+    return file_list
+
+
+def gen_load(t_file, tmpdir, orgzly_files):
+    t_path = os.path.join(tmpdir, t_file)
+    path = os.path.expanduser(orgzly_files[0])
+    orgzly_fname = str(os.path.basename(path))
+    orgzly_dirpath = str(os.path.realpath(path)).strip(orgzly_fname)
+    orgzly_fpath = os.path.join(orgzly_dirpath, t_file)
+    temp_load = orgparse.load(t_path)
+    oz_load = orgparse.load(orgzly_fpath)
+    return temp_load, oz_load
+
+
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
-    folder = dropbox_folder
-    for k in orgzly_files:
-        path = os.path.expanduser(k)
-        fullname = os.path.realpath(path)
-        name = os.path.basename(path)
-        dropbox_upload(app_key, app_secret, fullname, folder, name)
+    with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
+        with TemporaryDirectory(suffix='_dir2', prefix='oroz_') as tmp2dir:
+            file_list = down_to_tmp(orgzly_files, app_key, app_secret,
+                                    dropbox_folder, tmpdir)
+            for t_file in file_list:
+                t_name = os.path.join(tmpdir, os.path.basename(t_file))
+                node_set = set()
+                node_set.clear()
+                temp_load, oz_load = gen_load(t_file, tmpdir, orgzly_files)
+                for node in oz_load[1:]:
+                    if node not in temp_load[1:]:
+                        node_set.add(node)
+                path_to_write = os.path.join(tmp2dir, t_name)
+                with open(path_to_write, 'a', encoding='utf-8') as w_f:
+                    for node in node_set:
+                        w_f.write(str(node))
+                        w_f.write('\n')
+                dropbox_upload(app_key, app_secret, path_to_write,
+                               dropbox_folder, t_name)
     print('Upload to Dropbox was successful!')
 
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
     with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
-        for k_file in orgzly_files:
-            path = os.path.expanduser(k_file)
-            name = os.path.basename(path)
-            tmp_path = os.path.join(tmpdir, name)
-            dbx_path = '/' + str(dropbox_folder) + '/' + str(name)
-            config_dbx = ConfigObj(DBX_CONFIG_FILE)
-            REFRESH_TOKEN = config_dbx['dropbox_token']
-            with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
-                                 app_key=app_key,
-                                 app_secret=app_secret) as dbx:
-                dbx.files_download_to_file(download_path=tmp_path,
-                                           path=dbx_path)
-        print('Successfully Downloaded orgfiles to ' + tmpdir)
-        file_list = os.listdir(tmpdir)
+        file_list = down_to_tmp(orgzly_files, app_key, app_secret,
+                                dropbox_folder, tmpdir)
         for t_file in file_list:
-            t_path = os.path.join(tmpdir, t_file)
+            node_set = set()
+            node_set.clear()
+            temp_load, oz_load = gen_load(t_file, tmpdir, orgzly_files)
             path = os.path.expanduser(orgzly_files[0])
             orgzly_fname = str(os.path.basename(path))
             orgzly_dirpath = str(os.path.realpath(path)).strip(orgzly_fname)
-            orgzly_fpath = os.path.join(orgzly_dirpath, t_file)
-            node_set = set()
-            node_set.clear()
-            temp_load = orgparse.load(t_path)
-            oz_load = orgparse.load(orgzly_fpath)
             for node in temp_load[1:]:
                 active_stamp = node.get_timestamps(active=True,
                                                    range=True, point=True)
@@ -572,7 +612,7 @@ def main():
     p_arg = argparse.ArgumentParser(
             prog='org-orgzly',
             usage='%(prog)s.py [ --up | --down ] or [ --push |'
-                  ' --pull | --put | --get ] '
+                  ' --pull || --put | --get ] '
                   ' or --list '
             ' or --dropbox_token',
             description='Makes managing mobile org '
@@ -610,6 +650,8 @@ def main():
                         config['org_inbox'], config['orgzly_files'],
                         config['orgzly_inbox'])
 
+    # OK, I admit. The following is a bit of a mess.
+
     # Run the gambit of args vs config
     if fcheck:
         # First the two meta commands: up and down
@@ -625,7 +667,8 @@ def main():
         if args.down:
             dropbox_get(config['app_key'], config['app_secret'],
                         config['dropbox_folder'], config['orgzly_files'])
-            sync_back(config['orgzly_files'], config['org_inbox'])
+            sync_back(config['orgzly_files'], config['org_inbox'],
+                      config['org_files'])
         # Next the four individual commands
         if args.push:
             if config['backup']:
@@ -635,7 +678,8 @@ def main():
             gen_file(env, config['org_files'], config['orgzly_inbox'],
                      config['days'])
         if args.pull:
-            sync_back(config['orgzly_files'], config['org_inbox'])
+            sync_back(config['orgzly_files'], config['org_inbox'],
+                      config['org_files'])
         if args.put:
             dropbox_put(config['app_key'], config['app_secret'],
                         config['dropbox_folder'], config['orgzly_files'])
