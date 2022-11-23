@@ -1,63 +1,99 @@
 
-     ┌─────────┐                                ┌────────────┐                                        ┌───────┐                           ┌─────────────┐                               ┌────────┐
-     │org_files│                                │orgzly_files│                                        │tmp_dir│                           │dropbox_files│                               │tmp2_dir│
-     └────┬────┘                                └─────┬──────┘                                        └───┬───┘                           └──────┬──────┘                               └───┬────┘
-          │                                           │                                                   │                                      │                                          │
-          │                                           │                                         ╔════╗    │                                      │                                          │
-══════════╪═══════════════════════════════════════════╪═════════════════════════════════════════╣ up ╠════╪══════════════════════════════════════╪══════════════════════════════════════════╪══════════
-          │                                           │                                         ╚════╝    │                                      │                                          │
-          │                                           │                                                   │                                      │                                          │
-          │    org nodes are added to orgzly inbox    │                                                  ┌┴┐                                     │                                          │
-          │───────────────────────────────────────────>                                                  │ │                                     │                                          │
-          │                                           │                                                  │ │                                     │                                          │
-          │                                           │                                                  │ │ org files are downloaded to tmp dir │                                          │
-          │                                           │                                                  │ │ <───────────────────────────────────│                                          │
-          │                                           │                                                  │ │                                     │                                          │
-          │                                           │ orgzly files are compared with files in tmp dir  \ /                                     │                                         ┌┴┐
-          │                                           │ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>│X│                                     │                                         │ │
-          │                                           │                                                  /┬\                                     │                                         │ │
-          │                                           │                                                   │                 the result is created in a secondary directory                 \ /
-          │                                           │                                                   │ ──────────────────────────────────────────────────────────────────────────────>│X│
-          │                                           │                                                   │                                      │                                         /┬\
-          │                                           │                                                   │                                      │these files are then uploaded to dropbox  │
-          │                                           │                                                   │                                      │<─────────────────────────────────────────│
-          │                                           │                                                   │                                      │                                          │
-          │                                           │                                                   │                                      │                                          │
-          │                                           │                                        ╔══════╗   │                                      │                                          │
-══════════╪═══════════════════════════════════════════╪════════════════════════════════════════╣ down ╠═══╪══════════════════════════════════════╪══════════════════════════════════════════╪══════════
-          │                                           │                                        ╚══════╝   │                                      │                                          │
-          │                                           │                                                   │                                      │                                          │
-          │                                           │                                                  ┌┴┐ dropbox files downloaded to tmpdir  │                                          │
-          │                                           │                                                  │ │ <───────────────────────────────────│                                          │
-          │                                           │                                                  │ │                                     │                                          │
-          │                                           │ orgzly_files are compared the files from dropbox \ /                                     │                                          │
-          │                                           │ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>│X│                                     │                                          │
-          │                                           │                                                  /┬\                                     │                                          │
-          │                                           │           The result is added to orgzly           │                                      │                                          │
-          │                                           │ <─────────────────────────────────────────────────│                                      │                                          │
-          │                                           │                                                   │                                      │                                          │
-          │finally orgzly_files are pushed back to org│                                                   │                                      │                                          │
-          │<───────────────────────────────────────────                                                   │                                      │                                          │
-     ┌────┴────┐                                ┌─────┴──────┐                                        ┌───┴───┐                           ┌──────┴──────┐                               ┌───┴────┐
-     │org_files│                                │orgzly_files│                                        │tmp_dir│                           │dropbox_files│                               │tmp2_dir│
-     └─────────┘                                └────────────┘                                        └───────┘                           └─────────────┘                               └────────┘
+                    ┌───┐                           ┌────────┐          ┌───────┐                      ┌───┐                                     ┌──────┐          ┌────┐          ┌────────┐
+                    │org│                           │oz_inbox│          │Dropbox│                      │tmp│                                     │orgzly│          │tmp2│          │or_inbox│
+                    └─┬─┘                           └───┬────┘          └───┬───┘                      └─┬─┘                                     └──┬───┘          └─┬──┘          └───┬────┘
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │   ╔════╗                                 │                │                 │
+══════════════════════╪═════════════════════════════════╪═══════════════════╪════════════════════════════╪═══╣ up ╠═════════════════════════════════╪════════════════╪═════════════════╪════════════════════════════════════════
+                      │                                 │                   │                            │   ╚════╝                                 │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+          ╔═══════╤═══╪═════════════════════════════════╪═══════════════════╪═════════╗                  │                                          │                │                 │
+          ║ PUSH  │   │                                 │                   │         ║                  │                                          │                │                 │
+          ╟───────┘   │1 org nodes added to orgzly inbox│  ╔═══════════════╗│         ║                  │                                          │                │                 │
+          ║           │─────────────────────────────────>  ║prevent dupes ░║│         ║                  │                                          │                │                 │
+          ╚═══════════╪═════════════════════════════════╪══╚═══════════════╝╪═════════╝                  │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                            ╔════╪═╤═════════════════╪════════════════════════════╪══════════════════════════════════════════╪════════════════╪═════════════════╪═════════╗
+                      │                            ║ PUT  │                 │                            │                                          │                │                 │         ║
+                      │                            ╟──────┘                 │ 2 files downloaded to tmp ┌┴┐  ╔═════════════════╗                    │                │                 │         ║
+                      │                            ║    │                   │ ─────────────────────────>│ │  ║direct download ░║                    │                │                 │         ║
+                      │                            ║    │                   │                           │ │  ╚═════════════════╝                    │                │                 │         ║
+                      │                            ║    │                   │         ╔═══════════════╗ \ / 3 orgzly files compared to dropbox files│                ┌┴┐               │         ║
+                      │                            ║    │                   │         ║prevent dupes ░║ │X│ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>                │ │               │         ║
+                      │                            ║    │                   │         ╚═══════════════╝ /┬\                                         │                │ │               │         ║
+                      │                            ║    │                   │                            │                 4 result created in tmp2 │                \ /  ╔════════════╧╗        ║
+                      │                            ║    │                   │                            │ ─────────────────────────────────────────────────────────>│X│  ║only unique ░║        ║
+                      │                            ║    │                   │                            │                                          │                /┬\  ╚════════════╤╝        ║
+                      │                            ║    │ ╔════════════════╗│                            │  5 tmp2 uploaded to dropbox              │                │                 │         ║
+                      │                            ║    │ ║overwrite mode ░║│ <───────────────────────────────────────────────────────────────────────────────────────                 │         ║
+                      │                            ╚════╪═╚════════════════╝╪════════════════════════════╪══════════════════════════════════════════╪════════════════╪═════════════════╪═════════╝
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │  ╔══════╗                                │                │                 │
+══════════════════════╪═════════════════════════════════╪═══════════════════╪════════════════════════════╪══╣ down ╠════════════════════════════════╪════════════════╪═════════════════╪════════════════════════════════════════
+                      │                                 │                   │                            │  ╚══════╝                                │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │     ╔══════╤══════╪════════════════════════════╪══════════════════════════════════════════╪════════════════╪═════╗           │
+                      │                                 │     ║ GET  │      │                            │                                          │                │     ║           │
+                      │                                 │     ╟──────┘      │6 dropbox downloaded to tmp┌┴┐  ╔═════════════════╗                    │                │     ║           │
+                      │                                 │     ║             │ ─────────────────────────>│ │  ║direct download ░║                    │                │     ║           │
+                      │                                 │     ║             │                           │ │  ╚═════════════════╝                    │                │     ║           │
+                      │                                 │     ║             │         ╔═══════════════╗ \ /      7 orgzly files compared to tmp     │                │     ║           │
+                      │                                 │     ║             │         ║prevent dupes ░║ │X│ <─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>                │     ║           │
+                      │                                 │     ║             │         ╚═══════════════╝ /┬\                                         │                │     ║           │
+                      │                                 │     ║             │                            │         8 result added to orgzly         │  ╔════════╗    │     ║           │
+                      │                                 │     ║             │                            │ ─────────────────────────────────────────>  ║unique ░║    │     ║           │
+                      │                                 │     ╚═════════════╪════════════════════════════╪══════════════════════════════════════════╪══╚════════╝════╪═════╝           │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                                          │                │                 │
+                      │                                 │                   │                            │                             ╔═══════╤════╪════════════════╪═════════════════╪═════════════════════════════╗
+                      │                                 │                   │                            │                             ║ PULL  │    │                │                 │                             ║
+                      │                                 │                   │                            │                             ╟───────┘    │   9 orgzly files pushed to org   │  ╔═══════════════╗          ║
+                      │                                 │                   │                            │                             ║            │ ─────────────────────────────────>  ║prevent dupes ░║          ║
+                      │                                 │                   │                            │                             ╚════════════╪════════════════╪═════════════════╪══╚═══════════════╝══════════╝
+                    ┌─┴─┐                           ┌───┴────┐          ┌───┴───┐                      ┌─┴─┐                                     ┌──┴───┐          ┌─┴──┐          ┌───┴────┐
+                    │org│                           │oz_inbox│          │Dropbox│                      │tmp│                                     │orgzly│          │tmp2│          │or_inbox│
+                    └───┘                           └────────┘          └───────┘                      └───┘                                     └──────┘          └────┘          └────────┘
 
 @startuml
+autonumber
+
 == up ==
-org_files -> orgzly_files : org nodes are added to orgzly inbox
-activate tmp_dir
-dropbox_files -> tmp_dir : org files are downloaded to tmp dir
-orgzly_files o<-->o tmp_dir : orgzly files are compared with files in tmp dir
-activate tmp2_dir
-tmp_dir -> tmp2_dir : the result is created in a secondary directory
-destroy tmp_dir
-tmp2_dir ->x dropbox_files : these files are then uploaded to dropbox
-destroy tmp2_dir
+group push
+	org -> oz_inbox : org nodes added to orgzly inbox
+	note right: prevent dupes
+end
+group put
+	Dropbox o-> tmp : files downloaded to tmp
+	note right: direct download
+	activate tmp
+	orgzly o<-->o tmp : orgzly files compared to dropbox files
+	note left: prevent dupes
+	activate tmp2
+	tmp -> tmp2 : result created in tmp2
+	note right: only unique
+	destroy tmp
+	tmp2 ->x Dropbox : tmp2 uploaded to dropbox
+	note left: overwrite mode
+	destroy tmp2
+end
+
 == down ==
-tmp_dir <- dropbox_files : dropbox files downloaded to tmpdir
-activate tmp_dir
-orgzly_files o<-->o tmp_dir : orgzly_files are compared the files from dropbox
-tmp_dir -> orgzly_files : The result is added to orgzly
-destroy tmp_dir
-org_files x<- orgzly_files : finally orgzly_files are pushed back to org
+group get
+	tmp <- Dropbox : dropbox downloaded to tmp
+	note right: direct download
+	activate tmp
+	orgzly o<-->o tmp : orgzly files compared to tmp
+	note left: prevent dupes
+	tmp -> orgzly : result added to orgzly
+	note right: unique
+	destroy tmp
+end
+group pull
+	or_inbox x<- orgzly : orgzly files pushed to org
+	note right: prevent dupes
+end
 @enduml

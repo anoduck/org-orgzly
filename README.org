@@ -2,7 +2,6 @@
 #+DATE: Tue Nov  8 02:56:53 2022
 #+AUTHOR: Anoduck
 
-#+CAPTION: org-orgzly logo
 #+NAME: org-orgzly_logo.png
 [[./Resources/README/org-orgzly_logo.png.png]]
 
@@ -16,21 +15,26 @@
 #+end_src
 * Org-orgzly
 /A python application to parse and generate org files for orgzly practically, by making managing your org schedule easier./
+*** Issues/Bugs?
+If you experience ANY issues using this script, encounter ANY bugs, or you just think this script sucks. PLEASE, submit and issue to
+either the github or codeberg repositories, and we will try our best to address the issue as soon as feasibly possible.
 *** About
 **** What it does
 This script takes a specified list of org files, extracts org entries, filters out entries that do not meet specified TODO and Date
 parameters, provides allowances for days in a month and leap years, and then writes those entries to the designated orgzly inbox. It
-then uploads designated orgzly files to Dropbox. Then it allows the user to download those files from Dropbox, and add newly added or
-changed entries found within the orgzly inbox to the org inbox for categorization and re-filing.
+then uploads designated orgzly files to Dropbox. Then later on, the user may download those files from Dropbox, and merge entries
+from the orgzly inbox back to org via the org inbox file.
 **** Features
 - Processes org nodes for only a particularly defined amount of days, and add them to your orgzly inbox.
 - Allows for retrieving created org nodes inside your orgzly inbox to your org inbox.
 - Compensates for leap years.
 - Uploads orgzly files to a defined folder in your dropbox account
 - Downloads orgzly files to a defined local folder on your local machine.
+- Lists contents of the remote orgzly folder within dropbox
+- Eleminates duplicate entries
 **** Methodological Assumptions
 There are several assumptions made concerning time management and the use of orgzly.
-
+- Evidently orgzly was never intended to be a replacement for emacs.
 - The user does not desire to sync all org agenda files with orgzly.
 - Mobile management of many org entries is difficult.
 - Duplicate org entries are not cool.
@@ -50,6 +54,7 @@ notation.
 **** Required Python libraries
 - orgparse
 - configobj
+- dropbox
 **** The 'ini' file
 The configuration file, =config.ini= will be automatically generated for you in your ~XDG_CONFIG_HOME~ directory under the =org-orgzly=
 folder, with the default values already filled out for you. If you plan on using this script in conjunction with
@@ -102,12 +107,16 @@ todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
 dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 #+end_src
 *** Usage:
-*Please note!* In order to avoid reception of a file conflict error using the Dropbox API, "overwrite mode" has been enabled for the
-dropbox api until a means to handle these conflicts can be worked out.
+*Please note!* In order to avoid either a file conflict error or a overall general buggering of org files, "overwrite mode" has been
+enabled for dropbox api.
 
-Navigate to the repository directory and run ~python org-orgzly.py~, or create an alias in your shell =rc= file, or create a simple
-script in your ~$PATH~ that points to the repository and run it where ever, or even add it to cron. All should work since things are
-kept together in a single file. An example of creating an alias for ZSH or Bash is below:
+Any of the following methods may be employed to run this script:
+- Navigate to the repository directory and run ~python org-orgzly.py~
+- create an alias in your shell =rc= file
+- create a simple script in your ~$PATH~ that points to the repository and run it where ever
+- for the reckless cron could be employed to run this script periodically
+
+All should work since things are kept together in a single file. An example of creating an alias for ZSH or Bash is below:
 
 #+begin_src bash
 
@@ -119,6 +128,7 @@ Below are the four commands available for org-orgzly. See _workflow_ below for i
 
 | Command Flags | What they do                                                            |
 |---------------+-------------------------------------------------------------------------|
+| ~--list~      | List remote contents of =Dropbox:/orgzly/=                              |
 | ~--up~        | Combines =--push= and =--put=, in that order                            |
 | ~--down~      | Combines =--get= and =--pull=, in that order                            |
 | ~--push~      | Parses org files and copies entries matching parameters to orgzly inbox |
@@ -139,6 +149,9 @@ could be very messy and lead to data loss. The intended command flow is as follo
 2. ~--down~:
    1. ~--get~: Get from Dropbox
    2. ~--pull~: Pull from orgzly
+
+#+NAME: sequence.svg
+[[./Resources/README/sequence.svg]]
 
 
 #+NAME: plantuml.svg
