@@ -3,7 +3,7 @@
 #+AUTHOR: Anoduck
 
 #+NAME: org-orgzly_logo.png
-[[./Resources/README/org-orgzly_logo.png.png]]
+[[./Resources/README/org-orgzly_logo.png]]
 
 #+begin_src text
   ___                ___              _
