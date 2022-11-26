@@ -126,15 +126,19 @@ alias org-orgzly="/path/to/python /path/to/org-orgzly/org-orgzly.py"
 
 Below are the four commands available for org-orgzly. See _workflow_ below for instructions on what order to execute them.
 
-| Command Flags | What they do                                                            |
-|---------------+-------------------------------------------------------------------------|
-| ~--list~      | List remote contents of =Dropbox:/orgzly/=                              |
-| ~--up~        | Combines =--push= and =--put=, in that order                            |
-| ~--down~      | Combines =--get= and =--pull=, in that order                            |
-| ~--push~      | Parses org files and copies entries matching parameters to orgzly inbox |
-| ~--pull~      | Copies newly created entries in orgzly inbox to your og inbox           |
-| ~--put~       | Uploads orgzly to Dropbox                                               |
-| ~--get~       | Downloads orgzly files from Dropbox                                     |
+| Command Flags     | What they do                                                            |
+|-------------------+-------------------------------------------------------------------------|
+| ~--help~          | Prints Help information                                                 |
+| ~--version~       | Spits out script version number                                         |
+| ~--dropbox_token~ | Fetches initial dropbox access token                                    |
+| ~--config~        | (optional) Path to configuration file if different from default         |
+| ~--list~          | List remote contents of =Dropbox:/orgzly/=                              |
+| ~--up~            | Combines =--push= and =--put=, in that order                            |
+| ~--down~          | Combines =--get= and =--pull=, in that order                            |
+| ~--push~          | Parses org files and copies entries matching parameters to orgzly inbox |
+| ~--pull~          | Copies newly created entries in orgzly inbox to your og inbox           |
+| ~--put~           | Uploads orgzly to Dropbox                                               |
+| ~--get~           | Downloads orgzly files from Dropbox                                     |
 
 The intention of the above "flag commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
