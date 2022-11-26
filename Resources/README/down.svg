@@ -1,0 +1,1054 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="1140.625px" preserveAspectRatio="none" style="width:431px;height:1140px;" version="1.1" viewBox="0 0 431 1140" width="431.25px" zoomAndPan="magnify"><defs><linearGradient id="gx77i1ucea8x40" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#151515"/><stop offset="100%" stop-color="#000000"/></linearGradient><linearGradient id="gx77i1ucea8x41" x1="50%" x2="50%" y1="0%" y2="100%"><stop offset="0%" stop-color="#D3F198"/><stop offset="100%" stop-color="#B5E853"/></linearGradient></defs><g><rect fill="url(#gx77i1ucea8x40)" height="47.168" id="_title" rx="4.1667" ry="4.1667" style="stroke:#B5E853;stroke-width:1.0416666666666667;" width="236.4583" x="88.0208" y="20.8333"/><text fill="#B5E853" font-family="&quot;Verdana&quot;" font-size="20.8333" font-weight="bold" lengthAdjust="spacing" textLength="213.5417" x="99.4792" y="51.6296">"org orgzly" Down</text><!--MD5=[9d466c5a3c3149398d60225914e05625]
+cluster org--><g id="cluster_org"><path d="M37.5,923.2973 L37.5,923.2973 A31.25,31.25 0 0 1 58.3333,944.1306 L65.625,954.5147 L152.0833,954.5147 A20.8333,20.8333 0 0 1 172.9167,975.3481 L172.9167,1098.2973 A20.8333,20.8333 0 0 1 152.0833,1119.1306 L37.5,1119.1306 A20.8333,20.8333 0 0 1 16.6667,1098.2973 L16.6667,944.1306 A20.8333,20.8333 0 0 1 37.5,923.2973 " fill="url(#gx77i1ucea8x40)" style="stroke:#F4BF75;stroke-width:2.0833333333333335;"/><line style="stroke:#F4BF75;stroke-width:2.0833333333333335;" x1="16.6667" x2="65.625" y1="954.5147" y2="954.5147"/><text fill="#F4BF75" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="25" x="26.0417" y="942.1917">org</text></g><!--MD5=[367f0a61503f39c25dcf0c4e37ee961f]
+cluster org_files--><g id="cluster_org_files"><rect fill="url(#gx77i1ucea8x41)" height="118.75" rx="20.8333" ry="20.8333" style="stroke:none;stroke-width:1.0416666666666667;" width="75" x="57.2917" y="975.3806"/><path d="M41.6667,975.3806 L36.4583,975.3806 A20.8333,20.8333 0 0 1 57.2917,996.214 L57.2917,1073.2973 A20.8333,20.8333 0 0 0 78.125,1094.1306 L111.4583,1094.1306 A20.8333,20.8333 0 0 0 132.2917,1073.2973 L132.2917,996.214 A20.8333,20.8333 0 0 1 153.125,975.3806 L147.9167,975.3806 " fill="none" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#151515" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="62.5" x="63.5417" y="1005.7334">org_files</text></g><!--MD5=[73f4bbe1922432ce8f04f53d38138e5c]
+cluster orgzly--><g id="cluster_orgzly"><path d="M269.7917,923.2973 L290.625,923.2973 A31.25,31.25 0 0 1 311.4583,944.1306 L318.75,954.5147 L388.5417,954.5147 A20.8333,20.8333 0 0 1 409.375,975.3481 L409.375,1098.2973 A20.8333,20.8333 0 0 1 388.5417,1119.1306 L269.7917,1119.1306 A20.8333,20.8333 0 0 1 248.9583,1098.2973 L248.9583,944.1306 A20.8333,20.8333 0 0 1 269.7917,923.2973 " fill="url(#gx77i1ucea8x40)" style="stroke:#F4BF75;stroke-width:2.0833333333333335;"/><line style="stroke:#F4BF75;stroke-width:2.0833333333333335;" x1="248.9583" x2="318.75" y1="954.5147" y2="954.5147"/><text fill="#F4BF75" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="45.8333" x="258.3333" y="942.1917">orgzly</text></g><!--MD5=[a4436369e761c661affe6ea1047ca71a]
+cluster orgzly_files--><g id="cluster_orgzly_files"><rect fill="url(#gx77i1ucea8x41)" height="118.75" rx="20.8333" ry="20.8333" style="stroke:none;stroke-width:1.0416666666666667;" width="79.1667" x="289.5833" y="975.3806"/><path d="M273.9583,975.3806 L268.75,975.3806 A20.8333,20.8333 0 0 1 289.5833,996.214 L289.5833,1073.2973 A20.8333,20.8333 0 0 0 310.4167,1094.1306 L347.9167,1094.1306 A20.8333,20.8333 0 0 0 368.75,1073.2973 L368.75,996.214 A20.8333,20.8333 0 0 1 389.5833,975.3806 L384.375,975.3806 " fill="none" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#151515" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="83.3333" x="287.5" y="1005.7334">orgzly_files</text></g><!--MD5=[fc7bd9b83e1113b5d4530dafe9cf057a]
+cluster dupe_check--><g id="cluster_dupe_check"><path d="M114.5833,599.339 L144.2708,343.089 L322.3958,343.089 L352.0833,599.339 L322.3958,855.589 L144.2708,855.589 L114.5833,599.339 " fill="#151515" style="stroke:#B5E853;stroke-width:1.0416666666666667;"/><text fill="#B5E853" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="85.4167" x="190.625" y="361.9834">dupe_check</text></g><!--MD5=[5f3256efecb9a6c64dcf7641abd32f06]
+cluster tmp1--><g id="cluster_tmp1"><path d="M177.0833,403.5056 L188.5417,403.5056 A31.25,31.25 0 0 1 209.375,424.339 L216.6667,434.7231 L297.9167,434.7231 A20.8333,20.8333 0 0 1 318.75,455.5564 L318.75,488.9223 A20.8333,20.8333 0 0 1 297.9167,509.7556 L177.0833,509.7556 A20.8333,20.8333 0 0 1 156.25,488.9223 L156.25,424.339 A20.8333,20.8333 0 0 1 177.0833,403.5056 " fill="url(#gx77i1ucea8x40)" style="stroke:#F4BF75;stroke-width:2.0833333333333335;"/><line style="stroke:#F4BF75;stroke-width:2.0833333333333335;" x1="156.25" x2="216.6667" y1="434.7231" y2="434.7231"/><text fill="#F4BF75" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="36.4583" x="165.625" y="422.4001">tmp1</text></g><!--MD5=[a2e22c7f9ad09cf6ca81cff681cc23ef]
+cluster tmp2--><g id="cluster_tmp2"><path d="M177.0833,716.0056 L188.5417,716.0056 A31.25,31.25 0 0 1 209.375,736.839 L216.6667,747.2231 L297.9167,747.2231 A20.8333,20.8333 0 0 1 318.75,768.0564 L318.75,801.4223 A20.8333,20.8333 0 0 1 297.9167,822.2556 L177.0833,822.2556 A20.8333,20.8333 0 0 1 156.25,801.4223 L156.25,736.839 A20.8333,20.8333 0 0 1 177.0833,716.0056 " fill="url(#gx77i1ucea8x40)" style="stroke:#F4BF75;stroke-width:2.0833333333333335;"/><line style="stroke:#F4BF75;stroke-width:2.0833333333333335;" x1="156.25" x2="216.6667" y1="747.2231" y2="747.2231"/><text fill="#F4BF75" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="36.4583" x="165.625" y="734.9001">tmp2</text></g><!--MD5=[9bf7582b0a8fc2df915569f2652aaf9e]
+cluster Dropbox--><g id="cluster_Dropbox"><path d="M140.3521,100.8943 C144.3071,93.0696 151.1884,93.5653 155.6512,100.363 C160.3615,90.9264 168.1903,91.786 173.4987,99.7495 C178.5184,91.2145 184.8457,91.9849 190.1024,99.5043 C193.866,92.0017 200.684,91.4763 205.5418,98.3273 C208.8382,88.9328 214.4766,87.8142 221.1051,95.2451 C225.9428,87.8722 232.6736,85.7096 238.2225,94.4915 C243.8699,87.103 251.9442,87.7945 254.725,97.2928 C258.906,89.1518 266.6743,88.8251 271.8108,96.2436 C276.9402,88.5664 285.7099,87.367 289.9114,97.2026 C296.7593,91.0519 301.8448,91.9132 305.8539,100.313 C309.9938,93.6804 317.5206,92.6671 321.929,100.0039 C332.0665,92.2758 341.2482,95.7409 344.7917,107.6723 C345.2156,107.5288 345.5871,107.6622 345.5054,108.2011 C354.53,111.7062 355.1285,119.7516 347.8984,125.5048 C356.1408,129.4897 355.9553,134.6543 350.4473,140.9137 C356.3389,142.7142 358.9863,148.5179 353.8979,153.3621 C360.1552,158.0458 361.8867,164.3512 353.4734,168.6269 C363.751,171.9274 365.1026,178.5861 357.4099,185.9662 C362.9775,191.5709 362.7661,197.4928 355.1567,201.1409 C360.4795,206.5378 358.4117,213.8261 351.2617,215.9402 C357.1417,220.2425 357.6985,226.3677 351.0818,230.5158 C357.9647,236.6752 356.1603,242.596 348.4832,246.3688 C355.9024,258.6972 349.7294,265.155 337.5,267.0473 C338.7295,267.2385 339.0319,268.0435 338.391,269.0619 C334.625,277.6782 326.6925,277.364 322.415,269.5596 C318.5599,277.096 311.4401,278.1436 306.1262,271.2007 C301.6812,279.5757 294.8658,278.8394 290.1379,271.4883 C287.2721,281.5648 281.1868,283.4189 273.6756,275.8133 C267.9457,283.021 260.4557,283.7535 255.4653,274.9711 C251.6454,283.3598 243.9838,284.0711 238.7138,276.4923 C233.7758,284.1752 225.7972,282.1484 222.0772,275.1153 C217.7572,283.3695 210.4735,283.663 205.5797,275.6991 C200.4806,282.8181 192.7539,282.7832 189.7021,273.6936 C184.1975,281.224 176.9531,280.4939 172.6136,272.4179 C165.992,279.9194 159.8493,279.9097 155.4904,270.1706 C142.7104,278.087 133.0091,276.0637 130.2083,259.7556 C132.1855,259.4264 132.8849,260.4466 132.638,262.2681 C125.4179,258.847 124.4011,251.6856 130.6221,246.5415 C122.8756,243.1197 121.2426,237.5556 126.551,230.7651 C120.2723,228.1183 117.7982,221.2934 124.333,216.6352 C115.3962,213.4841 115.3515,205.1884 122.485,200.2273 C114.3369,196.8893 114.3207,192.4245 119.337,186.1439 C113.1882,179.4671 113.7556,174.583 122.2417,170.6498 C115.1507,163.9274 114.2631,158.5662 124.1925,153.8161 C117.1647,147.4371 118.6526,142.0396 127.1276,138.6635 C120.2366,133.0668 121.7118,128.2091 128.8011,124.2339 C118.2449,112.7761 122.6386,102.569 137.5,100.3806 C138.5807,99.2141 139.7465,99.4228 140.3521,100.8943 " fill="#151515" style="stroke:#B5E853;stroke-width:1.0416666666666667;"/><text fill="#EAEAEA" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="61.4583" x="206.7708" y="122.4001">Dropbox</text></g><!--MD5=[7c5108b4e60a756e8b4e6a74e4b93c98]
+cluster remote_orgzly--><g id="cluster_remote_orgzly"><path d="M167.7083,144.1306 L247.9167,144.1306 A31.25,31.25 0 0 1 268.75,164.964 L276.0417,175.3481 L307.2917,175.3481 A20.8333,20.8333 0 0 1 328.125,196.1814 L328.125,229.5473 A20.8333,20.8333 0 0 1 307.2917,250.3806 L167.7083,250.3806 A20.8333,20.8333 0 0 1 146.875,229.5473 L146.875,164.964 A20.8333,20.8333 0 0 1 167.7083,144.1306 " fill="url(#gx77i1ucea8x40)" style="stroke:#F4BF75;stroke-width:2.0833333333333335;"/><line style="stroke:#F4BF75;stroke-width:2.0833333333333335;" x1="146.875" x2="276.0417" y1="175.3481" y2="175.3481"/><text fill="#F4BF75" font-family="&quot;Verdana&quot;" font-size="12.5" font-weight="bold" lengthAdjust="spacing" textLength="105.2083" x="156.25" y="163.0251">remote_orgzly</text></g><!--MD5=[ca4ef649ef88a52c8c1ffc2aa01e514b]
+entity org_inbox--><g id="elem_org_inbox"><ellipse cx="94.7917" cy="1035.7973" fill="url(#gx77i1ucea8x41)" rx="12.5" ry="12.5" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><polygon fill="#D3F198" points="90.625,1023.2973,96.875,1018.089,94.7917,1023.2973,96.875,1028.5056,90.625,1023.2973" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#EAEAEA" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="62.5" x="63.5417" y="1069.2751">org_inbox</text></g><!--MD5=[41c8ade02d57cdf764c31cd4ca337ab3]
+entity oz_inbox--><g id="elem_oz_inbox"><ellipse cx="329.1667" cy="1035.7973" fill="url(#gx77i1ucea8x41)" rx="12.5" ry="12.5" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><polygon fill="#D3F198" points="325,1023.2973,331.25,1018.089,329.1667,1023.2973,331.25,1028.5056,325,1023.2973" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#EAEAEA" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="54.1667" x="302.0833" y="1069.2751">oz_inbox</text></g><!--MD5=[7cb1e53f3e1031f04d1b78371ebb6f09]
+entity org_parse--><g id="elem_org_parse"><ellipse cx="237.5" cy="600.3806" fill="url(#gx77i1ucea8x41)" rx="12.5" ry="12.5" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><line style="stroke:#D3F198;stroke-width:1.0416666666666667;" x1="225" x2="250" y1="614.964" y2="614.964"/><text fill="#EAEAEA" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="65.625" x="204.6875" y="633.8584">org_parse</text></g><!--MD5=[d4f281eea341319b54745bf0280b39c4]
+entity tmp1_files--><g id="elem_tmp1_files"><rect fill="url(#gx77i1ucea8x41)" height="45.8008" rx="4.1667" ry="4.1667" style="stroke:none;stroke-width:1.0416666666666667;" width="96.875" x="189.0625" y="447.2556"/><path d="M173.4375,447.2556 L184.8958,447.2556 A4.1667,4.1667 0 0 1 189.0625,451.4223 L189.0625,488.8897 A4.1667,4.1667 0 0 0 193.2292,493.0564 L281.7708,493.0564 A4.1667,4.1667 0 0 0 285.9375,488.8897 L285.9375,451.4223 A4.1667,4.1667 0 0 1 290.1042,447.2556 L301.5625,447.2556 " fill="none" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#151515" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="65.625" x="204.6875" y="474.4834">tmp1_files</text></g><!--MD5=[ee95173b2b02dfcac0977a85921eaffe]
+entity tmp2_files--><g id="elem_tmp2_files"><rect fill="url(#gx77i1ucea8x41)" height="45.8008" rx="4.1667" ry="4.1667" style="stroke:none;stroke-width:1.0416666666666667;" width="96.875" x="189.0625" y="759.7556"/><path d="M173.4375,759.7556 L184.8958,759.7556 A4.1667,4.1667 0 0 1 189.0625,763.9223 L189.0625,801.3897 A4.1667,4.1667 0 0 0 193.2292,805.5564 L281.7708,805.5564 A4.1667,4.1667 0 0 0 285.9375,801.3897 L285.9375,763.9223 A4.1667,4.1667 0 0 1 290.1042,759.7556 L301.5625,759.7556 " fill="none" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#151515" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="65.625" x="204.6875" y="786.9834">tmp2_files</text></g><!--MD5=[f9425a611e87e363f7856ca6dabe8553]
+entity dropbox_files--><g id="elem_dropbox_files"><rect fill="url(#gx77i1ucea8x41)" height="45.8008" rx="4.1667" ry="4.1667" style="stroke:none;stroke-width:1.0416666666666667;" width="116.6667" x="179.1667" y="187.8806"/><path d="M163.5417,187.8806 L175,187.8806 A4.1667,4.1667 0 0 1 179.1667,192.0473 L179.1667,229.5147 A4.1667,4.1667 0 0 0 183.3333,233.6814 L291.6667,233.6814 A4.1667,4.1667 0 0 0 295.8333,229.5147 L295.8333,192.0473 A4.1667,4.1667 0 0 1 300,187.8806 L311.4583,187.8806 " fill="none" style="stroke:#D3F198;stroke-width:1.0416666666666667;"/><text fill="#151515" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="85.4167" x="194.7917" y="215.1084">dropbox_files</text></g><!--MD5=[e340589eada7d18f7cd84522ceb0782f]
+link dropbox_files to tmp1_files--><g id="link_dropbox_files_tmp1_files"><path d="M237.5,233.7765 C237.5,276.3077 237.5,370.6723 237.5,426.1306 " fill="none" id="dropbox_files-to-tmp1_files" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="none" points="244.7917,426.4119,237.5,447.2452,230.2083,426.4119,244.7917,426.4119" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="243.75" y="309.9001">1</text></g><!--MD5=[bc00a1de7406b838b0f6dfaad0fd2134]
+link tmp1_files to org_parse--><g id="link_tmp1_files_org_parse"><path d="M237.5,493.1827 C237.5,514.9744 237.5,548.7765 237.5,574.7348 " fill="none" id="tmp1_files-to-org_parse" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="#B5E853" points="237.5,583.214,240.625,574.8806,234.375,574.8806,237.5,583.214" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="243.75" y="544.2751">2</text></g><!--MD5=[27bce0808f997cc9f4f130253103aaf6]
+link org_parse to tmp2_files--><g id="link_org_parse_tmp2_files"><path d="M237.5,642.3702 C237.5,672.4848 237.5,719.839 237.5,750.8181 " fill="none" id="org_parse-to-tmp2_files" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="#B5E853" points="237.5,759.4848,240.625,751.1515,234.375,751.1515,237.5,759.4848" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="243.75" y="691.1501">3</text></g><!--MD5=[52a1673f79f82707e8314804b24c10bc]
+link tmp2_files to oz_inbox--><g id="link_tmp2_files_oz_inbox"><path d="M245.1563,805.7348 C261.2083,851.8702 298.4479,958.9535 317.5,1013.7035 " fill="none" id="tmp2_files-to-oz_inbox" style="stroke:#B5E853;stroke-width:3.125;"/><ellipse cx="319.2813" cy="1018.839" fill="none" rx="6.25" ry="6.25" style="stroke:#B5E853;stroke-width:1.5625;"/><path d="M323.8128,1009.4596 A10.4167,10.4167 0 0 0 309.9019 1014.3074" fill="none" style="stroke:#B5E853;stroke-width:1.5625;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="283.3333" y="898.4417">4</text></g><!--MD5=[77072b3063d023506c9449e6207687a2]
+link oz_inbox to org_parse--><g id="link_oz_inbox_org_parse"><path d="M334.5,1018.7035 C344.4063,958.6515 361.0313,815.9015 318.75,707.6723 C309.5729,684.1723 291.7813,662.5473 275.1771,646.0056 " fill="none" id="oz_inbox-to-org_parse" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="#B5E853" points="271.4375,642.339,275.2169,651.8767,275.1574,645.9844,281.0496,645.9249,271.4375,642.339" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="352.0833" y="787.5042">5</text></g><!--MD5=[7648811c92c2c9ec6a564c9fc22d1495]
+link org_inbox to org_parse--><g id="link_org_inbox_org_parse"><path d="M88.4583,1018.839 C76.4479,959.6306 54.2292,819.2869 85.4167,707.6723 C98.6771,660.214 154.0521,635.5577 194.1563,623.6723 " fill="none" id="org_inbox-to-org_parse" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="#B5E853" points="199.4583,622.1515,189.2994,620.7206,194.4504,623.5823,191.5887,628.7333,199.4583,622.1515" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="91.6667" y="787.5042">6</text></g><!--MD5=[17d2de4a3103e175a0ac095a5dbfc5a9]
+link org_parse to dupe_check--><g id="link_org_parse_dupe_check"><path d="M209.1771,642.141 C192.3646,659.9119 171.4479,683.9015 156.25,707.6723 C137.4375,737.0994 123.7917,778.9223 122.9583,781.5056 " fill="none" id="org_parse-to-dupe_check" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="#B5E853" points="122.9583,781.5056,129.8019,773.8625,124.5573,776.5488,121.871,771.3042,122.9583,781.5056" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="186.4583" y="691.1501">7</text></g><!--MD5=[e55581702a031ad013f0e5cb2e17d267]
+link dupe_check to org_inbox--><g id="link_dupe_check_org_inbox"><path d="M115.241,855.6705 C114.957,858.3314 114.6685,861.0336 114.3763,863.7713 C109.7005,907.5733 104.0573,960.4379 100.0313,998.1515 " fill="none" id="dupe_check-to-org_inbox" style="stroke:#B5E853;stroke-width:3.125;"/><polygon fill="none" points="97.8125,1018.964,92.6542,998.5123,107.1558,1000.0541,97.8125,1018.964" style="stroke:#B5E853;stroke-width:3.125;"/><ellipse cx="95.3536" cy="992.8283" fill="#B5E853" rx="2.0833" ry="2.0833" style="stroke:#B5E853;stroke-width:3.125;"/><ellipse cx="105.7119" cy="993.9297" fill="#B5E853" rx="2.0833" ry="2.0833" style="stroke:#B5E853;stroke-width:3.125;"/><text fill="#FFFFFF" font-family="&quot;Verdana&quot;" font-size="12.5" lengthAdjust="spacing" textLength="8.3333" x="117.7083" y="898.4417">8</text></g><!--MD5=[b541e4d419eb2a5376bdd431b02e7baa]
+@startuml
+!theme hacker
+!theme hacker
+title "org orgzly" Down
+
+folder org {
+	stack org_files {
+		control org_inbox
+	}
+}
+
+folder orgzly {
+	stack orgzly_files {
+		control oz_inbox
+		}
+	}
+
+hexagon dupe_check {
+	entity org_parse
+	folder tmp1 {
+		stack tmp1_files
+		}
+	folder tmp2 {
+		stack tmp2_files
+		}
+	}
+
+cloud Dropbox {
+	folder remote_orgzly {
+		stack dropbox_files
+		}
+	}
+
+dropbox_files - -|> tmp1_files : 1
+tmp1_files - ->> org_parse : 2
+org_parse - ->> tmp2_files : 3
+tmp2_files - -(0 oz_inbox : 4
+oz_inbox - -> org_parse : 5
+org_inbox - -> org_parse : 6
+org_parse - -> dupe_check : 7
+dupe_check - -:|> org_inbox : 8
+
+@enduml
+
+@startuml
+
+
+
+skinparam BackgroundColor transparent
+skinparam useBetaStyle false
+
+
+
+
+
+
+<style>
+  root {
+    BackgroundColor transparent
+    FontColor #151515
+    HyperLinkColor $ORANGE
+    LineColor #6d8b32
+    LineThickness 1
+    Margin 10
+    Padding 6
+    Shadowing 0.0
+  }
+  node {
+   Padding 15
+   roundcorner 20
+   BackgroundColor #b5e853-#6d8b32
+  }
+  caption {
+    LineThickness 0
+  }
+  footer {
+    LineThickness 0
+  }
+  groupHeader {
+    BackgroundColor #6a9fb5
+    FontColor #aa759f
+    FontStyle bold
+  }
+  header {
+    LineThickness 0
+  }
+  referenceHeader {
+    BackgroundColor transparent
+    FontColor #eaeaea
+    FontStyle bold
+  }
+  separator {
+    BackgroundColor $FGCOLOR
+    FontColor transparent
+    FontStyle bold
+  }
+  title {
+	FontSize 20
+	BorderRoundCorner            8
+	BorderThickness 	         1
+	BackgroundColor  #88b2c4-#6a9fb5
+	FontColor #b5e853
+	BorderColor #6a9fb5
+  }
+  nwdiagDiagram {
+	network {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853    
+		LineColor #b5e853
+		LineThickness 1.0
+		FontColor #d3f198
+	}
+	server {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	}
+	arrow {
+		FontColor #d3f198
+		LineColor #d3f198
+	}
+	group {
+		BackGroundColor #151515
+		LineColor $LIGHT_DARK
+		LineThickness 2.0
+		Margin 5
+		Padding 5
+	}
+  }
+  ganttDiagram {
+	task {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+		LineColor #b5e853
+		Margin 10
+		Padding 6
+	}
+	note {
+		FontColor $INFO_TEXT
+		LineColor #885E7F
+		BackGroundColor #aa759f
+	}
+	separator {
+		LineColor #6a9fb5
+		BackGroundColor #6a9fb5-#557f91
+		FontColor #fefefe
+	}
+	milestone {
+		FontColor #aa759f
+		FontSize 16
+		FontStyle italic
+		BackGroundColor #6a9fb5
+		LineColor #557f91
+	}
+	timeline {
+		BackgroundColor #6a9fb5
+		FontColor #fefefe
+	}
+	closed {
+		BackgroundColor $WARNING_DARK
+		FontColor #151515
+	}
+  }
+</style>
+skinparam defaultFontName       "Verdana"
+skinparam defaultFontSize       12
+skinparam dpi                   100
+skinparam shadowing             false
+skinparam roundcorner           40
+skinparam ParticipantPadding    40
+skinparam BoxPadding            40
+skinparam Padding               5
+skinparam ArrowColor            #eaeaea
+skinparam stereotype {
+    CBackgroundColor #557f91
+    CBorderColor #88b2c4
+    ABackgroundColor #a6ba7a
+    ABorderColor $SUCCESS_DARK
+    IBackgroundColor #bd6768
+    IBorderColor $DANGER_DARK
+    EBackgroundColor #f6cc91
+    EBorderColor $WARNING_DARK
+    NBackgroundColor #bb91b2
+    NBorderColor #885E7F
+}
+skinparam title {
+	FontColor	                 #b5e853
+	BorderColor	                 #b5e853
+	FontSize	    	         20
+	BorderRoundCorner            8
+	BorderThickness 	         1
+	BackgroundColor              #151515-black
+}
+
+
+skinparam legend {
+	BackgroundColor #6a9fb5
+	BorderColor #557f91
+	FontColor #eaeaea
+}
+
+skinparam swimlane {
+	BorderColor #aa759f
+	BorderThickness 2
+	TitleBackgroundColor  #88b2c4-#6a9fb5
+	TitleFontColor #b5e853
+}
+
+
+skinparam activity {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BarColor #90a959
+	StartColor #aa759f
+	EndColor #aa759f
+	DiamondBackgroundColor #88b2c4-#6a9fb5
+  	DiamondBorderColor #88b2c4
+  	DiamondFontColor #fefefe
+}
+
+
+skinparam participant {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BorderThickness 2
+}
+
+
+skinparam actor {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam arrow {
+	Thickness 3
+	Color #b5e853
+	FontColor $FGCOLOR
+}
+
+
+skinparam sequence {
+	BorderColor #b5e853
+	TitleFontColor #b5e853
+	BackgroundColor transparent
+	StartColor #b5e853
+	EndColor #b5e853
+	BoxBackgroundColor transparent
+	BoxBorderColor #eaeaea
+	BoxFontColor #eaeaea
+	DelayFontColor #eaeaea
+	LifeLineBorderColor #6a9fb5
+	LifeLineBorderThickness 2
+	LifeLineBackgroundColor #557f91
+	GroupBackgroundColor #151515
+	GroupBorderColor #eaeaea
+	GroupFontColor #eaeaea
+	GroupHeaderFontColor #aa759f
+	GroupHeaderBackgroundColor transparent
+	DividerBackgroundColor #eaeaea
+    DividerBorderColor #eaeaea
+    DividerBorderThickness 2
+    DividerFontColor #151515
+	ReferenceBackgroundColor transparent
+	ReferenceBorderColor #eaeaea
+	ReferenceFontColor #eaeaea
+	ReferenceHeaderBackgroundColor #151515
+	StereotypeFontColor #151515
+}
+
+
+skinparam partition {
+	BorderColor #b5e853
+	FontColor #b5e853
+	BackgroundColor #151515-black
+}
+
+
+skinparam collections {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam control {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam entity {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam boundary {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam agent {
+	BackgroundColor #f6cc91-#f4bf75
+	BorderColor #f6cc91
+	FontColor #eaeaea
+}
+
+
+skinparam note {
+	BorderThickness 1
+	BackgroundColor #bb91b2-#885E7F
+	BorderColor #885E7F
+	FontColor $WHITE
+}
+
+
+skinparam artifact {
+	BackgroundColor #eaeaea
+	BorderColor white
+	FontColor #151515
+}
+
+
+skinparam component {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam interface {
+	BackgroundColor  #bd6768-#ac4142
+	BorderColor  #bd6768
+	FontColor #eaeaea
+}
+
+
+skinparam storage {
+	BackgroundColor #f6cc91-#f4bf75
+  	BorderColor #f6cc91
+	FontColor #151515
+}
+
+
+skinparam node {
+	BackgroundColor  #151515-black
+	BorderColor #d3f198
+	FontColor #eaeaea
+}
+
+
+skinparam cloud {
+	BackgroundColor transparent
+	BorderColor #eaeaea
+	FontColor #eaeaea
+}
+
+
+skinparam database {
+	BackgroundColor  #151515-black
+	BorderColor #d3f198
+	FontColor #eaeaea
+}
+
+
+skinparam class {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	HeaderBackgroundColor #d3f198-#b5e853
+	StereotypeFontColor #eaeaea
+	BorderThickness 1
+	AttributeFontColor #151515
+	AttributeFontSize 11
+}
+
+
+skinparam object {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	StereotypeFontColor #eaeaea
+	BorderThickness 1
+	AttributeFontColor #151515
+	AttributeFontSize 11
+}
+
+
+skinparam usecase {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BorderThickness 2
+	StereotypeFontColor #b5e853
+}
+
+
+skinparam rectangle {
+	BackgroundColor transparent
+	BorderColor #b5e853
+	BorderThickness 2
+	FontColor #6d8b32
+	StereotypeFontColor #b5e853
+}
+
+
+skinparam package {
+	BackgroundColor #151515
+  	BorderColor #b5e853
+	FontColor #b5e853
+	BorderThickness 2
+}
+
+
+skinparam folder {
+	BackgroundColor #151515-black
+  	BorderColor #f4bf75
+	FontColor #f4bf75
+	BorderThickness 2
+}
+
+
+skinparam frame {
+	BackgroundColor #151515-black
+  	BorderColor #aa759f
+	FontColor #aa759f
+	BorderThickness 2
+}
+
+
+skinparam state {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	StartColor #aa759f
+	EndColor #aa759f
+	AttributeFontColor #fefefe
+	AttributeFontSize 11
+}
+
+
+skinparam queue {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam card {
+	BackgroundColor #bb91b2-#aa759f
+	BorderColor #bb91b2
+	FontColor $INFO_TEXT
+}
+
+
+skinparam file {
+	BackgroundColor #88b2c4-#6a9fb5
+	BorderColor #88b2c4
+	FontColor #eaeaea
+}
+
+
+skinparam stack {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+<style>
+mindmapDiagram, wbsDiagram {
+    element {
+	    	FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	}
+	:depth(0) {
+        fontSize 16
+        fontStyle bold
+        fontColor #6a9fb5
+    }
+    :depth(1) {
+        fontSize 14
+        padding 5
+        fontStyle bold
+    }
+    :depth(2) {
+        fontSize 12
+        padding 4
+    }
+    :depth(3) {
+        fontSize 11
+        padding 3
+        fontColor #aa759f
+    }
+
+}
+</style>
+
+
+
+
+
+skinparam BackgroundColor transparent
+skinparam useBetaStyle false
+
+
+
+
+
+
+<style>
+  root {
+    BackgroundColor transparent
+    FontColor #151515
+    HyperLinkColor $ORANGE
+    LineColor #6d8b32
+    LineThickness 1
+    Margin 10
+    Padding 6
+    Shadowing 0.0
+  }
+  node {
+   Padding 15
+   roundcorner 20
+   BackgroundColor #b5e853-#6d8b32
+  }
+  caption {
+    LineThickness 0
+  }
+  footer {
+    LineThickness 0
+  }
+  groupHeader {
+    BackgroundColor #6a9fb5
+    FontColor #aa759f
+    FontStyle bold
+  }
+  header {
+    LineThickness 0
+  }
+  referenceHeader {
+    BackgroundColor transparent
+    FontColor #eaeaea
+    FontStyle bold
+  }
+  separator {
+    BackgroundColor $FGCOLOR
+    FontColor transparent
+    FontStyle bold
+  }
+  title {
+	FontSize 20
+	BorderRoundCorner            8
+	BorderThickness 	         1
+	BackgroundColor  #88b2c4-#6a9fb5
+	FontColor #b5e853
+	BorderColor #6a9fb5
+  }
+  nwdiagDiagram {
+	network {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853    
+		LineColor #b5e853
+		LineThickness 1.0
+		FontColor #d3f198
+	}
+	server {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	}
+	arrow {
+		FontColor #d3f198
+		LineColor #d3f198
+	}
+	group {
+		BackGroundColor #151515
+		LineColor $LIGHT_DARK
+		LineThickness 2.0
+		Margin 5
+		Padding 5
+	}
+  }
+  ganttDiagram {
+	task {
+			FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+		LineColor #b5e853
+		Margin 10
+		Padding 6
+	}
+	note {
+		FontColor $INFO_TEXT
+		LineColor #885E7F
+		BackGroundColor #aa759f
+	}
+	separator {
+		LineColor #6a9fb5
+		BackGroundColor #6a9fb5-#557f91
+		FontColor #fefefe
+	}
+	milestone {
+		FontColor #aa759f
+		FontSize 16
+		FontStyle italic
+		BackGroundColor #6a9fb5
+		LineColor #557f91
+	}
+	timeline {
+		BackgroundColor #6a9fb5
+		FontColor #fefefe
+	}
+	closed {
+		BackgroundColor $WARNING_DARK
+		FontColor #151515
+	}
+  }
+</style>
+skinparam defaultFontName       "Verdana"
+skinparam defaultFontSize       12
+skinparam dpi                   100
+skinparam shadowing             false
+skinparam roundcorner           40
+skinparam ParticipantPadding    40
+skinparam BoxPadding            40
+skinparam Padding               5
+skinparam ArrowColor            #eaeaea
+skinparam stereotype {
+    CBackgroundColor #557f91
+    CBorderColor #88b2c4
+    ABackgroundColor #a6ba7a
+    ABorderColor $SUCCESS_DARK
+    IBackgroundColor #bd6768
+    IBorderColor $DANGER_DARK
+    EBackgroundColor #f6cc91
+    EBorderColor $WARNING_DARK
+    NBackgroundColor #bb91b2
+    NBorderColor #885E7F
+}
+skinparam title {
+	FontColor	                 #b5e853
+	BorderColor	                 #b5e853
+	FontSize	    	         20
+	BorderRoundCorner            8
+	BorderThickness 	         1
+	BackgroundColor              #151515-black
+}
+
+
+skinparam legend {
+	BackgroundColor #6a9fb5
+	BorderColor #557f91
+	FontColor #eaeaea
+}
+
+skinparam swimlane {
+	BorderColor #aa759f
+	BorderThickness 2
+	TitleBackgroundColor  #88b2c4-#6a9fb5
+	TitleFontColor #b5e853
+}
+
+
+skinparam activity {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BarColor #90a959
+	StartColor #aa759f
+	EndColor #aa759f
+	DiamondBackgroundColor #88b2c4-#6a9fb5
+  	DiamondBorderColor #88b2c4
+  	DiamondFontColor #fefefe
+}
+
+
+skinparam participant {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BorderThickness 2
+}
+
+
+skinparam actor {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam arrow {
+	Thickness 3
+	Color #b5e853
+	FontColor $FGCOLOR
+}
+
+
+skinparam sequence {
+	BorderColor #b5e853
+	TitleFontColor #b5e853
+	BackgroundColor transparent
+	StartColor #b5e853
+	EndColor #b5e853
+	BoxBackgroundColor transparent
+	BoxBorderColor #eaeaea
+	BoxFontColor #eaeaea
+	DelayFontColor #eaeaea
+	LifeLineBorderColor #6a9fb5
+	LifeLineBorderThickness 2
+	LifeLineBackgroundColor #557f91
+	GroupBackgroundColor #151515
+	GroupBorderColor #eaeaea
+	GroupFontColor #eaeaea
+	GroupHeaderFontColor #aa759f
+	GroupHeaderBackgroundColor transparent
+	DividerBackgroundColor #eaeaea
+    DividerBorderColor #eaeaea
+    DividerBorderThickness 2
+    DividerFontColor #151515
+	ReferenceBackgroundColor transparent
+	ReferenceBorderColor #eaeaea
+	ReferenceFontColor #eaeaea
+	ReferenceHeaderBackgroundColor #151515
+	StereotypeFontColor #151515
+}
+
+
+skinparam partition {
+	BorderColor #b5e853
+	FontColor #b5e853
+	BackgroundColor #151515-black
+}
+
+
+skinparam collections {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam control {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam entity {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam boundary {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	FontColor #eaeaea
+}
+
+
+skinparam agent {
+	BackgroundColor #f6cc91-#f4bf75
+	BorderColor #f6cc91
+	FontColor #eaeaea
+}
+
+
+skinparam note {
+	BorderThickness 1
+	BackgroundColor #bb91b2-#885E7F
+	BorderColor #885E7F
+	FontColor $WHITE
+}
+
+
+skinparam artifact {
+	BackgroundColor #eaeaea
+	BorderColor white
+	FontColor #151515
+}
+
+
+skinparam component {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam interface {
+	BackgroundColor  #bd6768-#ac4142
+	BorderColor  #bd6768
+	FontColor #eaeaea
+}
+
+
+skinparam storage {
+	BackgroundColor #f6cc91-#f4bf75
+  	BorderColor #f6cc91
+	FontColor #151515
+}
+
+
+skinparam node {
+	BackgroundColor  #151515-black
+	BorderColor #d3f198
+	FontColor #eaeaea
+}
+
+
+skinparam cloud {
+	BackgroundColor transparent
+	BorderColor #eaeaea
+	FontColor #eaeaea
+}
+
+
+skinparam database {
+	BackgroundColor  #151515-black
+	BorderColor #d3f198
+	FontColor #eaeaea
+}
+
+
+skinparam class {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	HeaderBackgroundColor #d3f198-#b5e853
+	StereotypeFontColor #eaeaea
+	BorderThickness 1
+	AttributeFontColor #151515
+	AttributeFontSize 11
+}
+
+
+skinparam object {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	StereotypeFontColor #eaeaea
+	BorderThickness 1
+	AttributeFontColor #151515
+	AttributeFontSize 11
+}
+
+
+skinparam usecase {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	BorderThickness 2
+	StereotypeFontColor #b5e853
+}
+
+
+skinparam rectangle {
+	BackgroundColor transparent
+	BorderColor #b5e853
+	BorderThickness 2
+	FontColor #6d8b32
+	StereotypeFontColor #b5e853
+}
+
+
+skinparam package {
+	BackgroundColor #151515
+  	BorderColor #b5e853
+	FontColor #b5e853
+	BorderThickness 2
+}
+
+
+skinparam folder {
+	BackgroundColor #151515-black
+  	BorderColor #f4bf75
+	FontColor #f4bf75
+	BorderThickness 2
+}
+
+
+skinparam frame {
+	BackgroundColor #151515-black
+  	BorderColor #aa759f
+	FontColor #aa759f
+	BorderThickness 2
+}
+
+
+skinparam state {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	StartColor #aa759f
+	EndColor #aa759f
+	AttributeFontColor #fefefe
+	AttributeFontSize 11
+}
+
+
+skinparam queue {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+
+skinparam card {
+	BackgroundColor #bb91b2-#aa759f
+	BorderColor #bb91b2
+	FontColor $INFO_TEXT
+}
+
+
+skinparam file {
+	BackgroundColor #88b2c4-#6a9fb5
+	BorderColor #88b2c4
+	FontColor #eaeaea
+}
+
+
+skinparam stack {
+		FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+}
+
+<style>
+mindmapDiagram, wbsDiagram {
+    element {
+	    	FontColor #151515
+	BorderColor #d3f198
+	BackgroundColor #d3f198-#b5e853
+	}
+	:depth(0) {
+        fontSize 16
+        fontStyle bold
+        fontColor #6a9fb5
+    }
+    :depth(1) {
+        fontSize 14
+        padding 5
+        fontStyle bold
+    }
+    :depth(2) {
+        fontSize 12
+        padding 4
+    }
+    :depth(3) {
+        fontSize 11
+        padding 3
+        fontColor #aa759f
+    }
+
+}
+</style>
+
+
+title "org orgzly" Down
+
+folder org {
+	stack org_files {
+		control org_inbox
+	}
+}
+
+folder orgzly {
+	stack orgzly_files {
+		control oz_inbox
+		}
+	}
+
+hexagon dupe_check {
+	entity org_parse
+	folder tmp1 {
+		stack tmp1_files
+		}
+	folder tmp2 {
+		stack tmp2_files
+		}
+	}
+
+cloud Dropbox {
+	folder remote_orgzly {
+		stack dropbox_files
+		}
+	}
+
+dropbox_files - -|> tmp1_files : 1
+tmp1_files - ->> org_parse : 2
+org_parse - ->> tmp2_files : 3
+tmp2_files - -(0 oz_inbox : 4
+oz_inbox - -> org_parse : 5
+org_inbox - -> org_parse : 6
+org_parse - -> dupe_check : 7
+dupe_check - -:|> org_inbox : 8
+
+@enduml
+
+PlantUML version 1.2022.12(Sun Oct 23 14:12:26 EDT 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
