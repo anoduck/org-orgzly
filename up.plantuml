@@ -1,0 +1,38 @@
+@startuml
+!theme hacker
+title "org orgzly" up
+
+folder org {
+	stack org_files
+	}
+folder orgzly {
+	stack orgzly_files {
+		control oz_inbox
+		}		
+	}
+entity org_parse
+node dupe_check {
+	portin 2
+	portin 3
+	portout 4			
+	folder tmp1 {
+		stack tmp1_files
+		}
+	folder tmp2 {				
+		stack tmp2_files
+		}
+	}	
+cloud Dropbox {
+	folder remote_orgzly {
+		stack dropbox_files
+		}
+	}
+oz_inbox -0)- org_parse : 1 
+org_parse --( 2
+org_files --o 3
+4 --|> oz_inbox : 4
+dropbox_files --:|> tmp1_files : 5
+tmp1_files -- tmp2_files : 6
+tmp2_files --|> dropbox_files : 7
+
+@enduml

@@ -1,0 +1,20 @@
+@startuml
+!theme hacker
+start
+
+:Parse org files;
+if (meet specs?) then (no)
+	stop
+else (yes)
+	if (is duplicate) then (no)
+	:write to orgzly file;
+	else (yes)
+	stop
+	endif
+else (no)
+	stop
+endif
+
+end
+
+@enduml

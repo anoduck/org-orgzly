@@ -592,21 +592,9 @@ def file_check(create_missing, org_files, org_inbox,
 # The startup command
 # ---------------------------------------------------------------------------------------
 def main():
-    filename = CONFIG_FILE
     # Setup of ConfigObj
     config = ConfigObj()
     spec = cfg.split("\n")
-    if not os.path.isfile(filename):
-        config = ConfigObj(filename, configspec=spec)
-        config.filename = filename
-        validator = validate.Validator()
-        config.validate(validator, copy=True)
-        config.write()
-        print("Configuration file written to "
-              "$XDG_CONFIG_HOME/orgzly/config.ini")
-        sys.exit()
-    else:
-        config = ConfigObj(filename, configspec=spec)
 
     # ArgParse Setup
     p_arg = argparse.ArgumentParser(
@@ -619,11 +607,12 @@ def main():
             'easier, by controling what you take with you.',
             epilog='Dedicated to karlicoss, who made it possible.',
             conflict_handler='resolve')
-
+    # Arguments for argparse
     p_arg.add_argument('--version', action='version',
                        version='org-orgzly ' + VERSION)
     p_arg.add_argument('--dropbox_token', action='store_true',
                        help='Fetch initial Access Token')
+    p_arg.add_argument('--config', help='path to configuration file'),
     p_arg.add_argument('--list', action='store_true',
                        help='list files in orgzly directory in dropbox')
     p_arg.add_argument('--up', action='store_true',
@@ -638,9 +627,31 @@ def main():
                        help='Upload orgzly files to dropbox')
     p_arg.add_argument('--get', action='store_true',
                        help='Download orgzly files from dropbox')
-
+    ##################
+    # parse the args #
+    ##################
     args = p_arg.parse_args()
-
+    # ----------------------------------
+    # # Now Process configObj #
+    # ----------------------------------
+    if len(args.config) > 2:
+        filename = args.config
+    else:
+        filename = CONFIG_FILE
+    if not os.path.isfile(filename):
+        config = ConfigObj(filename, configspec=spec)
+        config.filename = filename
+        validator = validate.Validator()
+        config.validate(validator, copy=True)
+        config.write()
+        print("Configuration file written to "
+              "$XDG_CONFIG_HOME/orgzly/config.ini")
+        sys.exit()
+    else:
+        config = ConfigObj(filename, configspec=spec)
+    ########################
+    # Load org todo values #
+    ########################
     env = orgparse.node.OrgEnv()
     addkeys = env.add_todo_keys
     addkeys(todos=config['todos'], dones=config['dones'])
