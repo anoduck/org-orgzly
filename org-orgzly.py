@@ -65,7 +65,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.7'
+VERSION = '0.0.8'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -75,6 +75,7 @@ app_secret = string(default='Replace with your dropbox app secret')
 create_missing = boolean(default=True)
 backup = boolean(default=True)
 dropbox_folder = string(default='orgzly')
+resources_folder = string(default='~/orgzly/Resources')
 org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
 orgzly_files = list(default=list('~/orgzly/todo.org', '~/orgzly/inbox.org'))
 org_inbox = string(default='~/org/inbox.org')
@@ -318,7 +319,7 @@ def dbx_list(response):
     return rv
 
 
-def list_orgzly(app_key, app_secret, dropbox_folder):
+def orgzly_gen_list(app_key, app_secret, dropbox_folder):
     config_dbx = ConfigObj(DBX_CONFIG_FILE)
     REFRESH_TOKEN = config_dbx['dropbox_token']
     with dropbox.Dropbox(
@@ -328,10 +329,17 @@ def list_orgzly(app_key, app_secret, dropbox_folder):
         response = dbx.files_list_folder(folder)
         resp_dir = dbx_list(response)
     files_as_keys = resp_dir.keys()
+    return files_as_keys
+
+
+def list_orgzly(app_key, app_secret, dropbox_folder):
+    files_as_keys = orgzly_gen_list(app_key, app_secret, dropbox_folder)
+    folder = '/' + str(dropbox_folder)
     print('Files in dropbox folder ' + '"' + folder + '"' + ' are: ')
     for key in files_as_keys:
-        print(key)
-    print(' --> Done.')
+        print('->' + key)
+    print('-------------------')
+    print(' ===> Done.')
 
 
 # Dropbox upload
@@ -348,19 +356,18 @@ def dropbox_upload(app_key, app_secret,
         path = '/%s/%s' % (folder, name)
         while '//' in path:
             path = path.replace('//', '/')
-        mode = (dropbox.files.WriteMode.overwrite
-                if overwrite
-                else dropbox.files.WriteMode.add)
+        dbx_mode = dropbox.files.WriteMode.overwrite
         mtime = os.path.getmtime(fullname)
         client_modified = datetime.datetime(*time.gmtime(mtime)[:6])
         with open(fullname, 'rb') as f:
             data = f.read()
-        try:
-            res = dbx.files_upload(
-                data, path, mode, client_modified=client_modified, mute=True)
-        except exceptions.ApiError as err:
-            print('*** API error', err)
-            return None
+            try:
+                res = dbx.files_upload(
+                    data, path, dbx_mode, client_modified=client_modified,
+                    mute=True)
+            except exceptions.ApiError as err:
+                print('*** API error', err)
+                return None
         return res
 
 
@@ -383,6 +390,31 @@ def dropbox_download(app_key, app_secret, folder, name):
             return None
         data = res.content
         return data
+
+
+# -----------------------------------------------------------------------
+# Check Resource folder
+# -----------------------------------------------------------------------
+def dropbox_check_resources(app_key, app_secret, res_folder, dropbox_folder):
+    config_dbx = ConfigObj(DBX_CONFIG_FILE)
+    REFRESH_TOKEN = config_dbx['dropbox_token']
+    with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN, app_key=app_key,
+                         app_secret=app_secret) as dbx:
+        files_as_keys = orgzly_gen_list(app_key, app_secret, dropbox_folder)
+        create_folder = dbx.files_create_folder
+        oz_path = os.path.dirname(res_folder)
+        res_name = os.path.basename(res_folder)
+        oz_name = os.path.basename(oz_path)
+        dbx_folder = os.path.join('/', oz_name, res_name)
+        if res_name not in files_as_keys:
+            print('Creating Resource folder in Dropbox')
+            create_folder(dbx_folder)
+            if res_name in files_as_keys:
+                print('Resource folder now exists')
+                return True
+        if res_name in files_as_keys:
+            print('Resource folder already found in Dropbox')
+            return True
 
 
 # -------------------------------------------------------------------------------------
@@ -455,7 +487,8 @@ def gen_load(t_file, tmpdir, orgzly_files):
 
 # -------------------------------------------------------------------------------------
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
-def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
+def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files,
+                resources_folder):
     with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
         with TemporaryDirectory(suffix='_dir2', prefix='oroz_') as tmp2dir:
             file_list = down_to_tmp(orgzly_files, app_key, app_secret,
@@ -475,10 +508,39 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files):
                         w_f.write('\n')
                 dropbox_upload(app_key, app_secret, path_to_write,
                                dropbox_folder, t_name)
+    res_folder = os.path.expanduser(resources_folder)
+    dbx_folder = '/' + str(os.path.basename(res_folder))
+    oz_path = os.path.dirname(res_folder)
+    res_name = os.path.basename(res_folder)
+    oz_name = os.path.basename(oz_path)
+    dbx_folder = os.path.join('/', oz_name, res_name)
+    to_res = dropbox_check_resources(app_key, app_secret, res_folder,
+                                     dropbox_folder)
+    if to_res:
+        config_dbx = ConfigObj(DBX_CONFIG_FILE)
+        REFRESH_TOKEN = config_dbx['dropbox_token']
+        with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
+                             app_key=app_key, app_secret=app_secret) as dbx:
+            file_upload = dbx.files_upload
+            dbx_mode = dropbox.files.WriteMode.overwrite
+            for res_file in os.listdir(res_folder):
+                file_path = os.path.join(res_folder, res_file)
+                dbx_path = os.path.join(dbx_folder, res_file)
+                mtime = os.path.getmtime(file_path)
+                client_modified = datetime.datetime(*time.gmtime(mtime)[:6])
+                with open(file_path, 'rb') as f_file:
+                    data = f_file.read()
+                try:
+                    file_upload(data, dbx_path, dbx_mode,
+                                client_modified=client_modified, mute=True)
+                except exceptions.ApiError as err:
+                    print('*** API error', err)
+                    return None
+            print('Uploaded file from resources')
     print('Upload to Dropbox was successful!')
 
 
-def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files):
+def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files, resources_folder):
     with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
         file_list = down_to_tmp(orgzly_files, app_key, app_secret,
                                 dropbox_folder, tmpdir)
@@ -551,7 +613,10 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
 # File Check
 # -------------------------------------------------------------------------------------
 def file_check(create_missing, org_files, org_inbox,
-               orgzly_files, orgzly_inbox):
+               orgzly_files, orgzly_inbox, resources_folder):
+    res_path = os.path.expanduser(resources_folder)
+    if not os.path.exists(res_path):
+        os.mkdir(res_path)
     flist = org_files + orgzly_files
     inboxes = [org_inbox, orgzly_inbox]
     for inbox in inboxes:
@@ -634,7 +699,7 @@ def main():
     # ----------------------------------
     # # Now Process configObj #
     # ----------------------------------
-    if len(args.config) > 2:
+    if args.config is not None:
         filename = args.config
     else:
         filename = CONFIG_FILE
@@ -659,7 +724,7 @@ def main():
     # check that files exist and create if missing:
     fcheck = file_check(config['create_missing'], config['org_files'],
                         config['org_inbox'], config['orgzly_files'],
-                        config['orgzly_inbox'])
+                        config['orgzly_inbox'], config['resources_folder'])
 
     # OK, I admit. The following is a bit of a mess.
 
@@ -674,10 +739,12 @@ def main():
             gen_file(env, config['org_files'], config['orgzly_inbox'],
                      config['days'])
             dropbox_put(config['app_key'], config['app_secret'],
-                        config['dropbox_folder'], config['orgzly_files'])
+                        config['dropbox_folder'], config['orgzly_files'],
+                        config['resources_folder'])
         if args.down:
             dropbox_get(config['app_key'], config['app_secret'],
-                        config['dropbox_folder'], config['orgzly_files'])
+                        config['dropbox_folder'], config['orgzly_files'],
+                        config['resources_folder'])
             sync_back(config['orgzly_files'], config['org_inbox'],
                       config['org_files'])
         # Next the four individual commands
@@ -693,10 +760,12 @@ def main():
                       config['org_files'])
         if args.put:
             dropbox_put(config['app_key'], config['app_secret'],
-                        config['dropbox_folder'], config['orgzly_files'])
+                        config['dropbox_folder'], config['orgzly_files'],
+                        config['resources_folder'])
         if args.get:
             dropbox_get(config['app_key'], config['app_secret'],
-                        config['dropbox_folder'], config['orgzly_files'])
+                        config['dropbox_folder'], config['orgzly_files'],
+                        config['resources_folder'])
     if not fcheck:
         print('Error occured in creation of necessarily files, '
               'or file creation has been disabled.\n'
