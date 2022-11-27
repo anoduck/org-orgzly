@@ -15,6 +15,8 @@
 #+end_src
 * Org-orgzly
 /A python application to parse and generate org files for orgzly practically, by making managing your org schedule easier./
+*** New Breaking Changes - Nov 27 2022
+Please see the heading below concerning integration of attachments for details.
 *** Issues/Bugs?
 If you experience ANY issues using this script, encounter ANY bugs, or you just think this script sucks. PLEASE, submit and issue to
 either the github or codeberg repositories, and we will try our best to address the issue as soon as feasibly possible.
@@ -75,36 +77,38 @@ files on the Dropbox platform. Updates are instantaneous and take priority.
 
 The default configuration variables are as follows:
 
-| Option         | Default                                     | Definitions                                                      |
-|----------------+---------------------------------------------+------------------------------------------------------------------|
-| app_key        | =Change This=                               | Dropbox API App Key                                              |
-| app_secret     | =Change This=                               | Dropbox API APP Secret                                           |
-| create_missing | =True=                                      | Create any missing files from configuration                      |
-| backup         | =True=                                      | Backup original org files                                        |
-| dropbox_folder | =/orgzly=                                   | Name of folder for orgzly in dropbox                             |
-| org_files      | ="~/org/todo.org", "~/org/inbox.org"=       | Comma seperated list of org files to process entries/nodes from. |
-| orgzly_files   | ="~/orgzly/todo.org", "~/orgzly/inbox.org"= | Comma seperated orgzly file list to use with this entire system  |
-| org_inbox      | ="~/org/inbox.org"=                         | Name of org mode inbox file to push new or changed entries to    |
-| orgzly_inbox   | ="~/orgzly/inbox.org"=                      | Name of orgzly inbox to add new or changed entries to            |
-| days           | =7=                                         | Number of days to draw entries / nodes for                       |
-| todos          | ="TODO", "LATERS", "HOLD", "OPEN"=          | Org "TODO" keywords defining an uncomplete task                  |
-| dones          | ="DONE", "CLOSED", "CANCELED"=              | Org "DONE" keywords defining a complete task                     |
+| Option          | Default                                     | Definitions                                                      |
+|-----------------+---------------------------------------------+------------------------------------------------------------------|
+| app_key         | =Change This=                               | Dropbox API App Key                                              |
+| app_secret      | =Change This=                               | Dropbox API APP Secret                                           |
+| create_missing  | =True=                                      | Create any missing files from configuration                      |
+| backup          | =True=                                      | Backup original org files                                        |
+| dropbox_folder  | =/orgzly=                                   | Name of folder for orgzly in dropbox                             |
+| resource_folder | ="~/orgzly/Resources"=                      | Folder where solely attachment files will be stored              |
+| org_files       | ="~/org/todo.org", "~/org/inbox.org"=       | Comma seperated list of org files to process entries/nodes from. |
+| orgzly_files    | ="~/orgzly/todo.org", "~/orgzly/inbox.org"= | Comma seperated orgzly file list to use with this entire system  |
+| org_inbox       | ="~/org/inbox.org"=                         | Name of org mode inbox file to push new or changed entries to    |
+| orgzly_inbox    | ="~/orgzly/inbox.org"=                      | Name of orgzly inbox to add new or changed entries to            |
+| days            | =7=                                         | Number of days to draw entries / nodes for                       |
+| todos           | ="TODO", "LATERS", "HOLD", "OPEN"=          | Org "TODO" keywords defining an uncomplete task                  |
+| dones           | ="DONE", "CLOSED", "CANCELED"=              | Org "DONE" keywords defining a complete task                     |
 
 For redundancy, the configuration file spec is as follows:
 
 #+begin_src conf
-app_key = string(default='Replace with your dropbox app key')
-app_secret = string(default='Replace with your dropbox app secret')
-create_missing = boolean(default=True)
-backup = boolean(default=True)
-dropbox_folder = string(default='orgzly')
-org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
-orgzly_files = list(default=list('~/orgzly/todo.org',))
-org_inbox = string(default='~/org/inbox.org')
-orgzly_inbox = string(default='~/orgzly/inbox.org')
-days = integer(default=7)
-todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
-dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
+  app_key = string(default='Replace with your dropbox app key')
+  app_secret = string(default='Replace with your dropbox app secret')
+  create_missing = boolean(default=True)
+  backup = boolean(default=True)
+  dropbox_folder = string(default='orgzly')
+  resources_folder = string(default='~/orgzly/Resources')
+  org_files = list(default=list('~/org/todo.org', '~/org/inbox.org'))
+  orgzly_files = list(default=list('~/orgzly/todo.org',))
+  org_inbox = string(default='~/org/inbox.org')
+  orgzly_inbox = string(default='~/orgzly/inbox.org')
+  days = integer(default=7)
+  todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
+  dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 #+end_src
 *** Usage:
 *Please note!* In order to avoid either a file conflict error or a overall general buggering of org files, "overwrite mode" has been
@@ -167,6 +171,30 @@ could be very messy and lead to data loss. The intended command flow is as follo
 #+NAME: plantuml.svg
 [[./Resources/README/flow.png]]
 
+*** A Note on Attachments, (New Breaking Feature)
+As a new experimental feature, modifications have been made to allow the upload of attachment files located within the designated
+attachment folder, referred to as "resource folder". By default this folder is located inside the orgzly directory and will rather
+uncreatively be named "Resources". If this folder does not exist, it will be created for you as a part of the normal file checking
+process. If this folder does not exist remotely on dropbox, it will also be created for you when asked to put files in Dropbox.
+**** Configuration file changes
+To facilitate this new experimental feature an additional configuration variable has been added to the configuration file. *If you are
+using version =<0.0.8= (less than eight), this variable must be added to the configuration file manually.* You will want to add it
+immediately below the =dropbox_folder= variable and above the =org_files= variable so that your config file looks like below:
+
+#+begin_src ini
+dropbox_folder = orgzly
+resources_folder = ~/orgzly/Resources
+org_files = ~/org/todo.org, ~/org/inbox.org, ~/org/events.org
+#+end_src
+
+If you fail to perform the modification of your configuration file, the script will become very crossed with you, and refuse to run.
+**** Attachment folder requirements
+Some org-mode extensions naturally, by default, create a subfolder inside of the Resource folder with the same title as the org_file
+the attachment is being added to. For example, a file attached to ~inbox.org~ will be copied into ~Resources/inbox~. This will
+need to be changed in order to upload attachments to Dropbox using this script. Rather that attachments being placed in a subfolder,
+*all attachments must be placed solely in the resources folder without the creation of subfolders*. Creating subfolders in the resources
+folder will cause the script to fail, because folders cannot be uploaded to dropbox, they must be created first and only then can all
+the files be uploaded to the newly created folder.
 *** Troubleshooting
 As long as the option =create_missing= is set to =True=, any missing file defined in the configuration file
 will be automatically created for the user in the defined folder located in the user's home directory. The file will be created with a
