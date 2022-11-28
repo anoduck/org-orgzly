@@ -259,13 +259,22 @@ def gen_file(env, org_files, orgzly_inbox, days):
             if node.heading not in {x.heading for x in prime_set}:
                 uniq_set.add(node)
     print("Duplicates removed using node id and node heading.")
-    for uniq_node in uniq_set:
-        # print(node_to_use)
-        with open(inbox_path, "a",
-                  encoding="utf-8", newline="\n") as w_funky:
+    file_title = os.path.basename(inbox_path).strip('.org')
+    title_label = ' '.join(['#+TITLE: ', file_title])
+    date_string = date.today().strftime('%Y-%m-%d %A')
+    date_label = ' '.join(['#+DATE: ', date_string])
+    with open(inbox_path, "w+",
+              encoding="utf-8", newline="\n") as w_funky:
+        w_funky.seek(0)
+        w_funky.write(title_label)
+        w_funky.write(date_label)
+        w_funky.write('# -------------------------------------')
+        # w_funky.write("\n")
+        for uniq_node in uniq_set:
             w_funky.write(str(uniq_node))
             w_funky.write("\n")
-            w_funky.close()
+        w_funky.truncate()
+        w_funky.close()
     prime_set.clear()
     print('Successfully pushed org nodes to orgzly!')
 
@@ -319,32 +328,48 @@ def dbx_list(response):
     return rv
 
 
-def orgzly_gen_list(app_key, app_secret, dropbox_folder):
+def gen_list(app_key, app_secret, dropbox_folder):
     config_dbx = ConfigObj(DBX_CONFIG_FILE)
     REFRESH_TOKEN = config_dbx['dropbox_token']
+    r_v = dict()
     with dropbox.Dropbox(
             oauth2_refresh_token=str(REFRESH_TOKEN), app_key=app_key,
             app_secret=app_secret) as dbx:
-        folder = '/' + str(dropbox_folder)
-        response = dbx.files_list_folder(folder)
-        resp_dir = dbx_list(response)
+        dbx_folder = os.path.join('/', dropbox_folder)
+        response = dbx.files_list_folder(dbx_folder,
+                                         include_mounted_folders=False)
+        for entry in response.entries:
+            r_v[entry.name] = entry
+        resp_dir = r_v
     files_as_keys = resp_dir.keys()
     return files_as_keys
 
 
+def gen_file_list(app_key, app_secret, dropbox_folder):
+    of_list = []
+    of_list.clear()
+    files_as_keys = gen_list(app_key, app_secret, dropbox_folder)
+    for key in files_as_keys:
+        ofile = re.search(r'.\w+?\.org$', str(key))
+    if ofile:
+        oname_o = ofile.string.strip()
+        if oname_o not in of_list:
+            of_list.append(oname_o)
+    return of_list
+
+
 def list_orgzly(app_key, app_secret, dropbox_folder):
-    files_as_keys = orgzly_gen_list(app_key, app_secret, dropbox_folder)
+    dbx_file_list = gen_list(app_key, app_secret, dropbox_folder)
     folder = '/' + str(dropbox_folder)
     print('Files in dropbox folder ' + '"' + folder + '"' + ' are: ')
-    for key in files_as_keys:
+    for key in dbx_file_list:
         print('->' + key)
     print('-------------------')
     print(' ===> Done.')
 
 
 # Dropbox upload
-def dropbox_upload(app_key, app_secret,
-                   fullname, folder, name, overwrite=True):
+def dropbox_upload(app_key, app_secret, fullname, folder, name):
     """Upload a file.
     Return the request response, or None in case of error.
     """
@@ -400,7 +425,7 @@ def dropbox_check_resources(app_key, app_secret, res_folder, dropbox_folder):
     REFRESH_TOKEN = config_dbx['dropbox_token']
     with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN, app_key=app_key,
                          app_secret=app_secret) as dbx:
-        files_as_keys = orgzly_gen_list(app_key, app_secret, dropbox_folder)
+        files_as_keys = gen_list(app_key, app_secret, dropbox_folder)
         create_folder = dbx.files_create_folder
         oz_path = os.path.dirname(res_folder)
         res_name = os.path.basename(res_folder)
@@ -456,12 +481,13 @@ def get_access_token(key, sec):
 # --------------------------------------------------------------------------------
 # Down to tmp
 # --------------------------------------------------------------------------------
-def down_to_tmp(orgzly_files, app_key, app_secret, dropbox_folder, tmpdir):
-    for k_file in orgzly_files:
-        path = os.path.expanduser(k_file)
-        name = os.path.basename(path)
-        tmp_path = os.path.join(tmpdir, name)
-        dbx_path = '/' + str(dropbox_folder) + '/' + str(name)
+def down_to_tmp(app_key, app_secret, dropbox_folder, tmpdir):
+    files_as_keys = gen_file_list(app_key, app_secret, dropbox_folder)
+    for k_file in files_as_keys:
+        k_path = os.path.expanduser(k_file)
+        k_name = os.path.basename(k_path)
+        tmp_path = os.path.join(tmpdir, k_name)
+        dbx_path = os.path.join('/', dropbox_folder, k_name)
         config_dbx = ConfigObj(DBX_CONFIG_FILE)
         REFRESH_TOKEN = config_dbx['dropbox_token']
         with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
@@ -489,25 +515,40 @@ def gen_load(t_file, tmpdir, orgzly_files):
 # Make sure all variables satisfy the code "Borrowed" from Dropbox.
 def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files,
                 resources_folder):
+    config_dbx = ConfigObj(DBX_CONFIG_FILE)
+    REFRESH_TOKEN = config_dbx['dropbox_token']
+    dbx_mode = dropbox.files.WriteMode.overwrite
     with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
         with TemporaryDirectory(suffix='_dir2', prefix='oroz_') as tmp2dir:
-            file_list = down_to_tmp(orgzly_files, app_key, app_secret,
-                                    dropbox_folder, tmpdir)
+            file_list = down_to_tmp(app_key, app_secret, dropbox_folder,
+                                    tmpdir)
             for t_file in file_list:
-                t_name = os.path.join(tmpdir, os.path.basename(t_file))
                 node_set = set()
                 node_set.clear()
                 temp_load, oz_load = gen_load(t_file, tmpdir, orgzly_files)
                 for node in oz_load[1:]:
                     if node not in temp_load[1:]:
                         node_set.add(node)
-                path_to_write = os.path.join(tmp2dir, t_name)
-                with open(path_to_write, 'a', encoding='utf-8') as w_f:
+                path_to_write = os.path.join(tmp2dir, t_file)
+                with open(path_to_write, 'w+', encoding='utf-8') as w_f:
                     for node in node_set:
                         w_f.write(str(node))
                         w_f.write('\n')
-                dropbox_upload(app_key, app_secret, path_to_write,
-                               dropbox_folder, t_name)
+                dbx_file_path = os.path.join('/', dropbox_folder, t_file)
+                mtime = os.path.getmtime(path_to_write)
+                client_modified = datetime.datetime(*time.gmtime(mtime)[:6])
+                with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
+                                     app_key=app_key,
+                                     app_secret=app_secret) as dbx:
+                    file_upload = dbx.files_upload
+                    with open(path_to_write, 'rb') as f_u:
+                        data = f_u.read()
+                    try:
+                        dbx.files_upload(data, dbx_file_path, dbx_mode,
+                                         client_modified=client_modified,
+                                         mute=True)
+                    except exceptions.ApiError as err:
+                        print('*** API error', err)
     res_folder = os.path.expanduser(resources_folder)
     dbx_folder = '/' + str(os.path.basename(res_folder))
     oz_path = os.path.dirname(res_folder)
@@ -517,12 +558,9 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files,
     to_res = dropbox_check_resources(app_key, app_secret, res_folder,
                                      dropbox_folder)
     if to_res:
-        config_dbx = ConfigObj(DBX_CONFIG_FILE)
-        REFRESH_TOKEN = config_dbx['dropbox_token']
         with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
                              app_key=app_key, app_secret=app_secret) as dbx:
             file_upload = dbx.files_upload
-            dbx_mode = dropbox.files.WriteMode.overwrite
             for res_file in os.listdir(res_folder):
                 file_path = os.path.join(res_folder, res_file)
                 dbx_path = os.path.join(dbx_folder, res_file)
@@ -542,8 +580,7 @@ def dropbox_put(app_key, app_secret, dropbox_folder, orgzly_files,
 
 def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files, resources_folder):
     with TemporaryDirectory(suffix='_dir', prefix='oroz_') as tmpdir:
-        file_list = down_to_tmp(orgzly_files, app_key, app_secret,
-                                dropbox_folder, tmpdir)
+        file_list = down_to_tmp(app_key, app_secret, dropbox_folder, tmpdir)
         for t_file in file_list:
             node_set = set()
             node_set.clear()
@@ -561,7 +598,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files, resources_fol
                             node_set.add(node)
             path_to_write = os.path.join(orgzly_dirpath,
                                          os.path.basename(t_file))
-            with open(path_to_write, 'a', encoding='utf-8') as w_f:
+            with open(path_to_write, 'w+', encoding='utf-8') as w_f:
                 for node in node_set:
                     w_f.write(str(node))
                     w_f.write('\n')
@@ -584,7 +621,7 @@ def backup_files(org_files, orgzly_files, orgzly_inbox,
         os.mkdir(BACKUP_HOME)
     dir_list = os.listdir(BACKUP_HOME)
     for dir_file in dir_list:
-        dstring = str(dir_file).split('_')[0]
+        dstring = str(dir_file).split('_', maxsplit=1)[0]
         y, m, d = [int(x) for x in dstring.split('-')]
         exp_date = date(y, m, d)
         expiration = exp_date.strftime('%Y-%m-%d')
