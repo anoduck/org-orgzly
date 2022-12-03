@@ -171,17 +171,18 @@ could be very messy and lead to data loss. The intended command flow is as follo
 #+NAME: plantuml.svg
 [[./Resources/README/flow.png]]
 
-*** A Note on Attachments, (New Breaking Feature)
+*** A Note on Attachments
 As a new experimental feature, modifications have been made to allow the upload of attachment files located within the designated
 attachment folder, referred to as "resource folder". By default this folder is located inside the orgzly directory and will rather
 uncreatively be named "Resources". If this folder does not exist, it will be created for you as a part of the normal file checking
 process. If this folder does not exist remotely on dropbox, it will also be created for you when asked to put files in Dropbox.
-**** Configuration file changes
-To facilitate this new experimental feature an additional configuration variable has been added to the configuration file. *If you are
+*** Configuration file changes
+To facilitate the new feature additions, additional configuration variables were added to the configuration file. *If you are
 using version =<0.0.8= (less than eight), this variable must be added to the configuration file manually.* You will want to add it
 immediately below the =dropbox_folder= variable and above the =org_files= variable so that your config file looks like below:
 
 #+begin_src ini
+split_events = True
 dropbox_folder = orgzly
 resources_folder = ~/orgzly/Resources
 org_files = ~/org/todo.org, ~/org/inbox.org, ~/org/events.org

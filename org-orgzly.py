@@ -46,6 +46,7 @@ import shutil
 from tempfile import mkdtemp, TemporaryDirectory
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
 from orgparse import load
+from orgparse import OrgEnv
 from datetime import date
 import validate
 import dropbox
@@ -65,7 +66,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.9'
+VERSION = '0.0.11'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -140,8 +141,8 @@ def get_future(tdate, days):
 # Dedupe
 # ---------------------------------------------------------------------
 def dedupe_files(test, control):
-    tfile = orgparse.load(os.path.expanduser(test))
-    cfile = orgparse.load(os.path.expanduser(control))
+    tfile = get_parser(os.path.expanduser(test))
+    cfile = get_parser(os.path.expanduser(control))
     uniq = set()
     con_set = set()
     test_set = set()
@@ -239,8 +240,8 @@ def process_entries(orgfile, days):
 def parse_events(org_events, orgzly_events):
     or_epath = os.path.expanduser(org_events)
     oz_epath = os.path.expanduser(orgzly_events)
-    or_ep = orgparse.load(or_epath)
-    oz_ep = orgparse.load(oz_epath)
+    or_ep = get_parser(or_epath)
+    oz_ep = get_parser(oz_epath)
     or_ns = set(or_ep[1:])
     oz_ns = set(oz_ep[1:])
     master_elist = [*set(or_ns | oz_ns)]
@@ -270,6 +271,19 @@ def funky_chicken(target_path, node_list):
         w_funky.close()
     return True
 
+
+# ---------------------------------------------------------------------
+# The main function
+# ---------------------------------------------------------------------
+def write_event(node, event_file):
+    efile_path = os.path.expanduser(event_file)
+    with open(efile_path, "a") as w_ef:
+        w_ef.write(node)
+        w_ef.write('\n')
+        w_ef.close()
+    return True
+
+
 # ---------------------------------------------------------------------
 # The main function
 # ---------------------------------------------------------------------
@@ -283,25 +297,36 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
         if p_events:
             print('event files processed')
     inbox_path = os.path.expanduser(orgzly_inbox)
-    in_file = orgparse.load(inbox_path)
+    in_file = get_parser(inbox_path)
     for node_i in in_file[1:]:
         if node_i not in inbox_list:
             inbox_list.append(node_i)
     for orgfile in org_files:
         print('Processing: ' + orgfile)
-        file = orgparse.load(os.path.expanduser(orgfile))
-        add_file_keys = file.env.add_todo_keys
-        add_file_keys(todos=env.todo_keys, dones=env.done_keys)
+        file = get_parser(os.path.expanduser(orgfile))
+        all_keys = file.env.all_todo_keys
         to_write = process_entries(file, days)
         prime_set = prime_set | set(inbox_list) | set(to_write)
     for node in prime_set:
-        node_id = node.get_property('ID')
-        if node_id:
-            if node_id not in {x.get_property('ID') for x in uniq_set}:
-                uniq_set.add(node)
+        if node.todo:
+            if node.todo not in all_keys:
+                evented = write_event(node, orgzly_events)
+                if evented:
+                    print("Event node discovered and written to event file")
         else:
-            if node.heading not in {x.heading for x in prime_set}:
-                uniq_set.add(node)
+            timestamp = node.get_timestamps
+            if timestamp(active=True):
+                evented = write_event(node, orgzly_events)
+                if evented:
+                    print("Event node discovered and written to event file")
+            else:
+                node_id = node.get_property('ID')
+                if node_id:
+                    if node_id not in {x.get_property('ID') for x in uniq_set}:
+                        uniq_set.add(node)
+                else:
+                    if node.heading not in {x.heading for x in prime_set}:
+                        uniq_set.add(node)
     print("Duplicates removed using node id and node heading.")
     node_write = funky_chicken(inbox_path, [uniq_set])
     if node_write:
@@ -313,30 +338,57 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
 # Sync Back
 # ----------------------------------------------------------
 def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
-             orgzly_events):
+              orgzly_events):
     oznode_set = set()
     ornode_set = set()
+    oziq_set = set()
     if split_events:
         p_events = parse_events(org_events, orgzly_events)
         if p_events:
             print('event files processed')
     for orgzly_file in orgzly_files:
         oz_path = os.path.expanduser(orgzly_file)
-        oz_parse = orgparse.load(oz_path)
+        oz_parse = get_parser(oz_path)
         oznode_set = oznode_set.union(set(oz_parse[1:]))
     for org_file in org_files:
         or_path = os.path.expanduser(org_file)
-        or_parse = orgparse.load(or_path)
+        or_parse = get_parser(or_path)
         ornode_set = ornode_set.union(set(or_parse[1:]))
     for oznode in oznode_set:
-        if oznode not in ornode_set:
-            with open(os.path.expanduser(org_inbox),
-                      "a", encoding="utf-8",
-                      newline="\n") as w_file:
-                w_file.writelines(str(oznode))
-                w_file.write("\n")
-                w_file.close()
-    print("New entries added to inbox")
+        all_keys = or_parse.env.all_todo_keys
+        if oznode.todo:
+            if oznode.todo not in all_keys:
+                evented = write_event(oznode, org_events)
+                if evented:
+                    print("Event node discovered and written to event file")
+        else:
+            timestamp = oznode.get_timestamps
+            if timestamp(active=True):
+                evented = write_event(oznode, org_events)
+                if evented:
+                    print("Event node discovered and written to event file")
+            else:
+                oznode_id = oznode.get_property('ID')
+                if oznode_id:
+                    if oznode_id not in {x.get_property('ID') for x in
+                                         ornode_set}:
+                        oziq_set.add(oznode)
+                else:
+                    if oznode.heading not in {x.heading for x in ornode_set}:
+                        oziq_set.add(oznode)
+    oziq_list = [*oziq_set]
+    oziq_list.sort(key=lambda x: x.priority)
+    pulled = False
+    for oziq_node in oziq_list:
+        with open(os.path.expanduser(org_inbox), "a", encoding="utf-8",
+                  newline="\n") as w_file:
+            w_file.writelines(str(oziq_node))
+            w_file.write("\n")
+            w_file.close()
+            pulled = True
+    if pulled:
+        print("New entries added to inbox")
+
 
 # ----------------------------------------------------------------
 # Dropbox's setup:
@@ -401,55 +453,6 @@ def list_orgzly(app_key, app_secret, dropbox_folder):
         print('->' + key)
     print('-------------------')
     print(' ===> Done.')
-
-
-# Dropbox upload
-def dropbox_upload(app_key, app_secret, fullname, folder, name):
-    """Upload a file.
-    Return the request response, or None in case of error.
-    """
-    config_dbx = ConfigObj(DBX_CONFIG_FILE)
-    REFRESH_TOKEN = config_dbx['dropbox_token']
-    with dropbox.Dropbox(
-            oauth2_refresh_token=str(REFRESH_TOKEN), app_key=app_key,
-            app_secret=app_secret) as dbx:
-        path = '/%s/%s' % (folder, name)
-        while '//' in path:
-            path = path.replace('//', '/')
-        dbx_mode = dropbox.files.WriteMode.overwrite
-        mtime = os.path.getmtime(fullname)
-        client_modified = datetime.datetime(*time.gmtime(mtime)[:6])
-        with open(fullname, 'rb') as f:
-            data = f.read()
-            try:
-                res = dbx.files_upload(
-                    data, path, dbx_mode, client_modified=client_modified,
-                    mute=True)
-            except exceptions.ApiError as err:
-                print('*** API error', err)
-                return None
-        return res
-
-
-# Dropbox Download
-def dropbox_download(app_key, app_secret, folder, name):
-    """Download a file.
-    Return the bytes of the file, or None if it doesn't exist.
-    """
-    config_dbx = ConfigObj(DBX_CONFIG_FILE)
-    REFRESH_TOKEN = config_dbx['dropbox_token']
-    with dropbox.Dropbox(oauth2_refresh_token=REFRESH_TOKEN,
-                         app_key=app_key, app_secret=app_secret) as dbx:
-        path = '/%s/%s' % (folder, name)
-        while '//' in path:
-            path = path.replace('//', '/')
-        try:
-            md, res = dbx.files_download(path)
-        except exceptions.HttpError as err:
-            print('*** HTTP error', err)
-            return None
-        data = res.content
-        return data
 
 
 # -----------------------------------------------------------------------
@@ -519,8 +522,8 @@ def get_access_token(key, sec):
 def dbox_efiles(tmpdir, tmp2dir, orgzly_events, dbx_events):
     db_epath = os.path.join(tmpdir, dbx_events)
     oz_epath = os.path.expanduser(orgzly_events)
-    db_ep = orgparse.load(db_epath)
-    oz_ep = orgparse.load(oz_epath)
+    db_ep = get_parser(db_epath)
+    oz_ep = get_parser(oz_epath)
     db_ns = set(db_ep[1:])
     oz_ns = set(oz_ep[1:])
     master_elist = [*set(db_ns | oz_ns)]
@@ -562,8 +565,8 @@ def gen_load(t_file, tmpdir, orgzly_files):
     orgzly_fname = str(os.path.basename(path))
     orgzly_dirpath = str(os.path.realpath(path)).strip(orgzly_fname)
     orgzly_fpath = os.path.join(orgzly_dirpath, t_file)
-    temp_load = orgparse.load(t_path)
-    oz_load = orgparse.load(orgzly_fpath)
+    temp_load = get_parser(t_path)
+    oz_load = get_parser(orgzly_fpath)
     return temp_load, oz_load
 
 
@@ -666,8 +669,8 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files,
             if t_file == 'events.org':
                 db_path = os.path.join(tmpdir, t_file)
                 oz_path = os.path.expanduser(orgzly_events)
-                db_parse = orgparse.load(db_path)
-                oz_parse = orgparse.load(oz_path)
+                db_parse = get_parser(db_path)
+                oz_parse = get_parser(oz_path)
                 events_list = [*set(db_parse[1:].append(oz_parse[1:]))]
                 for node in events_list:
                     ev_car = write_to_orgzly(orgzly_files, t_file, node)
@@ -790,6 +793,17 @@ def file_check(create_missing, org_files, orgzly_files, org_events,
 
 
 # ---------------------------------------------------------------------------------------
+# get parser
+# ---------------------------------------------------------------------------------------
+def get_parser(parse_file):
+    config = ConfigObj(CONFIG_FILE)
+    parser = orgparse.load(parse_file)
+    add_keys = parser.env.add_todo_keys
+    add_keys(config['todos'], config['dones'])
+    return parser
+
+
+# ---------------------------------------------------------------------------------------
 # The startup command
 # ---------------------------------------------------------------------------------------
 def main():
@@ -853,7 +867,7 @@ def main():
     ########################
     # Load org todo values #
     ########################
-    env = orgparse.node.OrgEnv()
+    env = OrgEnv()
     addkeys = env.add_todo_keys
     addkeys(todos=config['todos'], dones=config['dones'])
 
