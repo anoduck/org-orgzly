@@ -328,7 +328,9 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
                     if node.heading not in {x.heading for x in prime_set}:
                         uniq_set.add(node)
     print("Duplicates removed using node id and node heading.")
-    node_write = funky_chicken(inbox_path, [uniq_set])
+    uniq_list = [*uniq_set]
+    uniq_list.sort(key=lambda x: x.priority)
+    node_write = funky_chicken(inbox_path, uniq_list)
     if node_write:
         prime_set.clear()
         print('Successfully pushed org nodes to orgzly!')
