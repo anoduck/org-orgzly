@@ -66,7 +66,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.13'
+VERSION = '0.0.14'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -308,25 +308,24 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
         to_write = process_entries(file, days)
         prime_set = prime_set | set(inbox_list) | set(to_write)
     for node in prime_set:
+        timestamp = node.get_timestamps
+        node_id = node.get_property('ID')
         if node.todo:
             if node.todo not in all_keys:
                 evented = write_event(node, orgzly_events)
                 if evented:
                     print("Event node discovered and written to event file")
-        else:
-            timestamp = node.get_timestamps
-            if timestamp(active=True):
-                evented = write_event(node, orgzly_events)
-                if evented:
-                    print("Event node discovered and written to event file")
-            else:
-                node_id = node.get_property('ID')
+            if node.todo in all_keys:
                 if node_id:
                     if node_id not in {x.get_property('ID') for x in uniq_set}:
                         uniq_set.add(node)
                 else:
-                    if node.heading not in {x.heading for x in prime_set}:
+                    if node.heading not in {x.heading for x in uniq_set}:
                         uniq_set.add(node)
+        elif not node.todo and timestamp(active=True):
+            evented = write_event(node, orgzly_events)
+            if evented:
+                print("Event node discovered and written to event file")
     print("Duplicates removed using node id and node heading.")
     uniq_list = [*uniq_set]
     # uniq_list.sort(key=lambda x: x.priority)
@@ -348,29 +347,24 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
         p_events = parse_events(org_events, orgzly_events)
         if p_events:
             print('event files processed')
-    for orgzly_file in orgzly_files:
-        oz_path = os.path.expanduser(orgzly_file)
-        oz_parse = get_parser(oz_path)
-        oznode_set = oznode_set.union(set(oz_parse[1:]))
     for org_file in org_files:
         or_path = os.path.expanduser(org_file)
         or_parse = get_parser(or_path)
         ornode_set = ornode_set.union(set(or_parse[1:]))
+    for orgzly_file in orgzly_files:
+        oz_path = os.path.expanduser(orgzly_file)
+        oz_parse = get_parser(oz_path)
+        oznode_set = oznode_set.union(set(oz_parse[1:]))
     for oznode in oznode_set:
+        timestamp = oznode.get_timestamps
+        oznode_id = oznode.get_property('ID')
         all_keys = or_parse.env.all_todo_keys
         if oznode.todo:
             if oznode.todo not in all_keys:
                 evented = write_event(oznode, org_events)
                 if evented:
                     print("Event node discovered and written to event file")
-        else:
-            timestamp = oznode.get_timestamps
-            if timestamp(active=True):
-                evented = write_event(oznode, org_events)
-                if evented:
-                    print("Event node discovered and written to event file")
-            else:
-                oznode_id = oznode.get_property('ID')
+            if oznode.todo in all_keys:
                 if oznode_id:
                     if oznode_id not in {x.get_property('ID') for x in
                                          ornode_set}:
@@ -378,6 +372,10 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
                 else:
                     if oznode.heading not in {x.heading for x in ornode_set}:
                         oziq_set.add(oznode)
+        elif not oznode.todo and timestamp(active=True):
+            evented = write_event(oznode, org_events)
+            if evented:
+                print("Event node discovered and written to event file")
     oziq_list = [*oziq_set]
     # oziq_list.sort(key=lambda x: x.priority)
     pulled = False
