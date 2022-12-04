@@ -326,6 +326,9 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
             evented = write_event(node, orgzly_events)
             if evented:
                 print("Event node discovered and written to event file")
+        else:
+            print('Zombie node identified in node set!')
+            print(node)
     print("Duplicates removed using node id and node heading.")
     uniq_list = [*uniq_set]
     # uniq_list.sort(key=lambda x: x.priority)
@@ -376,6 +379,9 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
             evented = write_event(oznode, org_events)
             if evented:
                 print("Event node discovered and written to event file")
+        else:
+            print('Zombie node found in return node set!')
+            print(oznode)
     oziq_list = [*oziq_set]
     # oziq_list.sort(key=lambda x: x.priority)
     pulled = False
@@ -890,7 +896,7 @@ def main():
                         orgzly_files, config['org_events'],
                         config['orgzly_events'], config['resources_folder'])
 
-        # OK, I admit. The following is a bit of a mess.
+    # OK, I admit. The following is a bit of a mess.
 
     # Run the gambit of args vs config
     if fcheck:
