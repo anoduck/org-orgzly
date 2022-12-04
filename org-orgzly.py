@@ -329,7 +329,7 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
                         uniq_set.add(node)
     print("Duplicates removed using node id and node heading.")
     uniq_list = [*uniq_set]
-    uniq_list.sort(key=lambda x: x.priority)
+    # uniq_list.sort(key=lambda x: x.priority)
     node_write = funky_chicken(inbox_path, uniq_list)
     if node_write:
         prime_set.clear()
@@ -379,7 +379,7 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
                     if oznode.heading not in {x.heading for x in ornode_set}:
                         oziq_set.add(oznode)
     oziq_list = [*oziq_set]
-    oziq_list.sort(key=lambda x: x.priority)
+    # oziq_list.sort(key=lambda x: x.priority)
     pulled = False
     for oziq_node in oziq_list:
         with open(os.path.expanduser(org_inbox), "a", encoding="utf-8",
