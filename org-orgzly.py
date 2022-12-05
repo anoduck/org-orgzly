@@ -31,26 +31,28 @@
 # https://orgparse.readthedocs.io/en/latest/
 # ---------------------------------------------------------------------------------
 
+import argparse
+import datetime
+import os
+import re
+import shutil
+import sys
+import time
+from tempfile import TemporaryDirectory, mkdtemp
+
 # --------------------------------------------------------
 # Imports
 # --------------------------------------------------------
 import orgparse
 from configobj import ConfigObj
-import datetime
-import argparse
-import re
-import os
-import sys
-import time
-import shutil
-from tempfile import mkdtemp, TemporaryDirectory
+
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
-from orgparse import load
-from orgparse import OrgEnv
 from datetime import date
-import validate
+
 import dropbox
+import validate
 from dropbox import DropboxOAuth2FlowNoRedirect, exceptions
+from orgparse import OrgEnv, load
 
 # --------------------------------------------------------
 # Variables
@@ -66,7 +68,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.14'
+VERSION = '0.0.15'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -160,40 +162,12 @@ def dedupe_files(test, control):
     return uniq
 
 
-# ----------------------------------------------------------------------
-# Process events
-# ----------------------------------------------------------------------
-def process_event(node, days, to_write):
-    active_stamp = node.get_timestamps(active=True, inactive=False,
-                                       range=True, point=True)
-    if active_stamp:
-        if node.deadline:
-            ndate = str(node.deadline)
-        elif node.scheduled and not node.deadline:
-            ndate = str(node.scheduled)
-        else:
-            ndate = str(active_stamp)
-        if ndate:
-            t_ndate = re.findall(r'\d+', ndate)
-            r_d = list(map(int, t_ndate))
-            newdate = str(r_d[0]) + '-' + str(r_d[1]) + '-' + str(r_d[2])
-            y_1, m_1, d_1 = [int(x) for x in newdate.split('-')]
-            date_org = datetime.date(y_1, m_1, d_1)
-            tdate = date.today()
-            y_2, m_2, d_2 = [int(x) for x in str(tdate).split('-')]
-            date_today = datetime.date(y_2, m_2, d_2)
-            future_date = get_future(tdate, days)
-            if date_today >= date_org:
-                if future_date >= date_org:
-                    to_write.append(node)
-    return to_write
-
-
 # ---------------------------------------------------------------------
 # Process Entries
 # ---------------------------------------------------------------------
 def process_entries(orgfile, days):
     to_write = []
+    event_list = []
     for node in orgfile[1:]:
         if node.todo:
             ndate = False
@@ -230,22 +204,55 @@ def process_entries(orgfile, days):
                                 print("There appears to be something wrong: "
                                       + str(date_org))
         else:
-            to_write = process_event(node, days, to_write)
+            event_list.append(node)
+    to_write = process_events(event_list, days)
     return to_write
+
+
+# ----------------------------------------------------------------------
+# Process events
+# ----------------------------------------------------------------------
+def process_events(event_list, days):
+    write_set = set()
+    for event in event_list:
+        active_stamp = event.get_timestamps(active=True, inactive=False,
+                                            range=True, point=True)
+        if active_stamp:
+            if not event.deadline and not event.scheduled:
+                ndate = str(active_stamp)
+            if ndate:
+                t_ndate = re.findall(r'\d+', ndate)
+                r_d = list(map(int, t_ndate))
+                newdate = str(r_d[0]) + '-' + str(r_d[1]) + '-' + str(r_d[2])
+                y_1, m_1, d_1 = [int(x) for x in newdate.split('-')]
+                date_org = datetime.date(y_1, m_1, d_1)
+                tdate = date.today()
+                y_2, m_2, d_2 = [int(x) for x in str(tdate).split('-')]
+                date_today = datetime.date(y_2, m_2, d_2)
+                future_date = get_future(tdate, days)
+                if date_today >= date_org:
+                    if future_date >= date_org:
+                        write_set.add(event)
+    write_events = [*write_set]
+    return write_events
 
 
 # -----------------------------------------------------------------------
 # Parse Events
 # -----------------------------------------------------------------------
-def parse_events(org_events, orgzly_events):
+def parse_events(org_events, orgzly_events, days):
     or_epath = os.path.expanduser(org_events)
     oz_epath = os.path.expanduser(orgzly_events)
     or_ep = get_parser(or_epath)
     oz_ep = get_parser(oz_epath)
     or_ns = set(or_ep[1:])
     oz_ns = set(oz_ep[1:])
-    master_elist = [*set(or_ns | oz_ns)]
-    write_true = funky_chicken(oz_epath, master_elist)
+    event_list = [*set(or_ns | oz_ns)]
+    if days is not None:
+        write_events = process_events(event_list, days)
+    else:
+        write_events = event_list
+    write_true = funky_chicken(oz_epath, write_events)
     if write_true:
         return True
 
@@ -289,24 +296,18 @@ def write_event(node, event_file):
 # ---------------------------------------------------------------------
 def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
              orgzly_events):
-    inbox_list = []
     prime_set = set()
     uniq_set = set()
     if split_events:
-        p_events = parse_events(org_events, orgzly_events)
+        p_events = parse_events(org_events, orgzly_events, days)
         if p_events:
             print('event files processed')
-    inbox_path = os.path.expanduser(orgzly_inbox)
-    in_file = get_parser(inbox_path)
-    for node_i in in_file[1:]:
-        if node_i not in inbox_list:
-            inbox_list.append(node_i)
     for orgfile in org_files:
         print('Processing: ' + orgfile)
         file = get_parser(os.path.expanduser(orgfile))
         all_keys = file.env.all_todo_keys
         to_write = process_entries(file, days)
-        prime_set = prime_set | set(inbox_list) | set(to_write)
+        prime_set = set(to_write)
     for node in prime_set:
         timestamp = node.get_timestamps
         node_id = node.get_property('ID')
@@ -327,11 +328,13 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
             if evented:
                 print("Event node discovered and written to event file")
         else:
-            print('Zombie node identified in node set!')
-            print(node)
+            org_path = os.path.expanduser(org_files[0])
+            dir_path = os.path.dirname(org_path)
+            handle_zombies(node, dir_path)
     print("Duplicates removed using node id and node heading.")
     uniq_list = [*uniq_set]
     # uniq_list.sort(key=lambda x: x.priority)
+    inbox_path = os.path.expanduser(orgzly_inbox)
     node_write = funky_chicken(inbox_path, uniq_list)
     if node_write:
         prime_set.clear()
@@ -347,7 +350,8 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
     ornode_set = set()
     oziq_set = set()
     if split_events:
-        p_events = parse_events(org_events, orgzly_events)
+        days = None
+        p_events = parse_events(org_events, orgzly_events, days)
         if p_events:
             print('event files processed')
     for org_file in org_files:
@@ -380,8 +384,9 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
             if evented:
                 print("Event node discovered and written to event file")
         else:
-            print('Zombie node found in return node set!')
-            print(oznode)
+            oz_path = os.path.expanduser(orgzly_files[0])
+            oz_dir = os.path.dirname(oz_path)
+            handle_zombies(oznode, oz_dir)
     oziq_list = [*oziq_set]
     # oziq_list.sort(key=lambda x: x.priority)
     pulled = False
@@ -799,6 +804,17 @@ def file_check(create_missing, org_files, orgzly_files, org_events,
 
 
 # ---------------------------------------------------------------------------------------
+def handle_zombies(zombie, working_dir):
+    working_path = os.path.realpath(working_dir)
+    zombie_path = os.path.join(working_path, 'zombie.org')
+    with open(zombie_path, 'a', encoding='utf-8') as z_f:
+        z_f.write(str(zombie))
+        z_f.write('\n')
+        z_f.close()
+    return True
+
+
+# ---------------------------------------------------------------------------------------
 # get parser
 # ---------------------------------------------------------------------------------------
 def get_parser(parse_file):
@@ -806,6 +822,7 @@ def get_parser(parse_file):
     parser = orgparse.load(parse_file)
     add_keys = parser.env.add_todo_keys
     add_keys(config['todos'], config['dones'])
+    parser.tags.add('@org-orgzly')
     return parser
 
 
