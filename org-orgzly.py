@@ -48,7 +48,7 @@ from configobj import ConfigObj
 
 sys.path.append(os.path.expanduser("~/.local/lib/python3.9"))
 from datetime import date
-
+import art
 import dropbox
 import validate
 from dropbox import DropboxOAuth2FlowNoRedirect, exceptions
@@ -68,7 +68,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.15'
+VERSION = '0.0.17'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -280,7 +280,7 @@ def funky_chicken(target_path, node_list):
 
 
 # ---------------------------------------------------------------------
-# The main function
+# Write Event
 # ---------------------------------------------------------------------
 def write_event(node, event_file):
     efile_path = os.path.expanduser(event_file)
@@ -295,7 +295,7 @@ def write_event(node, event_file):
 # The main function
 # ---------------------------------------------------------------------
 def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
-             orgzly_events):
+             orgzly_events, resources_folder):
     prime_set = set()
     uniq_set = set()
     if split_events:
@@ -336,6 +336,14 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
     # uniq_list.sort(key=lambda x: x.priority)
     inbox_path = os.path.expanduser(orgzly_inbox)
     node_write = funky_chicken(inbox_path, uniq_list)
+    res_dict = get_res(resources_folder, org_files, [orgzly_events])
+    or_res = res_dict.get('or_res')
+    for res in os.listdir(or_res):
+        res_name = os.path.basename(res)
+        oz_dir = res_dict.get('oz_dir')
+        oz_resfile = os.path.join(oz_dir, res_name)
+        if not os.path.exists(oz_resfile):
+            shutil.copy2(res, oz_resfile)
     if node_write:
         prime_set.clear()
         print('Successfully pushed org nodes to orgzly!')
@@ -345,7 +353,7 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
 # Sync Back
 # ----------------------------------------------------------
 def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
-              orgzly_events):
+              orgzly_events, resources_folder):
     oznode_set = set()
     ornode_set = set()
     oziq_set = set()
@@ -399,6 +407,18 @@ def sync_back(orgzly_files, org_inbox, org_files, split_events, org_events,
             pulled = True
     if pulled:
         print("New entries added to inbox")
+    res_dict = get_res(resources_folder, org_files, orgzly_files)
+    oz_res = res_dict.get('oz_res')
+    for res in os.listdir(oz_res):
+        res_name = os.path.basename(res)
+        res_folder = res_dict.get('resources')
+        or_dir = res_dict.get('or_dir')
+        oz_dir = res_dict.get('oz_dir')
+        or_resfile = os.path.join(or_dir, res_folder, res_name)
+        oz_resfile = os.path.join(oz_dir, res_folder, res_name)
+        if not os.path.exists(or_resfile):
+            shutil.copy2(oz_resfile, or_resfile)
+    print("Processing entries back to org: Done")
 
 
 # ----------------------------------------------------------------
@@ -681,8 +701,11 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files,
                 db_path = os.path.join(tmpdir, t_file)
                 oz_path = os.path.expanduser(orgzly_events)
                 db_parse = get_parser(db_path)
+                db_nodes = set(db_parse[1:])
                 oz_parse = get_parser(oz_path)
-                events_list = [*set(db_parse[1:].append(oz_parse[1:]))]
+                oz_nodes = set(oz_parse[1:])
+                get_nodes = set(db_nodes | oz_nodes)
+                events_list = [*(get_nodes)]
                 for node in events_list:
                     ev_car = write_to_orgzly(orgzly_files, t_file, node)
             else:
@@ -719,7 +742,7 @@ def dropbox_get(app_key, app_secret, dropbox_folder, orgzly_files,
                 rf_src = os.path.join(tmp_resources, r_file)
                 rf_dest = os.path.join(res_dir, r_file)
                 shutil.copy(rf_src, rf_dest)
-    print('Done downloading files from dropbox')
+    print('Dropbox download and processing: Done')
 
 
 # --------------------------------------------------------------------------------
@@ -762,14 +785,39 @@ def backup_files(org_files, orgzly_files, org_events, orgzly_events, days):
     print('File backup successful!')
 
 
+# --------------------------------------------------------------
+# get resouces folder
+# --------------------------------------------------------------
+def get_res(resources_folder, org_files, orgzly_files):
+    res_dict = {}
+    resources_path = os.path.expanduser(resources_folder)
+    or_file = os.path.expanduser(org_files[0])
+    oz_file = os.path.expanduser(orgzly_files[0])
+    res_name = os.path.basename(resources_path)
+    res_dict['resources'] = res_name
+    or_dir = os.path.dirname(or_file)
+    res_dict['or_dir'] = or_dir
+    oz_dir = os.path.dirname(oz_file)
+    res_dict['oz_dir'] = oz_dir
+    or_res = os.path.join(or_dir, res_name)
+    res_dict['or_res'] = or_res
+    oz_res = os.path.join(oz_dir, res_name)
+    res_dict['oz_res'] = oz_res
+    return res_dict
+
+
 # -------------------------------------------------------------------------------------
 # File Check
 # -------------------------------------------------------------------------------------
 def file_check(create_missing, org_files, orgzly_files, org_events,
                orgzly_events, resources_folder):
-    res_path = os.path.expanduser(resources_folder)
-    if not os.path.exists(res_path):
-        os.mkdir(res_path)
+    res_dict = get_res(resources_folder, org_files, orgzly_files)
+    or_res = res_dict.get("or_res")
+    oz_res = res_dict.get("oz_res")
+    resck = [or_res, oz_res]
+    for res in resck:
+        if not os.path.exists(res):
+            shutil.posix.mkdir(str(res))
     events = [org_events, orgzly_events]
     flist = org_files + orgzly_files + events
     for file in flist:
@@ -869,6 +917,12 @@ def main():
     # parse the args #
     ##################
     args = p_arg.parse_args()
+
+    # -------------------------------
+    # Print title
+    # -------------------------------
+    art.tprint('Org-Orgzly', font='rnd-small')
+
     # ----------------------------------
     # # Now Process configObj #
     # ----------------------------------
@@ -924,7 +978,8 @@ def main():
                              config['org_events'], config['days'])
             gen_file(env, org_files, config['orgzly_inbox'],
                      config['days'], split_events,
-                     config['org_events'], config['orgzly_events'])
+                     config['org_events'], config['orgzly_events'],
+                     config['resources_folder'])
             dropbox_put(config['app_key'], config['app_secret'],
                         config['dropbox_folder'], orgzly_files,
                         config['orgzly_events'], config['resources_folder'])
@@ -934,18 +989,21 @@ def main():
                         config['orgzly_events'], config['resources_folder'])
             sync_back(orgzly_files, config['org_inbox'],
                       org_files, split_events,
-                      config['org_events'], config['orgzly_events'])
+                      config['org_events'], config['orgzly_events'],
+                      config['resources_folder'])
         if args.push:
             if config['backup']:
                 backup_files(org_files, orgzly_files, config['orgzly_events'],
                              config['org_events'], config['days'])
             gen_file(env, org_files, config['orgzly_inbox'],
                      config['days'], split_events,
-                     config['org_events'], config['orgzly_events'])
+                     config['org_events'], config['orgzly_events'],
+                     config['resources_folder'])
         if args.pull:
             sync_back(orgzly_files, config['org_inbox'],
                       org_files, split_events,
-                      config['org_events'], config['orgzly_events'])
+                      config['org_events'], config['orgzly_events'],
+                      config['resources_folder'])
         if args.put:
             dropbox_put(config['app_key'], config['app_secret'],
                         config['dropbox_folder'], orgzly_files,

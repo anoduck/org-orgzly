@@ -56,6 +56,8 @@ notation.
 **** Required Python libraries
 - orgparse
 - configobj
+- validate
+- art
 - dropbox
 **** The 'ini' file
 The configuration file, =config.ini= will be automatically generated for you in your ~XDG_CONFIG_HOME~ directory under the =org-orgzly=
@@ -201,6 +203,10 @@ need to be changed in order to upload attachments to Dropbox using this script. 
 *all attachments must be placed solely in the resources folder without the creation of subfolders*. Creating subfolders in the resources
 folder will cause the script to fail, because folders cannot be uploaded to dropbox, they must be created first and only then can all
 the files be uploaded to the newly created folder.
+***** Resources sync back
+The attachment folder or "resources" now syncs all the way back to your "org" directory.
+***** Now with ascii art
+Ascii art has been added to the project by facilitation of the python art package.
 *** Troubleshooting
 As long as the option =create_missing= is set to =True=, any missing file defined in the configuration file
 will be automatically created for the user in the defined folder located in the user's home directory. The file will be created with a
