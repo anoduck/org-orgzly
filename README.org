@@ -15,19 +15,18 @@
 #+end_src
 * Org-orgzly
 /A python application to parse and generate org files for orgzly practically, by making managing your org schedule easier./
-** Project is currently not working.
-**** New Breaking Changes - Dec 03 2022
+*** New Breaking Changes - Dec 03 2022
 Please see the heading below concerning integration of attachments and event files for details.
-**** Issues/Bugs?
+*** Issues/Bugs?
 If you experience ANY issues using this script, encounter ANY bugs, or you just think this script sucks. PLEASE, submit and issue to
 either the github or codeberg repositories, and we will try our best to address the issue as soon as feasibly possible.
-**** About
-***** What it does
+*** About
+**** What it does
 This script takes a specified list of org files, extracts org entries, filters out entries that do not meet specified TODO and Date
 parameters, provides allowances for days in a month and leap years, and then writes those entries to the designated orgzly inbox. It
 then uploads designated orgzly files to Dropbox. Then later on, the user may download those files from Dropbox, and merge entries
 from the orgzly inbox back to org via the org inbox file.
-***** Features
+**** Features
 - Processes org nodes for only a particularly defined amount of days, and add them to your orgzly inbox.
 - Allows for retrieving created org nodes inside your orgzly inbox to your org inbox.
 - Compensates for leap years.
@@ -35,32 +34,32 @@ from the orgzly inbox back to org via the org inbox file.
 - Downloads orgzly files to a defined local folder on your local machine.
 - Lists contents of the remote orgzly folder within dropbox
 - Eleminates duplicate entries
-***** Methodological Assumptions
+**** Methodological Assumptions
 There are several assumptions made concerning time management and the use of orgzly.
 - Evidently orgzly was never intended to be a replacement for emacs.
 - The user does not desire to sync all org agenda files with orgzly.
 - Mobile management of many org entries is difficult.
 - Duplicate org entries are not cool.
 - Only having a few entries covering the immediate future is all that is needed.
-**** What is required
+*** What is required
 Admittedly, there are many limitations to the application, so don't go all willy nilly on it. In order for the program to discover and
 use your nodes, you will need to use a todo keyword, and either a deadline or a scheduled date. Traversal of multileveled org entries
 should be capable, due to the script processing all entries that possess the previously required properties.
-***** Installation
+**** Installation
 Since in order to make use of this library it is assumed one has reasonable apprehension of EMACS use, is
 familiar with using git, and knows how to execute a python script inside shell.
-***** Preferred installation method
+**** Preferred installation method
 It would be to the user's benefit to clone the source directly from the repository using
 ~git clone https://codeberg.org/anoduck/org-orgzly~. As, this would provide the user with the most recent
 version of the script with all newly added features. Please consider the releases as existing for historical
 notation.
-***** Required Python libraries
+**** Required Python libraries
 - orgparse
 - configobj
 - validate
 - art
 - dropbox
-***** The 'ini' file
+**** The 'ini' file
 The configuration file, =config.ini= will be automatically generated for you in your ~XDG_CONFIG_HOME~ directory under the =org-orgzly=
 folder, with the default values already filled out for you. If you plan on using this script in conjunction with
 the Dropbox service, then you will need to change the values of =app_key= and =app_secret= respectively with
@@ -120,7 +119,7 @@ For redundancy, the configuration file spec is as follows:
   todos = list(default=list('TODO', 'LATERS', 'HOLD', 'OPEN'))
   dones = list(default=list('DONE', 'CLOSED', 'CANCELED'))
 #+end_src
-**** Usage:
+*** Usage:
 *Please note!* In order to avoid either a file conflict error or a overall general buggering of org files, "overwrite mode" has been
 enabled for dropbox api.
 
@@ -156,10 +155,10 @@ Below are the four commands available for org-orgzly. See _workflow_ below for i
 
 The intention of the above "flag commands" is for them to run individually, and for the most part this is required, as not doing so
 could be very messy and lead to data loss. The intended command flow is as follows.
-***** Recommended Workflow
+**** Recommended Workflow
 - Use ~--up~ to parse org nodes and move them to dropbox.
 - Retrieve entries from orgzly with ~--down~.
-***** Sequence of Operation
+**** Sequence of Operation
 1. ~--up~:
    1. ~--push~: Push to orgzly
    2. ~--put~: Put in Dropbox
@@ -168,7 +167,7 @@ could be very messy and lead to data loss. The intended command flow is as follo
    1. ~--get~: Get from Dropbox
    2. ~--pull~: Pull from orgzly
 
-***** Process Diagrams
+**** Process Diagrams
 #+NAME: sequence.svg
 [[./Resources/README/sequence.svg]]
 
@@ -181,13 +180,13 @@ could be very messy and lead to data loss. The intended command flow is as follo
 #+NAME: plantuml.svg
 [[./Resources/README/flow.png]]
 
-**** Recent Changes
-***** A Note on Attachments
+*** Recent Changes
+**** A Note on Attachments
 As a new experimental feature, modifications have been made to allow the upload of attachment files located within the designated
 attachment folder, referred to as "resource folder". By default this folder is located inside the orgzly directory and will rather
 uncreatively be named "Resources". If this folder does not exist, it will be created for you as a part of the normal file checking
 process. If this folder does not exist remotely on dropbox, it will also be created for you when asked to put files in Dropbox.
-***** Configuration file changes
+**** Configuration file changes
 To facilitate the new feature additions, additional configuration variables were added to the configuration file. *If you are
 using version =<0.0.8= (less than eight), these variables must be added to the configuration file manually*, or if desired, you can
 completely delete your configuration file and have org-orgzly create another one for you with the default configuration variables.
@@ -197,18 +196,18 @@ configuration variables table above and compare it to their own configuration fi
 they need to be placed in the configuration file.
 
 If you fail to perform the modification of your configuration file, the script will become very crossed with you, and refuse to run.
-****** Attachment folder requirements
+***** Attachment folder requirements
 Some org-mode extensions naturally, by default, create a subfolder inside of the Resource folder with the same title as the org_file
 the attachment is being added to. For example, a file attached to ~inbox.org~ will be copied into ~Resources/inbox~. This will
 need to be changed in order to upload attachments to Dropbox using this script. Rather that attachments being placed in a subfolder,
 *all attachments must be placed solely in the resources folder without the creation of subfolders*. Creating subfolders in the resources
 folder will cause the script to fail, because folders cannot be uploaded to dropbox, they must be created first and only then can all
 the files be uploaded to the newly created folder.
-****** Resources sync back
+***** Resources sync back
 The attachment folder or "resources" now syncs all the way back to your "org" directory.
-****** Now with ascii art
+***** Now with ascii art
 Ascii art has been added to the project by facilitation of the python art package.
-**** Troubleshooting
+*** Troubleshooting
 As long as the option =create_missing= is set to =True=, any missing file defined in the configuration file
 will be automatically created for the user in the defined folder located in the user's home directory. The file will be created with a
 basic ~#+TITLE~ and ~#+DATE~ heading.
@@ -218,7 +217,7 @@ can be found in the ~.backup~ directory located in their orgzly folder.
 
 If you encounter any issues or bugs, please feel free to submit an issue for assistance. If there are also
 any desired feature requests, you may also fill out an issue labeling it as a "Feature Request".
-**** Dropbox App Creation and Credentials
+*** Dropbox App Creation and Credentials
 Creating a new dropbox app is not that difficult as long as you have a preexisting Dropbox account. All you
 need to do is [login to Dropbox](https://www.dropbox.com/login "Dropbox Login") browse over to the [Dropbox developers
 site](https://developers.dropbox.com/ "Dropbox Developers") and click the =App Console= button located in the top right corner of the
@@ -242,7 +241,7 @@ Without these selected, the app will not be able to upload and download Dropbox 
 6. Once complete, click on the "submit" button located in the middle-bottom of your screen.
 7. You know can return to the "Settings" page and write down your app key and app secret for use in the
    script.
-**** Thanks to the following
+*** Thanks to the following
 This application is dedicated to [[https://github.com/karlicoss][Karlicoss]] to whom without it would have never been possible. All the
 credit goes to the [[https://github.com/karlicoss/orgparse][python orgparse library]] that allows parsing org files in python.
 
