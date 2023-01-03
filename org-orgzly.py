@@ -326,7 +326,6 @@ def gen_file(env, org_files, orgzly_inbox, days, split_events, org_events,
     node_write = funky_chicken(inbox_path, uniq_list)
     res_dict = get_res(resources_folder, org_files, [orgzly_events])
     or_res = res_dict.get('or_res')
-    print(or_res)
     res_dir_list = os.listdir(or_res)
     # res_dir_name = os.path.dirname(or_res)
     res_list = [os.path.join(or_res, x) for x in res_dir_list]
