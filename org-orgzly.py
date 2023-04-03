@@ -69,7 +69,7 @@ PROG = os.path.basename(__file__)
 # -----------------------------------------------------------------------
 # Versioning
 # -----------------------------------------------------------------------
-VERSION = '0.0.20'
+VERSION = '0.0.21'
 # -----------------------------------------------------------------------
 # Config File Spec
 # -----------------------------------------------------------------------
@@ -148,14 +148,10 @@ def process_entries(orgfile, days):
     for node in orgfile[1:]:
         if node.todo:
             ndate = ''
-            if node.deadline:
-                if node.deadline is not None:
-                    if node.deadline.is_active:
+            if node.deadline is not None and node.deadline.is_active:
                         print('Deadline is:' + str(node.deadline))
                         ndate = node.deadline
-            if node.scheduled:
-                if node.scheduled is not None:
-                    if node.scheduled.is_active and not node.deadline:
+            if node.scheduled is not None and node.scheduled.is_active:
                         print('Scheduled for:' + str(node.scheduled))
                         ndate = node.scheduled
             if ndate:
@@ -535,8 +531,8 @@ def get_access_token(key, sec):
     auth_code = input("Enter the authorization code here: ").strip()
     try:
         oauth_result = auth_flow.finish(auth_code)
-    except Exception as e_t:
-        print("f'Error: %s' % (e_t,)")
+    except Exception:
+        print("f'Error: %s' % (" + Exception() + ",)")
         sys.exit()
     write_refresh(oauth_result.refresh_token)
 
